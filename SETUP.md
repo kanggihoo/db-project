@@ -34,7 +34,7 @@ db-project/
 │   └── grafana/
 │       └── provisioning/         # 대시보드, 데이터소스 자동 프로비저닝
 ├── src/
-│   └── main/java/com/example/
+│   └── main/java/dblab/ecommerce/
 │       ├── entity/               # JPA 엔티티
 │       ├── repository/           # Spring Data JPA Repository
 │       ├── seeder/               # 더미 데이터 삽입 (DataSeeder)
