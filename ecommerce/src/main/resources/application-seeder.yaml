@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    # reWriteBatchedInserts=true: PostgreSQL JDBC 드라이버가 여러 INSERT를
+    # 하나의 네트워크 패킷으로 묶어 전송 — 배치 성능 대폭 향상
+    url: jdbc:postgresql://localhost:5432/ecommerce?reWriteBatchedInserts=true
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    org.hibernate.SQL: WARN
+    org.springframework.jdbc: WARN

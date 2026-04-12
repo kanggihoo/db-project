@@ -1,3 +1,33 @@
 spring:
   application:
     name: ecommerce
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce
+    username: app
+    password: app1234
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    com.dblab.ecommerce: INFO
