@@ -22,29 +22,29 @@ public class Coupon {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String name; // 쿠폰의 이름 (예: '신규 가입 10% 할인권')
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private DiscountType discountType;
+    private DiscountType discountType; // 할인 방식 (RATE: 비율%, FIXED: 금액)
 
     @Column(nullable = false)
-    private Integer discountValue;
+    private Integer discountValue; // 할인 값 (10%면 10, 5000원이면 5000)
 
     @Column(nullable = false)
-    private Integer minOrderAmount;
+    private Integer minOrderAmount; // 최소 주문 금액 (이 금액 이상 결제 시 사용 가능)
 
     @Column(nullable = false)
-    private LocalDateTime startedAt;
+    private LocalDateTime startedAt; // 쿠폰 발급/사용 가능 시작 일시
 
     @Column(nullable = false)
-    private LocalDateTime expiredAt;
+    private LocalDateTime expiredAt; // 쿠폰 발급/사용 가능 종료 일시
 
     @Column(nullable = false)
-    private Integer maxIssueCount;
+    private Integer maxIssueCount; // 총 발급 가능 최대 수량 (선착순 쿠폰 등에 사용)
 
     @Column(nullable = false)
-    private Integer issuedCount;
+    private Integer issuedCount; // 현재까지 발급된 수량
 
     public enum DiscountType { RATE, FIXED }
 }

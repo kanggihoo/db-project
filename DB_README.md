@@ -34,16 +34,16 @@
 
 #### Phase별 핵심 Grafana 패널
 
-| Phase | 핵심 지표                                        | 무엇을 보는가                                                |
-| ----- | ------------------------------------------------ | ------------------------------------------------------------ |
-| 0     | DB 커넥션 수, 데이터 건수                        | 인프라 정상 가동 + 더미 데이터 삽입 확인                     |
-| 1     | k6 p95 응답시간, DB 커넥션 수                    | 최적화 없는 베이스라인 수치 확보                             |
-| 2     | 쿼리 실행시간 (인덱스 전/후)                     | 풀스캔 → 인덱스 스캔 ms 차이                                |
-| 3     | 발생 쿼리 수 (N+1 전/후)                         | 주문 100건 조회 시 쿼리 101번 → 1번                          |
-| 4     | 격리 수준별 에러율, 동시 처리 RPS                | SERIALIZABLE 직렬화 실패 빈도, 격리 수준별 처리량 변화       |
-| 5     | 응답시간, 데이터 전송량                          | Entity vs DTO, 단건 루프 vs 벌크 차이                        |
-| 6     | 집계 쿼리 실행시간 (인덱스 전/후)                | GROUP BY에 인덱스가 미치는 영향                              |
-| 7     | p95 응답시간 (페이지 번호별)                     | 1페이지 vs 1000페이지 응답시간                               |
+| Phase | 핵심 지표                         | 무엇을 보는가                                          |
+| ----- | --------------------------------- | ------------------------------------------------------ |
+| 0     | DB 커넥션 수, 데이터 건수         | 인프라 정상 가동 + 더미 데이터 삽입 확인               |
+| 1     | k6 p95 응답시간, DB 커넥션 수     | 최적화 없는 베이스라인 수치 확보                       |
+| 2     | 쿼리 실행시간 (인덱스 전/후)      | 풀스캔 → 인덱스 스캔 ms 차이                           |
+| 3     | 발생 쿼리 수 (N+1 전/후)          | 주문 100건 조회 시 쿼리 101번 → 1번                    |
+| 4     | 격리 수준별 에러율, 동시 처리 RPS | SERIALIZABLE 직렬화 실패 빈도, 격리 수준별 처리량 변화 |
+| 5     | 응답시간, 데이터 전송량           | Entity vs DTO, 단건 루프 vs 벌크 차이                  |
+| 6     | 집계 쿼리 실행시간 (인덱스 전/후) | GROUP BY에 인덱스가 미치는 영향                        |
+| 7     | p95 응답시간 (페이지 번호별)      | 1페이지 vs 1000페이지 응답시간                         |
 
 ### Testing & Verification
 
@@ -795,16 +795,16 @@ Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
 ## 전체 기술 도입 흐름 요약
 
-| Phase | 핵심 주제          | 새로 도입하는 기술/패턴                                  | 해결하는 문제                                  | 발견하는 새 문제                               |
-| ----- | ------------------ | -------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------- |
-| 0     | 초기 셋팅          | Docker Compose, Faker 더미데이터, Prometheus+Grafana     | -                                              | -                                              |
-| 1     | 베이스라인         | k6 부하 테스트, 나이브한 API 구현                        | -                                              | 풀스캔, N+1, 느린 페이지네이션                 |
-| 2     | 인덱스 설계        | EXPLAIN ANALYZE, 복합/커버링/부분 인덱스                 | 풀스캔                                         | 인덱스 순서 함정, Soft Delete 함정             |
-| 3     | N+1 + 로딩 전략    | Fetch Join, EntityGraph, BatchSize                       | 쿼리 N번 → 1~5번                                | Fetch Join + 페이징 OOM 위험                   |
-| 4     | 트랜잭션 격리 수준 | 격리 수준 실험, MVCC 스냅샷                              | 동시 요청 시 데이터 정합성                     | SERIALIZABLE 재시도 로직 필수                  |
-| 5     | 쿼리 최적화        | DTO Projection, QueryDSL, 벌크 연산                      | 불필요한 데이터 로딩, 동적 쿼리                | 집계 쿼리 + 인덱스 관계                        |
-| 6     | 집계 쿼리          | GROUP BY 인덱스, 표현식 인덱스, HashAggregate 분석       | 집계 쿼리 성능                                 | 대용량 이력 테이블 페이지네이션                |
-| 7     | 페이지네이션       | Cursor 페이지네이션, Count 쿼리 분리                     | Offset 성능 저하                               | Cursor 정렬 제약, 구현 복잡도                  |
+| Phase | 핵심 주제          | 새로 도입하는 기술/패턴                              | 해결하는 문제                   | 발견하는 새 문제                   |
+| ----- | ------------------ | ---------------------------------------------------- | ------------------------------- | ---------------------------------- |
+| 0     | 초기 셋팅          | Docker Compose, Faker 더미데이터, Prometheus+Grafana | -                               | -                                  |
+| 1     | 베이스라인         | k6 부하 테스트, 나이브한 API 구현                    | -                               | 풀스캔, N+1, 느린 페이지네이션     |
+| 2     | 인덱스 설계        | EXPLAIN ANALYZE, 복합/커버링/부분 인덱스             | 풀스캔                          | 인덱스 순서 함정, Soft Delete 함정 |
+| 3     | N+1 + 로딩 전략    | Fetch Join, EntityGraph, BatchSize                   | 쿼리 N번 → 1~5번                | Fetch Join + 페이징 OOM 위험       |
+| 4     | 트랜잭션 격리 수준 | 격리 수준 실험, MVCC 스냅샷                          | 동시 요청 시 데이터 정합성      | SERIALIZABLE 재시도 로직 필수      |
+| 5     | 쿼리 최적화        | DTO Projection, QueryDSL, 벌크 연산                  | 불필요한 데이터 로딩, 동적 쿼리 | 집계 쿼리 + 인덱스 관계            |
+| 6     | 집계 쿼리          | GROUP BY 인덱스, 표현식 인덱스, HashAggregate 분석   | 집계 쿼리 성능                  | 대용량 이력 테이블 페이지네이션    |
+| 7     | 페이지네이션       | Cursor 페이지네이션, Count 쿼리 분리                 | Offset 성능 저하                | Cursor 정렬 제약, 구현 복잡도      |
 
 ---
 
@@ -833,3 +833,189 @@ Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
 
 > "Cursor 페이지네이션이 뭔가요?"
 > → 마지막으로 읽은 id를 기준으로 다음 데이터를 조회하는 방식입니다. Phase 7에서 1페이지와 1000페이지 응답시간이 동일함을 k6로 증명했습니다.
+
+## 참고 ERD diagram
+
+```mermaid
+erDiagram
+    %% ==========================================
+    %% Layer 0 (최상위 독립 테이블)
+    %% ==========================================
+    users {
+        int id PK
+    }
+    category {
+        int id PK
+    }
+    coupon {
+        int id PK
+    }
+
+    %% ==========================================
+    %% Layer 1
+    %% ==========================================
+    user_address {
+        int id PK
+        int user_id FK
+    }
+    user_coupon {
+        int id PK
+        int user_id FK
+        int coupon_id FK
+    }
+    product {
+        int id PK
+        int category_id FK
+    }
+    point_history {
+        int id PK
+        int user_id FK
+    }
+
+    %% ==========================================
+    %% Layer 2
+    %% ==========================================
+    product_option {
+        int id PK
+        int product_id FK
+    }
+    product_image {
+        int id PK
+        int product_id FK
+    }
+    product_sku {
+        int id PK
+        int product_id FK
+    }
+    cart {
+        int id PK
+        int user_id FK
+    }
+
+    %% ==========================================
+    %% Layer 3
+    %% ==========================================
+    product_option_value {
+        int id PK
+        int product_option_id FK
+    }
+    product_sku_option {
+        int id PK
+        int product_sku_id FK
+        int product_option_value_id FK
+    }
+    cart_item {
+        int id PK
+        int cart_id FK
+        int product_sku_id FK
+    }
+    orders {
+        int id PK
+        int user_id FK
+        int user_address_id FK
+        int user_coupon_id FK
+    }
+
+    %% ==========================================
+    %% Layer 4
+    %% ==========================================
+    order_item {
+        int id PK
+        int order_id FK
+        int product_sku_id FK
+    }
+    payment {
+        int id PK
+        int order_id FK
+    }
+    delivery {
+        int id PK
+        int order_id FK
+    }
+
+    %% ==========================================
+    %% Layer 5
+    %% ==========================================
+    refund {
+        int id PK
+        int payment_id FK
+        int order_item_id FK
+    }
+    delivery_tracking {
+        int id PK
+        int delivery_id FK
+    }
+    review {
+        int id PK
+        int user_id FK
+        int product_id FK
+        int order_item_id FK
+    }
+
+    %% ==========================================
+    %% Layer 6
+    %% ==========================================
+    review_image {
+        int id PK
+        int review_id FK
+    }
+    review_like {
+        int id PK
+        int review_id FK
+        int user_id FK
+    }
+
+    %% ==========================================
+    %% 관계 (Relationships)
+    %% -|{ : 1 대 다 (1..N)
+    %% -|| : 1 대 1 (1..1)
+    %% -|o : 1 대 0 또는 1 (1..0,1)
+    %% ==========================================
+
+    %% 회원 영역
+    users ||--o{ user_address : "has"
+    users ||--o{ user_coupon : "owns"
+    coupon ||--o{ user_coupon : "assigned as"
+    users ||--o{ point_history : "records"
+    users ||--|| cart : "has"
+
+    %% 상품 기본 영역
+    category ||--o{ product : "contains"
+    product ||--o{ product_image : "has"
+    product ||--o{ product_option : "has"
+    product ||--o{ product_sku : "has"
+
+    %% 상품 옵션/SKU 영역 (N:M 해소)
+    product_option ||--o{ product_option_value : "has values"
+    product_sku ||--o{ product_sku_option : "maps to"
+    product_option_value ||--o{ product_sku_option : "maps to"
+
+    %% 장바구니 영역
+    cart ||--o{ cart_item : "contains"
+    product_sku ||--o{ cart_item : "added as"
+
+    %% 주문 기본 영역
+    users ||--o{ orders : "places"
+    user_address ||--o{ orders : "shipped to"
+    user_coupon ||--o| orders : "applied to"
+    orders ||--o{ order_item : "contains"
+    product_sku ||--o{ order_item : "ordered as"
+
+    %% 결제/배송 영역
+    orders ||--|| payment : "paid via"
+    orders ||--|| delivery : "shipped via"
+    delivery ||--o{ delivery_tracking : "tracked by"
+
+    %% 환불 영역
+    payment ||--o{ refund : "partially refunded"
+    order_item ||--o| refund : "is target of"
+
+    %% 리뷰 커뮤니티 영역
+    users ||--o{ review : "writes"
+    product ||--o{ review : "receives"
+    order_item ||--|| review : "written for"
+
+    review ||--o{ review_image : "contains"
+    review ||--o{ review_like : "receives"
+    users ||--o{ review_like : "gives"
+```
