@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.sql.Timestamp;
@@ -200,11 +201,7 @@ class DataSeederIntegrationTest {
         Map<String, Long> gradeCounts = new HashMap<>();
         jdbcTemplate.query(
             "SELECT grade, COUNT(*) as cnt FROM users WHERE id IN (" + inClause + ") GROUP BY grade",
-            rs -> {
-                while (rs.next()) {
-                    gradeCounts.put(rs.getString("grade"), rs.getLong("cnt"));
-                }
-            }
+            (RowCallbackHandler) rs -> gradeCounts.put(rs.getString("grade"), rs.getLong("cnt"))
         );
 
         assertThat(gradeCounts.get("BRONZE")).isGreaterThan(gradeCounts.getOrDefault("SILVER", 0L));

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.sql.Date;
 
 /**
  * 이커머스 더미 데이터 시더
@@ -40,18 +41,22 @@ public class DataSeeder implements CommandLineRunner {
     private final ApplicationContext context;
 
     // ============================================================
-    // 시딩 건수 설정 (소량 테스트 모드)
-    // 실제 대량 데이터가 필요할 때 아래 상수를 변경한다.
+    // 시딩 데이터 규모 설정 상구 (소량 테스트 모드)
+    // 성능 테스트가 필요할 경우 이 수치들을 수만~수십만 단위로 변경합니다.
     // ============================================================
-    private static final int USER_COUNT              = 100;
-    private static final int CATEGORY_COUNT          = 20;
-    private static final int COUPON_COUNT            = 10;
-    private static final int PRODUCT_COUNT           = 200;
-    private static final int ORDER_COUNT             = 500;
-    private static final int POINT_HISTORY_COUNT     = 1000;
-    private static final int DELIVERY_TRACKING_COUNT = 2000;
+    private static final int USER_COUNT = 100; // 생성할 회원 수
+    private static final int CATEGORY_COUNT = 20; // 카테고리 수
+    private static final int COUPON_COUNT = 10; // 발행 쿠폰 종류 수
+    private static final int PRODUCT_COUNT = 200; // 대표 상품 수
+    private static final int ORDER_COUNT = 500; // 주문 건수
+    private static final int POINT_HISTORY_COUNT = 1000; // 포인트 내역 수
+    private static final int DELIVERY_TRACKING_COUNT = 2000; // 배송 추적 이력 수
 
-    // Layer 간 ID 공유를 위한 인스턴스 변수
+    // ============================================================
+    // Layer 간 외래 키(FK) 관계 형성을 위한 ID 저장 리스트
+    // Bulk Insert를 위해 DB에 저장하기 전, 시퀀스에서 미리 번호를 예약하여 보관합니다.
+    // 이를 통해 메모리 상에서 부모-자식 객체 간의 ID 연결을 완료할 수 있습니다.
+    // ============================================================
     private List<Long> userIds;
     private List<Long> categoryIds;
     private List<Long> couponIds;
@@ -112,69 +117,81 @@ public class DataSeeder implements CommandLineRunner {
         userIds = bulkRepo.reserveSequence("users_id_seq", USER_COUNT);
         List<Object[]> userRows = new ArrayList<>(USER_COUNT);
         String[] grades = buildWeightedArray(
-            new String[]{"BRONZE", "SILVER", "GOLD", "VIP"},
-            new int[]{60, 25, 10, 5}
-        );
+                new String[] { "BRONZE", "SILVER", "GOLD", "VIP" },
+                new int[] { 60, 25, 10, 5 });
         String[] genders = buildWeightedArray(
-            new String[]{"MALE", "FEMALE", "OTHER"},
-            new int[]{48, 48, 4}
-        );
+                new String[] { "MALE", "FEMALE", "OTHER" },
+                new int[] { 48, 48, 4 });
 
         LocalDateTime baseCreatedAt = LocalDateTime.now().minusYears(3);
 
+        // 설정된 회원 수만큼 반복하며 개별 회원 정보 생성
         for (int i = 0; i < USER_COUNT; i++) {
+            // 과거 3년 전부터 현재 사이의 랜덤한 시점을 가입일(createdAt)로 설정
             LocalDateTime createdAt = baseCreatedAt.plusSeconds(
-                random.nextLong(0, ChronoUnit.SECONDS.between(baseCreatedAt, LocalDateTime.now()))
-            );
-            userRows.add(new Object[]{
-                userIds.get(i),
-                "user" + userIds.get(i) + "@example.com",
-                "hashed_password_" + i,
-                faker.name().fullName(),
-                faker.phoneNumber().cellPhone(),
-                genders[random.nextInt(genders.length)],
-                java.sql.Date.valueOf(LocalDate.now().minusYears(20 + random.nextInt(40))),
-                grades[random.nextInt(grades.length)],
-                random.nextInt(100000),
-                Timestamp.valueOf(createdAt),
-                Timestamp.valueOf(createdAt)
+                    random.nextLong(0, ChronoUnit.SECONDS.between(baseCreatedAt, LocalDateTime.now())));
+
+            // bulkInsert에 사용할 데이터 배열 구성
+            userRows.add(new Object[] {
+                    userIds.get(i), // [id] 미리 예약한 ID 사용
+                    "user" + userIds.get(i) + "@example.com", // [email] ID를 포함하여 절대 중복되지 않도록 설정
+                    "hashed_password_" + i, // [password] 빠른 시딩을 위한 단순 패턴 비밀번호
+                    faker.name().fullName(), // [name] 실명 데이터 생성
+                    faker.phoneNumber().cellPhone(), // [phone_number] 전화번호 생성
+                    genders[random.nextInt(genders.length)], // [gender] 가중치 배열에서 추출
+                    // [birth_date] 20~60세 사이의 랜덤 생일 생성
+                    java.sql.Date.valueOf(LocalDate.now().minusYears(20 + random.nextInt(40))),
+                    grades[random.nextInt(grades.length)], // [grade] 가중치 배열에서 추출
+                    random.nextInt(100000), // [point] 초기 포인트
+                    Timestamp.valueOf(createdAt), // [created_at] 랜덤 생성된 가입일
+                    Timestamp.valueOf(createdAt) // [updated_at] 생성 시점엔 가입일과 동일
             });
         }
         bulkRepo.bulkInsertUsers(userRows);
 
         // category: depth 0 (대분류 5개), depth 1 (중분류), depth 2 (소분류)
+        // 카테고리 ID를 시퀀스에서 미리 예약하여 대량 삽입 후에도 ID 참조가 가능하게 함
         categoryIds = bulkRepo.reserveSequence("category_id_seq", CATEGORY_COUNT);
         List<Object[]> categoryRows = new ArrayList<>(CATEGORY_COUNT);
-        String[] topCategories = {"전자제품", "패션", "식품", "스포츠", "뷰티"};
-        // 대분류 5개
+        String[] topCategories = { "전자제품", "패션", "식품", "스포츠", "뷰티" };
+
+        // 1. 대분류 생성: 상위 5개는 미리 정의된 고정 카테고리명 사용 (depth=0, parent_id=null)
         for (int i = 0; i < 5 && i < CATEGORY_COUNT; i++) {
-            categoryRows.add(new Object[]{categoryIds.get(i), null, topCategories[i], 0});
+            categoryRows.add(new Object[] { categoryIds.get(i), null, topCategories[i], 0 });
         }
-        // 중/소분류 나머지
+
+        // 2. 중/소분류 생성: 나머지 카테고리는 Faker를 사용해 생성하며, 상위 대분류 중 하나를 부모로 랜덤 지정
         for (int i = 5; i < CATEGORY_COUNT; i++) {
             Long parentId = categoryIds.get(random.nextInt(Math.min(i, 5)));
-            categoryRows.add(new Object[]{categoryIds.get(i), parentId, faker.commerce().department(), 1});
+            categoryRows.add(new Object[] { categoryIds.get(i), parentId, faker.commerce().department(), 1 });
         }
         bulkRepo.bulkInsertCategories(categoryRows);
 
-        // coupon
+        // coupon: 할인 쿠폰 정보 생성
+        // 쿠폰 ID 시퀀스 예약
         couponIds = bulkRepo.reserveSequence("coupon_id_seq", COUPON_COUNT);
         List<Object[]> couponRows = new ArrayList<>(COUPON_COUNT);
+
         for (int i = 0; i < COUPON_COUNT; i++) {
+            // 쿠폰 유효 기간 설정 (과거 30일 ~ 미래 60일)
             LocalDateTime startedAt = LocalDateTime.now().minusDays(30);
             LocalDateTime expiredAt = LocalDateTime.now().plusDays(60);
+
+            // 할인 방식 결정: RATE(정률, 10~40%) vs FIXED(정액, 1000~5000원)
             String discountType = random.nextBoolean() ? "RATE" : "FIXED";
-            int discountValue = discountType.equals("RATE") ? (random.nextInt(4) + 1) * 10 : (random.nextInt(5) + 1) * 1000;
-            couponRows.add(new Object[]{
-                couponIds.get(i),
-                faker.commerce().promotionCode(),
-                discountType,
-                discountValue,
-                random.nextInt(3) * 10000,
-                Timestamp.valueOf(startedAt),
-                Timestamp.valueOf(expiredAt),
-                1000,
-                random.nextInt(800)
+            int discountValue = discountType.equals("RATE") ? (random.nextInt(4) + 1) * 10
+                    : (random.nextInt(5) + 1) * 1000;
+
+            couponRows.add(new Object[] {
+                    couponIds.get(i), // [id]
+                    faker.commerce().promotionCode(), // [name] 랜덤 프로모션 코드명
+                    discountType, // [discount_type] 할인구분
+                    discountValue, // [discount_value] 할인금액/율
+                    random.nextInt(3) * 10000, // [min_order_amount] 사용 가능 최소 금액
+                    Timestamp.valueOf(startedAt), // [started_at] 시작일
+                    Timestamp.valueOf(expiredAt), // [expired_at] 종료일
+                    1000, // [max_issue_count] 최대 누적 발행량
+                    random.nextInt(800) // [issued_count] 현재까지 발행된 수
             });
         }
         bulkRepo.bulkInsertCoupons(couponRows);
@@ -189,92 +206,95 @@ public class DataSeeder implements CommandLineRunner {
     private void seedLayer1() {
         log.info("[Layer 1] 시작 — user_address, user_coupon, product, point_history");
 
-        // user_address: 회원당 1~2개
-        int addressCount = (int)(USER_COUNT * 1.5);
+        // user_address: 회원당 약 1.5개의 주소지 생성
+        int addressCount = (int) (USER_COUNT * 1.5);
         addressIds = bulkRepo.reserveSequence("user_address_id_seq", addressCount);
         List<Object[]> addressRows = new ArrayList<>(addressCount);
         for (int i = 0; i < addressCount; i++) {
-            addressRows.add(new Object[]{
-                addressIds.get(i),
-                userIds.get(i % USER_COUNT),
-                faker.address().streetAddress(),
-                faker.address().secondaryAddress(),
-                i % USER_COUNT == 0, // 첫 번째 주소는 기본 주소
-                faker.name().fullName(),
-                faker.phoneNumber().cellPhone()
+            addressRows.add(new Object[] {
+                    addressIds.get(i), // [id]
+                    userIds.get(i % USER_COUNT), // [user_id] 회원별 순환 배정
+                    faker.address().streetAddress(), // [address]
+                    faker.address().secondaryAddress(), // [detail_address]
+                    i % USER_COUNT == 0, // [is_default] 첫 번째 주소는 기본 배송지로 설정
+                    faker.name().fullName(), // [receiver_name]
+                    faker.phoneNumber().cellPhone() // [receiver_phone]
             });
         }
         bulkRepo.bulkInsertUserAddresses(addressRows);
 
-        // user_coupon: 회원의 60%에게 쿠폰 1장씩 발급
-        int couponUserCount = (int)(USER_COUNT * 0.6);
+        // user_coupon: 전체 회원의 60%에게 랜덤하게 쿠폰 1장씩 발급
+        int couponUserCount = (int) (USER_COUNT * 0.6);
         userCouponIds = bulkRepo.reserveSequence("user_coupon_id_seq", couponUserCount);
         List<Object[]> userCouponRows = new ArrayList<>(couponUserCount);
         List<Long> shuffledUserIds = new ArrayList<>(userIds);
-        Collections.shuffle(shuffledUserIds, random);
+        Collections.shuffle(shuffledUserIds, random); // 특정 회원에게 쏠리지 않도록 셔플
+
         for (int i = 0; i < couponUserCount; i++) {
-            boolean isUsed = random.nextInt(10) < 3; // 30% 사용됨
+            boolean isUsed = random.nextInt(10) < 3; // 30% 확률로 사용 완료 처리
             LocalDateTime usedAt = isUsed ? LocalDateTime.now().minusDays(random.nextInt(30)) : null;
-            userCouponRows.add(new Object[]{
-                userCouponIds.get(i),
-                shuffledUserIds.get(i),
-                couponIds.get(random.nextInt(COUPON_COUNT)),
-                isUsed,
-                usedAt != null ? Timestamp.valueOf(usedAt) : null
+            userCouponRows.add(new Object[] {
+                    userCouponIds.get(i), // [id]
+                    shuffledUserIds.get(i), // [user_id]
+                    couponIds.get(random.nextInt(COUPON_COUNT)), // [coupon_id]
+                    isUsed, // [is_used]
+                    usedAt != null ? Timestamp.valueOf(usedAt) : null // [used_at]
             });
         }
         bulkRepo.bulkInsertUserCoupons(userCouponRows);
 
-        // product: ON_SALE(80%), SOLD_OUT(15%), DISCONTINUED(5%)
+        // product: 판매 상태 분포 (ON_SALE: 80%, SOLD_OUT: 15%, DISCONTINUED: 5%)
         productIds = bulkRepo.reserveSequence("product_id_seq", PRODUCT_COUNT);
         List<Object[]> productRows = new ArrayList<>(PRODUCT_COUNT);
         String[] productStatuses = buildWeightedArray(
-            new String[]{"ON_SALE", "SOLD_OUT", "DISCONTINUED"},
-            new int[]{80, 15, 5}
-        );
+                new String[] { "ON_SALE", "SOLD_OUT", "DISCONTINUED" },
+                new int[] { 80, 15, 5 });
         LocalDateTime productBase = LocalDateTime.now().minusYears(2);
+
         for (int i = 0; i < PRODUCT_COUNT; i++) {
+            // 과거 2년 전부터 현재 사이의 랜덤한 등록일 설정
             LocalDateTime createdAt = productBase.plusSeconds(
-                random.nextLong(0, ChronoUnit.SECONDS.between(productBase, LocalDateTime.now()))
-            );
-            boolean isDeleted = random.nextInt(100) < 5; // 5%가 삭제됨
-            productRows.add(new Object[]{
-                productIds.get(i),
-                categoryIds.get(random.nextInt(CATEGORY_COUNT)),
-                faker.commerce().productName(),
-                faker.lorem().sentence(10),
-                (random.nextInt(10) + 1) * 10000, // 10,000 ~ 100,000원
-                productStatuses[random.nextInt(productStatuses.length)],
-                isDeleted,
-                Timestamp.valueOf(createdAt),
-                Timestamp.valueOf(createdAt)
+                    random.nextLong(0, ChronoUnit.SECONDS.between(productBase, LocalDateTime.now())));
+            boolean isDeleted = random.nextInt(100) < 5; // 5% 확률로 삭제된 상품(Soft Delete) 생성
+
+            productRows.add(new Object[] {
+                    productIds.get(i), // [id]
+                    categoryIds.get(random.nextInt(CATEGORY_COUNT)), // [category_id]
+                    faker.commerce().productName(), // [name]
+                    faker.lorem().sentence(10), // [description]
+                    (random.nextInt(10) + 1) * 10000, // [base_price] 10,000 ~ 100,000원
+                    productStatuses[random.nextInt(productStatuses.length)], // [status] 가중치에 따른 상태
+                    isDeleted, // [is_deleted]
+                    Timestamp.valueOf(createdAt), // [created_at]
+                    Timestamp.valueOf(createdAt) // [updated_at]
             });
         }
         bulkRepo.bulkInsertProducts(productRows);
 
-        // point_history: 최근 1년 데이터
+        // point_history: 최근 1년 동안의 포인트 내역 (EARN: 60%, USE: 35%, EXPIRE: 5%)
         List<Long> phIds = bulkRepo.reserveSequence("point_history_id_seq", POINT_HISTORY_COUNT);
         List<Object[]> phRows = new ArrayList<>(POINT_HISTORY_COUNT);
         String[] pointTypes = buildWeightedArray(
-            new String[]{"EARN", "USE", "EXPIRE"},
-            new int[]{60, 35, 5}
-        );
+                new String[] { "EARN", "USE", "EXPIRE" },
+                new int[] { 60, 35, 5 });
         LocalDateTime phBase = LocalDateTime.now().minusYears(1);
+
         for (int i = 0; i < POINT_HISTORY_COUNT; i++) {
             int amount = (random.nextInt(10) + 1) * 100;
-            phRows.add(new Object[]{
-                phIds.get(i),
-                userIds.get(random.nextInt(USER_COUNT)),
-                pointTypes[random.nextInt(pointTypes.length)],
-                amount,
-                random.nextInt(50000),
-                "포인트 " + (i % 3 == 0 ? "적립" : "사용"),
-                Timestamp.valueOf(phBase.plusSeconds(random.nextLong(0, ChronoUnit.SECONDS.between(phBase, LocalDateTime.now()))))
+            phRows.add(new Object[] {
+                    phIds.get(i), // [id]
+                    userIds.get(random.nextInt(USER_COUNT)), // [user_id]
+                    pointTypes[random.nextInt(pointTypes.length)], // [type]
+                    amount, // [amount]
+                    random.nextInt(50000), // [balance_after] 잔액 (가상값)
+                    "포인트 " + (i % 3 == 0 ? "적립" : "사용"), // [description]
+                    Timestamp.valueOf(phBase
+                            .plusSeconds(random.nextLong(0, ChronoUnit.SECONDS.between(phBase, LocalDateTime.now())))) // [created_at]
             });
         }
         bulkRepo.bulkInsertPointHistories(phRows);
 
-        // categoryIds는 Layer 2에서 사용하지 않으므로 해제
+        // 상위 레이어에서 사용한 카테고리 ID 리스트는 더 이상 필요 없으므로 메모리 해제
         categoryIds = null;
 
         log.info("[Layer 1] 완료");
@@ -288,15 +308,15 @@ public class DataSeeder implements CommandLineRunner {
         log.info("[Layer 2] 시작 — product_option, product_image, product_sku, cart");
 
         // product_option: 상품당 1~2개 옵션
-        int optionCount = (int)(PRODUCT_COUNT * 1.5);
+        int optionCount = (int) (PRODUCT_COUNT * 1.5);
         productOptionIds = bulkRepo.reserveSequence("product_option_id_seq", optionCount);
         List<Object[]> optionRows = new ArrayList<>(optionCount);
-        String[] optionNames = {"색상", "사이즈", "용량", "재질"};
+        String[] optionNames = { "색상", "사이즈", "용량", "재질" };
         for (int i = 0; i < optionCount; i++) {
-            optionRows.add(new Object[]{
-                productOptionIds.get(i),
-                productIds.get(i % PRODUCT_COUNT),
-                optionNames[i % optionNames.length]
+            optionRows.add(new Object[] {
+                    productOptionIds.get(i),
+                    productIds.get(i % PRODUCT_COUNT),
+                    optionNames[i % optionNames.length]
             });
         }
         bulkRepo.bulkInsertProductOptions(optionRows);
@@ -306,12 +326,12 @@ public class DataSeeder implements CommandLineRunner {
         List<Long> imageIds = bulkRepo.reserveSequence("product_image_id_seq", imageCount);
         List<Object[]> imageRows = new ArrayList<>(imageCount);
         for (int i = 0; i < imageCount; i++) {
-            imageRows.add(new Object[]{
-                imageIds.get(i),
-                productIds.get(i % PRODUCT_COUNT),
-                "https://example.com/images/" + UUID.randomUUID() + ".jpg",
-                i % 2 == 0, // 짝수 인덱스가 메인 이미지
-                i % 2
+            imageRows.add(new Object[] {
+                    imageIds.get(i),
+                    productIds.get(i % PRODUCT_COUNT),
+                    "https://example.com/images/" + UUID.randomUUID() + ".jpg",
+                    i % 2 == 0, // 짝수 인덱스가 메인 이미지
+                    i % 2
             });
         }
         bulkRepo.bulkInsertProductImages(imageRows);
@@ -321,25 +341,25 @@ public class DataSeeder implements CommandLineRunner {
         skuIds = bulkRepo.reserveSequence("product_sku_id_seq", skuCount);
         List<Object[]> skuRows = new ArrayList<>(skuCount);
         for (int i = 0; i < skuCount; i++) {
-            skuRows.add(new Object[]{
-                skuIds.get(i),
-                productIds.get(i % PRODUCT_COUNT),
-                "SKU-" + skuIds.get(i),
-                random.nextInt(500), // 0~499 재고
-                random.nextInt(5) * 1000 // 0~4,000원 추가 금액
+            skuRows.add(new Object[] {
+                    skuIds.get(i),
+                    productIds.get(i % PRODUCT_COUNT),
+                    "SKU-" + skuIds.get(i),
+                    random.nextInt(500), // 0~499 재고
+                    random.nextInt(5) * 1000 // 0~4,000원 추가 금액
             });
         }
         bulkRepo.bulkInsertProductSkus(skuRows);
 
         // cart: 회원의 70%에게 장바구니
-        int cartCount = (int)(USER_COUNT * 0.7);
+        int cartCount = (int) (USER_COUNT * 0.7);
         cartIds = bulkRepo.reserveSequence("cart_id_seq", cartCount);
         List<Object[]> cartRows = new ArrayList<>(cartCount);
         for (int i = 0; i < cartCount; i++) {
-            cartRows.add(new Object[]{
-                cartIds.get(i),
-                userIds.get(i),
-                Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(90)))
+            cartRows.add(new Object[] {
+                    cartIds.get(i),
+                    userIds.get(i),
+                    Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(90)))
             });
         }
         bulkRepo.bulkInsertCarts(cartRows);
@@ -359,17 +379,17 @@ public class DataSeeder implements CommandLineRunner {
         optionValueIds = bulkRepo.reserveSequence("product_option_value_id_seq", ovCount);
         List<Object[]> ovRows = new ArrayList<>(ovCount);
         String[][] optionValues = {
-            {"빨강", "파랑", "초록"},
-            {"S", "M", "L"},
-            {"250ml", "500ml", "1L"},
-            {"면", "폴리에스터", "울"}
+                { "빨강", "파랑", "초록" },
+                { "S", "M", "L" },
+                { "250ml", "500ml", "1L" },
+                { "면", "폴리에스터", "울" }
         };
         for (int i = 0; i < ovCount; i++) {
             String[] vals = optionValues[i % optionValues.length];
-            ovRows.add(new Object[]{
-                optionValueIds.get(i),
-                productOptionIds.get(i % productOptionIds.size()),
-                vals[i % vals.length]
+            ovRows.add(new Object[] {
+                    optionValueIds.get(i),
+                    productOptionIds.get(i % productOptionIds.size()),
+                    vals[i % vals.length]
             });
         }
         bulkRepo.bulkInsertProductOptionValues(ovRows);
@@ -378,10 +398,10 @@ public class DataSeeder implements CommandLineRunner {
         List<Long> psoIds = bulkRepo.reserveSequence("product_sku_option_id_seq", skuIds.size());
         List<Object[]> psoRows = new ArrayList<>(skuIds.size());
         for (int i = 0; i < skuIds.size(); i++) {
-            psoRows.add(new Object[]{
-                psoIds.get(i),
-                skuIds.get(i),
-                optionValueIds.get(i % optionValueIds.size())
+            psoRows.add(new Object[] {
+                    psoIds.get(i),
+                    skuIds.get(i),
+                    optionValueIds.get(i % optionValueIds.size())
             });
         }
         bulkRepo.bulkInsertProductSkuOptions(psoRows);
@@ -391,40 +411,41 @@ public class DataSeeder implements CommandLineRunner {
         List<Long> ciIds = bulkRepo.reserveSequence("cart_item_id_seq", cartItemCount);
         List<Object[]> ciRows = new ArrayList<>(cartItemCount);
         for (int i = 0; i < cartItemCount; i++) {
-            ciRows.add(new Object[]{
-                ciIds.get(i),
-                cartIds.get(i % cartIds.size()),
-                skuIds.get(random.nextInt(skuIds.size())),
-                random.nextInt(3) + 1,
-                Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(30)))
+            ciRows.add(new Object[] {
+                    ciIds.get(i),
+                    cartIds.get(i % cartIds.size()),
+                    skuIds.get(random.nextInt(skuIds.size())),
+                    random.nextInt(3) + 1,
+                    Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(30)))
             });
         }
         bulkRepo.bulkInsertCartItems(ciRows);
 
-        // orders: DELIVERED(50%), SHIPPED(15%), PREPARING(10%), PAID(10%), PENDING(10%), CANCELLED(5%)
+        // orders: DELIVERED(50%), SHIPPED(15%), PREPARING(10%), PAID(10%),
+        // PENDING(10%), CANCELLED(5%)
         orderIds = bulkRepo.reserveSequence("orders_id_seq", ORDER_COUNT);
         List<Object[]> orderRows = new ArrayList<>(ORDER_COUNT);
         String[] orderStatuses = buildWeightedArray(
-            new String[]{"DELIVERED", "SHIPPED", "PREPARING", "PAID", "PENDING", "CANCELLED"},
-            new int[]{50, 15, 10, 10, 10, 5}
-        );
+                new String[] { "DELIVERED", "SHIPPED", "PREPARING", "PAID", "PENDING", "CANCELLED" },
+                new int[] { 50, 15, 10, 10, 10, 5 });
         LocalDateTime orderBase = LocalDateTime.now().minusYears(2);
         for (int i = 0; i < ORDER_COUNT; i++) {
             int totalPrice = (random.nextInt(10) + 1) * 10000;
             // 30%만 쿠폰 사용
             boolean useCoupon = random.nextInt(10) < 3 && !userCouponIds.isEmpty();
             Long usedCouponId = useCoupon ? userCouponIds.get(random.nextInt(userCouponIds.size())) : null;
-            int discountPrice = useCoupon ? (int)(totalPrice * 0.1) : 0;
-            orderRows.add(new Object[]{
-                orderIds.get(i),
-                userIds.get(random.nextInt(USER_COUNT)),
-                addressIds.get(random.nextInt(addressIds.size())),
-                usedCouponId,
-                totalPrice,
-                discountPrice,
-                totalPrice - discountPrice,
-                orderStatuses[random.nextInt(orderStatuses.length)],
-                Timestamp.valueOf(orderBase.plusSeconds(random.nextLong(0, ChronoUnit.SECONDS.between(orderBase, LocalDateTime.now()))))
+            int discountPrice = useCoupon ? (int) (totalPrice * 0.1) : 0;
+            orderRows.add(new Object[] {
+                    orderIds.get(i),
+                    userIds.get(random.nextInt(USER_COUNT)),
+                    addressIds.get(random.nextInt(addressIds.size())),
+                    usedCouponId,
+                    totalPrice,
+                    discountPrice,
+                    totalPrice - discountPrice,
+                    orderStatuses[random.nextInt(orderStatuses.length)],
+                    Timestamp.valueOf(orderBase.plusSeconds(
+                            random.nextLong(0, ChronoUnit.SECONDS.between(orderBase, LocalDateTime.now()))))
             });
         }
         bulkRepo.bulkInsertOrders(orderRows);
@@ -449,15 +470,15 @@ public class DataSeeder implements CommandLineRunner {
         List<Object[]> oiRows = new ArrayList<>(oiCount);
         for (int i = 0; i < oiCount; i++) {
             int unitPrice = (random.nextInt(5) + 1) * 10000;
-            oiRows.add(new Object[]{
-                orderItemIds.get(i),
-                orderIds.get(i % ORDER_COUNT),
-                skuIds.get(random.nextInt(skuIds.size())),
-                faker.commerce().productName(),
-                "색상: " + new String[]{"빨강", "파랑", "초록"}[random.nextInt(3)],
-                random.nextInt(3) + 1,
-                unitPrice,
-                "DELIVERED"
+            oiRows.add(new Object[] {
+                    orderItemIds.get(i),
+                    orderIds.get(i % ORDER_COUNT),
+                    skuIds.get(random.nextInt(skuIds.size())),
+                    faker.commerce().productName(),
+                    "색상: " + new String[] { "빨강", "파랑", "초록" }[random.nextInt(3)],
+                    random.nextInt(3) + 1,
+                    unitPrice,
+                    "DELIVERED"
             });
         }
         bulkRepo.bulkInsertOrderItems(oiRows);
@@ -465,24 +486,23 @@ public class DataSeeder implements CommandLineRunner {
         // payment: 주문당 1개
         paymentIds = bulkRepo.reserveSequence("payment_id_seq", ORDER_COUNT);
         List<Object[]> paymentRows = new ArrayList<>(ORDER_COUNT);
-        String[] paymentMethods = {"CARD", "KAKAO_PAY", "NAVER_PAY"};
+        String[] paymentMethods = { "CARD", "KAKAO_PAY", "NAVER_PAY" };
         String[] paymentStatuses = buildWeightedArray(
-            new String[]{"COMPLETED", "PENDING", "FAILED", "REFUNDED"},
-            new int[]{80, 10, 5, 5}
-        );
+                new String[] { "COMPLETED", "PENDING", "FAILED", "REFUNDED" },
+                new int[] { 80, 10, 5, 5 });
         for (int i = 0; i < ORDER_COUNT; i++) {
             String status = paymentStatuses[random.nextInt(paymentStatuses.length)];
             LocalDateTime createdAt = LocalDateTime.now().minusDays(random.nextInt(365));
             LocalDateTime paidAt = status.equals("COMPLETED") ? createdAt.plusMinutes(random.nextInt(5)) : null;
-            paymentRows.add(new Object[]{
-                paymentIds.get(i),
-                orderIds.get(i),
-                paymentMethods[random.nextInt(paymentMethods.length)],
-                (random.nextInt(10) + 1) * 10000,
-                status,
-                "PG-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
-                Timestamp.valueOf(createdAt),
-                paidAt != null ? Timestamp.valueOf(paidAt) : null
+            paymentRows.add(new Object[] {
+                    paymentIds.get(i),
+                    orderIds.get(i),
+                    paymentMethods[random.nextInt(paymentMethods.length)],
+                    (random.nextInt(10) + 1) * 10000,
+                    status,
+                    "PG-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
+                    Timestamp.valueOf(createdAt),
+                    paidAt != null ? Timestamp.valueOf(paidAt) : null
             });
         }
         bulkRepo.bulkInsertPayments(paymentRows);
@@ -491,16 +511,15 @@ public class DataSeeder implements CommandLineRunner {
         deliveryIds = bulkRepo.reserveSequence("delivery_id_seq", ORDER_COUNT);
         List<Object[]> deliveryRows = new ArrayList<>(ORDER_COUNT);
         String[] deliveryStatuses = buildWeightedArray(
-            new String[]{"DELIVERED", "SHIPPED", "DELIVERING", "PREPARING"},
-            new int[]{50, 20, 15, 15}
-        );
+                new String[] { "DELIVERED", "SHIPPED", "DELIVERING", "PREPARING" },
+                new int[] { 50, 20, 15, 15 });
         for (int i = 0; i < ORDER_COUNT; i++) {
-            deliveryRows.add(new Object[]{
-                deliveryIds.get(i),
-                orderIds.get(i),
-                deliveryStatuses[random.nextInt(deliveryStatuses.length)],
-                "TRACK-" + (1000000 + random.nextInt(9000000)),
-                Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(365)))
+            deliveryRows.add(new Object[] {
+                    deliveryIds.get(i),
+                    orderIds.get(i),
+                    deliveryStatuses[random.nextInt(deliveryStatuses.length)],
+                    "TRACK-" + (1000000 + random.nextInt(9000000)),
+                    Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(365)))
             });
         }
         bulkRepo.bulkInsertDeliveries(deliveryRows);
@@ -519,18 +538,18 @@ public class DataSeeder implements CommandLineRunner {
         log.info("[Layer 5] 시작 — refund, delivery_tracking, review");
 
         // refund: 결제의 5%만 환불
-        int refundCount = Math.max(1, (int)(paymentIds.size() * 0.05));
+        int refundCount = Math.max(1, (int) (paymentIds.size() * 0.05));
         List<Long> refundIds = bulkRepo.reserveSequence("refund_id_seq", refundCount);
         List<Object[]> refundRows = new ArrayList<>(refundCount);
         for (int i = 0; i < refundCount; i++) {
-            refundRows.add(new Object[]{
-                refundIds.get(i),
-                paymentIds.get(i),
-                orderItemIds.get(i),
-                (random.nextInt(5) + 1) * 5000,
-                faker.lorem().sentence(5),
-                "COMPLETED",
-                Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(30)))
+            refundRows.add(new Object[] {
+                    refundIds.get(i),
+                    paymentIds.get(i),
+                    orderItemIds.get(i),
+                    (random.nextInt(5) + 1) * 5000,
+                    faker.lorem().sentence(5),
+                    "COMPLETED",
+                    Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(30)))
             });
         }
         bulkRepo.bulkInsertRefunds(refundRows);
@@ -538,33 +557,34 @@ public class DataSeeder implements CommandLineRunner {
         // delivery_tracking: 배송당 2~5개 이력
         List<Long> dtIds = bulkRepo.reserveSequence("delivery_tracking_id_seq", DELIVERY_TRACKING_COUNT);
         List<Object[]> dtRows = new ArrayList<>(DELIVERY_TRACKING_COUNT);
-        String[] trackingStatuses = {"PREPARING", "SHIPPED", "DELIVERING", "DELIVERED"};
-        String[] locations = {"서울 물류센터", "경기 허브", "부산 터미널", "대전 환승센터", "배송 중", "배송 완료"};
+        String[] trackingStatuses = { "PREPARING", "SHIPPED", "DELIVERING", "DELIVERED" };
+        String[] locations = { "서울 물류센터", "경기 허브", "부산 터미널", "대전 환승센터", "배송 중", "배송 완료" };
         LocalDateTime dtBase = LocalDateTime.now().minusMonths(6);
         for (int i = 0; i < DELIVERY_TRACKING_COUNT; i++) {
-            dtRows.add(new Object[]{
-                dtIds.get(i),
-                deliveryIds.get(i % deliveryIds.size()),
-                trackingStatuses[i % trackingStatuses.length],
-                locations[random.nextInt(locations.length)],
-                Timestamp.valueOf(dtBase.plusSeconds(random.nextLong(0, ChronoUnit.SECONDS.between(dtBase, LocalDateTime.now()))))
+            dtRows.add(new Object[] {
+                    dtIds.get(i),
+                    deliveryIds.get(i % deliveryIds.size()),
+                    trackingStatuses[i % trackingStatuses.length],
+                    locations[random.nextInt(locations.length)],
+                    Timestamp.valueOf(dtBase
+                            .plusSeconds(random.nextLong(0, ChronoUnit.SECONDS.between(dtBase, LocalDateTime.now()))))
             });
         }
         bulkRepo.bulkInsertDeliveryTrackings(dtRows);
 
         // review: 주문 항목의 30%에 리뷰
-        int reviewCount = Math.max(1, (int)(orderItemIds.size() * 0.3));
+        int reviewCount = Math.max(1, (int) (orderItemIds.size() * 0.3));
         List<Long> reviewIds = bulkRepo.reserveSequence("review_id_seq", reviewCount);
         List<Object[]> reviewRows = new ArrayList<>(reviewCount);
         for (int i = 0; i < reviewCount; i++) {
-            reviewRows.add(new Object[]{
-                reviewIds.get(i),
-                userIds.get(random.nextInt(USER_COUNT)),
-                productIds.get(random.nextInt(PRODUCT_COUNT)),
-                orderItemIds.get(i),
-                random.nextInt(5) + 1,
-                faker.lorem().sentence(20),
-                Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(365)))
+            reviewRows.add(new Object[] {
+                    reviewIds.get(i),
+                    userIds.get(random.nextInt(USER_COUNT)),
+                    productIds.get(random.nextInt(PRODUCT_COUNT)),
+                    orderItemIds.get(i),
+                    random.nextInt(5) + 1,
+                    faker.lorem().sentence(20),
+                    Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(365)))
             });
         }
         bulkRepo.bulkInsertReviews(reviewRows);
@@ -596,14 +616,14 @@ public class DataSeeder implements CommandLineRunner {
         int reviewCount = reviewCountForLayer6;
 
         // review_image: 리뷰의 40%에 이미지 1장
-        int riCount = Math.max(1, (int)(reviewCount * 0.4));
+        int riCount = Math.max(1, (int) (reviewCount * 0.4));
         List<Long> riIds = bulkRepo.reserveSequence("review_image_id_seq", riCount);
         List<Object[]> riRows = new ArrayList<>(riCount);
         for (int i = 0; i < riCount; i++) {
-            riRows.add(new Object[]{
-                riIds.get(i),
-                reviewIds.get(i),
-                "https://example.com/review-images/" + UUID.randomUUID() + ".jpg"
+            riRows.add(new Object[] {
+                    riIds.get(i),
+                    reviewIds.get(i),
+                    "https://example.com/review-images/" + UUID.randomUUID() + ".jpg"
             });
         }
         bulkRepo.bulkInsertReviewImages(riRows);
@@ -622,11 +642,11 @@ public class DataSeeder implements CommandLineRunner {
                 Long uId = userIds.get(random.nextInt(USER_COUNT));
                 String pair = rId + ":" + uId;
                 if (seenPairs.add(pair)) {
-                    rlRows.add(new Object[]{
-                        rlIds.get(idIndex++),
-                        rId,
-                        uId,
-                        Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(180)))
+                    rlRows.add(new Object[] {
+                            rlIds.get(idIndex++),
+                            rId,
+                            uId,
+                            Timestamp.valueOf(LocalDateTime.now().minusDays(random.nextInt(180)))
                     });
                 }
             }

@@ -47,7 +47,7 @@ public class BulkInsertRepository {
     /** users 벌크 삽입 */
     public void bulkInsertUsers(List<Object[]> rows) {
         String sql = "INSERT INTO users (id, email, password, name, phone, gender, birth_date, grade, point_balance, created_at, updated_at) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "users");
     }
 
@@ -60,7 +60,7 @@ public class BulkInsertRepository {
     /** coupon 벌크 삽입 */
     public void bulkInsertCoupons(List<Object[]> rows) {
         String sql = "INSERT INTO coupon (id, name, discount_type, discount_value, min_order_amount, started_at, expired_at, max_issue_count, issued_count) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "coupon");
     }
 
@@ -71,7 +71,7 @@ public class BulkInsertRepository {
     /** user_address 벌크 삽입 */
     public void bulkInsertUserAddresses(List<Object[]> rows) {
         String sql = "INSERT INTO user_address (id, user_id, address, detail_address, is_default, receiver_name, receiver_phone) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "user_address");
     }
 
@@ -84,14 +84,14 @@ public class BulkInsertRepository {
     /** product 벌크 삽입 */
     public void bulkInsertProducts(List<Object[]> rows) {
         String sql = "INSERT INTO product (id, category_id, name, description, base_price, status, is_deleted, created_at, updated_at) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "product");
     }
 
     /** point_history 벌크 삽입 */
     public void bulkInsertPointHistories(List<Object[]> rows) {
         String sql = "INSERT INTO point_history (id, user_id, type, amount, balance_after, description, created_at) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "point_history");
     }
 
@@ -148,7 +148,7 @@ public class BulkInsertRepository {
     /** orders 벌크 삽입 */
     public void bulkInsertOrders(List<Object[]> rows) {
         String sql = "INSERT INTO orders (id, user_id, address_id, used_coupon_id, total_price, discount_price, final_price, status, created_at) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "orders");
     }
 
@@ -159,14 +159,14 @@ public class BulkInsertRepository {
     /** order_item 벌크 삽입 */
     public void bulkInsertOrderItems(List<Object[]> rows) {
         String sql = "INSERT INTO order_item (id, order_id, sku_id, product_name, option_info, quantity, unit_price, status) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "order_item");
     }
 
     /** payment 벌크 삽입 */
     public void bulkInsertPayments(List<Object[]> rows) {
         String sql = "INSERT INTO payment (id, order_id, method, amount, status, pg_transaction_id, created_at, paid_at) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "payment");
     }
 
@@ -183,7 +183,7 @@ public class BulkInsertRepository {
     /** refund 벌크 삽입 */
     public void bulkInsertRefunds(List<Object[]> rows) {
         String sql = "INSERT INTO refund (id, payment_id, order_item_id, amount, reason, status, created_at) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "refund");
     }
 
@@ -196,7 +196,7 @@ public class BulkInsertRepository {
     /** review 벌크 삽입 */
     public void bulkInsertReviews(List<Object[]> rows) {
         String sql = "INSERT INTO review (id, user_id, product_id, order_item_id, rating, content, created_at) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         batchUpdate(sql, rows, "review");
     }
 

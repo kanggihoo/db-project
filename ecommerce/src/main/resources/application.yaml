@@ -25,8 +25,7 @@ management:
         include: health,info,prometheus
   metrics:
     export:
-      prometheus:
-        enabled: true
+      enabled: true
 
 logging:
   level:
