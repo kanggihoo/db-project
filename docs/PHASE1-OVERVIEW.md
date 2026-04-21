@@ -102,7 +102,7 @@ cd ecommerce
 ### Step 3. VACUUM ANALYZE (DB 쿼리 플랜 캐시 일관성 확보)
 ```bash
 # PostgreSQL 접속
-docker exec -it db-project-postgres-1 psql -U app -d ecommerce
+docker compose exec postgres psql -U app -d ecommerce
 
 # 아래 명령 실행
 VACUUM ANALYZE;

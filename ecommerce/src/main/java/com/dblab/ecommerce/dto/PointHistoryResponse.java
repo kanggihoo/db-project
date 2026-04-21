@@ -11,8 +11,7 @@ public record PointHistoryResponse(
         Integer amount,
         Integer balanceAfter,
         String description,
-        LocalDateTime createdAt
-) {
+        LocalDateTime createdAt) {
     public static PointHistoryResponse from(PointHistory ph) {
         return new PointHistoryResponse(
                 ph.getId(),
@@ -21,7 +20,6 @@ public record PointHistoryResponse(
                 ph.getAmount(),
                 ph.getBalanceAfter(),
                 ph.getDescription(),
-                ph.getCreatedAt()
-        );
+                ph.getCreatedAt());
     }
 }

@@ -21,8 +21,7 @@ public class ProductController {
     @GetMapping
     public List<ProductResponse> searchProducts(
             @RequestParam Long categoryId,
-            @RequestParam Product.Status status
-    ) {
+            @RequestParam Product.Status status) {
         return productService.searchProducts(categoryId, status);
     }
 }

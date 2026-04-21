@@ -12,14 +12,12 @@ public record OrderResponse(
         Orders.Status status,
         Integer finalPrice,
         LocalDateTime createdAt,
-        List<OrderItemDto> items
-) {
+        List<OrderItemDto> items) {
     public record OrderItemDto(
             Long itemId,
             String productName,
             Integer quantity,
-            Integer unitPrice
-    ) {
+            Integer unitPrice) {
         public static OrderItemDto from(OrderItem item) {
             return new OrderItemDto(item.getId(), item.getProductName(), item.getQuantity(), item.getUnitPrice());
         }
@@ -32,7 +30,6 @@ public record OrderResponse(
                 order.getStatus(),
                 order.getFinalPrice(),
                 order.getCreatedAt(),
-                items.stream().map(OrderItemDto::from).toList()
-        );
+                items.stream().map(OrderItemDto::from).toList());
     }
 }

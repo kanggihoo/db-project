@@ -7,15 +7,13 @@ public record ProductResponse(
         Long categoryId,
         String name,
         Integer basePrice,
-        Product.Status status
-) {
+        Product.Status status) {
     public static ProductResponse from(Product product) {
         return new ProductResponse(
                 product.getId(),
                 product.getCategoryId(),
                 product.getName(),
                 product.getBasePrice(),
-                product.getStatus()
-        );
+                product.getStatus());
     }
 }
