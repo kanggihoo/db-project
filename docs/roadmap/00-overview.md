@@ -72,7 +72,7 @@
 | Phase 7 | `point_history`, `delivery_tracking` | offset/cursor pagination |
 | Phase 10 | `orders`, `payment` | 운영 중 스키마 변경과 backfill |
 | Phase 11 | `product_sku`, `coupon`, `user_coupon` | 재고 차감, 선착순 발급, 동시성 |
-| Phase 12~13 | `orders`, `outbox_event` | Outbox, CDC, Kafka 이벤트 흐름 |
+| Phase 12~13 | `orders`, `payment`, `outbox_event` | Outbox, CDC, Kafka 이벤트 흐름 |
 
 ### k6 사용 시점
 
@@ -320,12 +320,12 @@ Phase 11: Concurrency Control
   └─ 발견: 정합성은 격리 수준만으로 끝나지 않고 비즈니스 제약과 연결됨
        │
 Phase 12: Outbox Pattern
-  └─ 해결: 주문 생성과 이벤트 저장을 같은 트랜잭션에 묶음
-  └─ 발견: 이벤트 발행은 실패와 중복을 기본 전제로 설계해야 함
+  └─ 해결: 주문 생성/결제 완료와 이벤트 저장을 같은 트랜잭션에 묶음
+  └─ 발견: Kafka 장애는 API 장애가 아니라 outbox backlog로 격리해야 함
        │
 Phase 13: CDC + Kafka
-  └─ 해결: PostgreSQL WAL, Debezium, Kafka topic, consumer replay
-  └─ 발견: 이벤트 스트림은 lag, replay, idempotency까지 관측해야 운영 가능
+  └─ 해결: Outbox polling publisher를 PostgreSQL WAL, Debezium, Kafka topic으로 확장
+  └─ 발견: 이벤트 스트림은 connector lag, consumer replay, idempotency까지 관측해야 운영 가능
 ```
 
 ---
@@ -348,8 +348,8 @@ Phase 13: CDC + Kafka
 | 9     | 장애 주입          | 커넥션 고갈, Lock wait, Deadlock, DB restart          | 장애 재현과 복구 절차 검증      | 자동화된 감지/복구 기준 필요       |
 | 10    | 운영 스키마 변경   | Flyway, expand-contract, backfill, validation query   | 운영 중 안전한 DB 변경          | 배포 순서와 rollback 전략          |
 | 11    | 동시성 제어        | 비관적 락, 낙관적 락, SERIALIZABLE retry, idempotency | 재고/쿠폰 정합성                | 이벤트 발행 원자성 문제            |
-| 12    | Outbox Pattern     | transactional outbox, publisher, retry               | DB 저장과 이벤트 발행 불일치    | CDC 기반 발행 자동화               |
-| 13    | CDC + Kafka        | PostgreSQL WAL, Debezium, Kafka, consumer replay      | 변경 이벤트 스트리밍            | lag, replay, 중복 처리             |
+| 12    | Outbox Pattern     | transactional outbox, polling publisher, health/readiness, retry | DB 저장과 이벤트 발행 불일치    | CDC 기반 발행 자동화               |
+| 13    | CDC + Kafka        | PostgreSQL WAL, Debezium, Kafka, consumer replay      | Outbox 이벤트 스트리밍          | connector lag, replay, 중복 처리   |
 
 ---
 
@@ -391,4 +391,4 @@ Phase 13: CDC + Kafka
 > → Phase 11에서 재고 차감과 선착순 쿠폰 발급을 대상으로 비관적 락, 낙관적 락, Atomic UPDATE, SERIALIZABLE retry, idempotency를 비교합니다.
 
 > "DB 저장과 Kafka 이벤트 발행은 어떻게 원자적으로 처리하나요?"
-> → Phase 12~13에서 Outbox Pattern으로 이벤트를 DB 트랜잭션에 포함시키고, Debezium CDC로 PostgreSQL WAL 변경을 Kafka topic에 흘린 뒤 consumer replay와 중복 처리를 검증합니다.
+> → Phase 12에서 주문 생성/결제 완료와 `outbox_event` 저장을 같은 DB 트랜잭션에 묶고, Kafka 장애를 API 장애가 아니라 PENDING backlog로 격리합니다. Phase 13에서는 Debezium CDC로 `outbox_event` WAL 변경을 Kafka topic에 흘린 뒤 connector lag, consumer replay, 중복 처리를 검증합니다.
