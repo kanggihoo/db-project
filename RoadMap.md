@@ -22,8 +22,8 @@
 | 10 | [Phase 9. Failure Injection](docs/roadmap/10-phase-9-failure-injection.md) | 커넥션 고갈, Lock wait, Deadlock, DB restart, runbook |
 | 11 | [Phase 10. Production Schema Migration](docs/roadmap/11-phase-10-production-schema-migration.md) | Flyway, expand-contract, backfill, validation, rollback |
 | 12 | [Phase 11. Concurrency Control](docs/roadmap/12-phase-11-concurrency-control.md) | 재고 차감, 쿠폰 발급, 락, retry, idempotency |
-| 13 | [Phase 12. Outbox Pattern](docs/roadmap/13-phase-12-outbox-pattern.md) | 주문 이벤트 저장, publisher, 재발행, 중복 방지 |
-| 14 | [Phase 13. CDC + Kafka](docs/roadmap/14-phase-13-cdc-kafka.md) | PostgreSQL WAL, Debezium, Kafka topic, replay, 장애 복구 |
+| 13 | [Phase 12. Outbox Pattern](docs/roadmap/13-phase-12-outbox-pattern.md) | 주문/결제 이벤트 저장, polling publisher, 장애 격리, 재발행 |
+| 14 | [Phase 13. CDC + Kafka](docs/roadmap/14-phase-13-cdc-kafka.md) | Outbox CDC, PostgreSQL WAL, Debezium, Kafka replay, lag 복구 |
 
 ## 운영 원칙
 
