@@ -14,7 +14,7 @@
 | 02 | [Phase 1. 나이브한 구현 + 베이스라인 확보](docs/roadmap/02-phase-1-baseline.md) | k6 기준선, 풀스캔, N+1, Offset 병목 |
 | 03 | [Phase 2. 인덱스 설계 + 실행계획 분석](docs/roadmap/03-phase-2-indexes.md) | EXPLAIN ANALYZE, 복합/커버링/부분 인덱스 |
 | 04 | [Phase 3. N+1 + 로딩 전략 최적화](docs/roadmap/04-phase-3-n-plus-one.md) | Fetch Join, EntityGraph, BatchSize |
-| 05 | [Phase 4. 트랜잭션 격리 수준](docs/roadmap/05-phase-4-transaction-isolation.md) | READ COMMITTED, REPEATABLE READ, SERIALIZABLE |
+| 05 | [Phase 4. 트랜잭션 격리 수준](docs/roadmap/05-phase-4-transaction-isolation.md) | 읽기 일관성, 격리 수준별 비용, SERIALIZABLE |
 | 06 | [Phase 5. 쿼리 최적화 + QueryDSL](docs/roadmap/06-phase-5-querydsl.md) | DTO Projection, 동적 쿼리, 벌크 연산 |
 | 07 | [Phase 6. 집계 쿼리 최적화](docs/roadmap/07-phase-6-aggregation.md) | GROUP BY, 표현식 인덱스, 집계 실행계획 |
 | 08 | [Phase 7. 페이지네이션 최적화](docs/roadmap/08-phase-7-pagination.md) | Offset vs Cursor, Count 쿼리 분리 |
@@ -33,4 +33,4 @@
 - 장애 주입은 SQL 스크립트, k6, Docker 명령으로 시작하고, 반복 실험이 필요할 때 `lab` 프로필 전용 API를 추가한다.
 - 새 주제를 추가할 때는 `docs/roadmap/NN-phase-name.md` 형식으로 별도 파일을 만든다.
 - Phase 전환은 해당 Phase 문서의 완료 조건과 증빙 자료가 채워졌을 때만 진행한다.
-- 결과 수치는 가능하면 `BASELINE.md`, `PHASE*_RESULT.md`, `docs/evidence/`에 분리해 기록한다.
+- 결과 수치는 각 Phase 문서의 완료 조건에 맞춰 `BASELINE.md`, `PHASE*_RESULT.md`, `docs/evidence/`에 분리해 기록한다.
