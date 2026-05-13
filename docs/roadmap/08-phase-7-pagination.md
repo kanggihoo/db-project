@@ -87,4 +87,12 @@ Page<Order> findByUserId(@Param("userId") Long userId, Pageable pageable);
 - Cursor: 1페이지 vs 1000페이지 응답시간 (거의 동일함을 증명)
 - COUNT 쿼리 분리 전/후 응답시간 차이 (ms)
 
+### 완료 조건
+
+- [ ] Offset 방식에서 앞쪽 페이지와 뒤쪽 페이지의 p95 차이를 측정했다.
+- [ ] Cursor 방식으로 동일 조건을 조회하고 페이지 위치에 따른 응답시간 차이를 비교했다.
+- [ ] `EXPLAIN ANALYZE`로 Offset이 읽고 버리는 row 수를 확인했다.
+- [ ] COUNT 쿼리 분리 전/후 목록 API 응답시간 또는 실행계획을 비교했다.
+- [ ] Phase 8에서 관측할 핵심 DB 지표 후보를 정리했다.
+
 ---

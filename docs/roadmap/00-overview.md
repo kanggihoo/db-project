@@ -20,7 +20,7 @@
 - **RDBMS**: PostgreSQL 17-alpine
 - **Monitoring**: Prometheus (latest), Grafana (latest)
 - **Load Testing**: k6 (latest, Docker 이미지 사용)
-- **Dummy Data**: Java Faker (100만 건 이상 대용량 데이터 생성)
+- **Dummy Data**: DataFaker (100만 건 이상 대용량 데이터 생성)
 
 ### Monitoring & Observability
 
@@ -53,7 +53,7 @@
 
 ### Testing & Verification
 
-- **Integration Test**: JUnit 5 + Testcontainers
+- **Integration Test**: JUnit 6 + Testcontainers
 - **쿼리 검증**: `@DataJpaTest` + 실행 쿼리 카운트 검증
 - **부하 테스트**: k6 시나리오별 VU, 지속 부하
 
@@ -261,7 +261,7 @@ REVIEW_LIKE
 | ----------------- | ------------------------------------------------------------------- | ------- |
 | N+1 대표 케이스   | ORDER → ORDER_ITEM → SKU → PRODUCT → PRODUCT_IMAGE                  | Phase 3 |
 | 복합 인덱스 실험  | ORDER(user_id + created_at), PRODUCT(category_id + status)          | Phase 2 |
-| 격리 수준 실험    | ORDER(동시 주문 시 Phantom Read), PRODUCT_SKU(재고 읽기 일관성)     | Phase 4 |
+| 격리 수준 실험    | ORDER(동시 주문 시 Phantom Read), PRODUCT_SKU(SERIALIZABLE 비용 예시) | Phase 4 |
 | 집계 쿼리 실험    | REVIEW(상품별 평점), ORDER(등급별 구매통계), PRODUCT(카테고리별 수) | Phase 6 |
 | Soft Delete 함정  | PRODUCT(is_deleted + 부분 인덱스)                                   | Phase 2 |
 | 페이지네이션 실험 | DELIVERY_TRACKING, POINT_HISTORY (계속 쌓이는 이력)                 | Phase 7 |
