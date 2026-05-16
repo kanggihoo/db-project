@@ -1,35 +1,44 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 
-// 공통 스펙: VU 50, 5분, Ramp-up 30초
+const preset = JSON.parse(open(__ENV.PRESET || 'presets/baseline.json'));
+
+const BASE_URL = preset.baseUrl || 'http://host.docker.internal:8080';
+const CATEGORY_START = Number(preset.categoryStart || 1);
+const CATEGORY_END = Number(preset.categoryEnd || CATEGORY_START);
+const STATUSES = preset.statuses || ['ON_SALE', 'SOLD_OUT', 'DISCONTINUED'];
+const TIMEOUT = preset.timeout || '5s';
+
 export const options = {
-    stages: [
-        { duration: '30s', target: 50 },
-        { duration: '4m30s', target: 50 },
-    ],
+    scenarios: {
+        steady: {
+            executor: 'constant-arrival-rate',
+            rate: Number(preset.rate || 50),
+            timeUnit: '1s',
+            duration: preset.duration || '5m',
+            preAllocatedVUs: Number(preset.preAllocatedVUs || 100),
+            maxVUs: Number(preset.maxVUs || 300),
+        },
+    },
     thresholds: {
         http_req_failed: ['rate<0.05'],
         http_req_duration: ['p(95)<5000'],
     },
 };
 
-const BASE_URL = 'http://host.docker.internal:8080';
-const CATEGORY_COUNT = 20;
-const STATUSES = ['ON_SALE', 'SOLD_OUT', 'DISCONTINUED'];
+function randomBetween(start, end) {
+    return Math.floor(Math.random() * (end - start + 1)) + start;
+}
 
 export default function () {
-    // categoryId + status 조합을 랜덤으로 주입 — 다양한 풀스캔 조건 유발
-    const categoryId = Math.floor(Math.random() * CATEGORY_COUNT) + 1;
+    const categoryId = randomBetween(CATEGORY_START, CATEGORY_END);
     const status = STATUSES[Math.floor(Math.random() * STATUSES.length)];
-
     const res = http.get(`${BASE_URL}/api/products?categoryId=${categoryId}&status=${status}`, {
-        timeout: '5s',
+        timeout: TIMEOUT,
     });
 
     check(res, {
         'status 200': (r) => r.status === 200,
         'response time < 5s': (r) => r.timings.duration < 5000,
     });
-
-    sleep(0.1);
 }

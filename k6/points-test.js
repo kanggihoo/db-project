@@ -1,46 +1,55 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 
-// 공통 스펙: VU 50, 5분, Ramp-up 30초
+const preset = JSON.parse(open(__ENV.PRESET || 'presets/baseline.json'));
+
+const BASE_URL = preset.baseUrl || 'http://host.docker.internal:8080';
+const USER_START = Number(preset.userStart || 1);
+const USER_END = Number(preset.userEnd || USER_START);
+const SIZE = Number(preset.size || 20);
+const TIMEOUT = preset.timeout || '5s';
+
 export const options = {
-    stages: [
-        { duration: '30s', target: 50 },
-        { duration: '4m30s', target: 50 },
-    ],
+    scenarios: {
+        steady: {
+            executor: 'constant-arrival-rate',
+            rate: Number(preset.rate || 50),
+            timeUnit: '1s',
+            duration: preset.duration || '5m',
+            preAllocatedVUs: Number(preset.preAllocatedVUs || 100),
+            maxVUs: Number(preset.maxVUs || 300),
+        },
+    },
     thresholds: {
         http_req_failed: ['rate<0.05'],
         http_req_duration: ['p(95)<5000'],
     },
 };
 
-const BASE_URL = 'http://host.docker.internal:8080';
-const USER_COUNT = 1000;
+function randomBetween(start, end) {
+    return Math.floor(Math.random() * (end - start + 1)) + start;
+}
 
-// Offset 병목 극대화를 위한 가중 분포 페이지 선택
-// 50% → 초반(1~10), 30% → 중반(50~100), 20% → 후반(500~1000)
-function randomPage() {
+function randomWeightedPage() {
     const rand = Math.random();
     if (rand < 0.5) {
-        return Math.floor(Math.random() * 10) + 1;
-    } else if (rand < 0.8) {
-        return Math.floor(Math.random() * 51) + 50;
-    } else {
-        return Math.floor(Math.random() * 501) + 500;
+        return randomBetween(1, 10);
     }
+    if (rand < 0.8) {
+        return randomBetween(50, 100);
+    }
+    return randomBetween(500, 1000);
 }
 
 export default function () {
-    const userId = Math.floor(Math.random() * USER_COUNT) + 1;
-    const page = randomPage();
-
-    const res = http.get(`${BASE_URL}/api/points?userId=${userId}&page=${page}&size=20`, {
-        timeout: '5s',
+    const userId = randomBetween(USER_START, USER_END);
+    const page = preset.page === undefined ? randomWeightedPage() : Number(preset.page);
+    const res = http.get(`${BASE_URL}/api/points?userId=${userId}&page=${page}&size=${SIZE}`, {
+        timeout: TIMEOUT,
     });
 
     check(res, {
         'status 200': (r) => r.status === 200,
         'response time < 5s': (r) => r.timings.duration < 5000,
     });
-
-    sleep(0.1);
 }
