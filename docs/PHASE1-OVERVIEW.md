@@ -3,6 +3,9 @@
 > 이 문서는 Phase 1 완료 조건 체크리스트를 기준으로,
 > **무엇이 구현되었고 / 무엇을 직접 실행해야 하는지**를 명확히 구분한다.
 
+> 최신 실행 방법은 [PHASE1_LOAD_TEST_RUNBOOK.md](./PHASE1_LOAD_TEST_RUNBOOK.md)를 기준으로 한다.
+> Grafana/DB 관측 전략은 [PHASE1_OBSERVABILITY_STRATEGY.md](./PHASE1_OBSERVABILITY_STRATEGY.md)를 기준으로 한다.
+
 ---
 
 ## 체크리스트 현황 요약
@@ -10,10 +13,10 @@
 | # | 항목 | 상태 | 비고 |
 |---|------|------|------|
 | 1 | 재현환경 (VACUUM ANALYZE + 데이터 고정) | ⬜ 미완 | 부하테스트 직전 수동 실행 필요 |
-| 2 | 변인통제 (show_sql: false, hikari max=10) | ✅ 완료 | `application.yaml` 이미 적용 |
+| 2 | 변인통제 (show_sql: false, Hikari pool preset) | ✅ 완료 | `application-pool*.yaml` 적용 |
 | 3 | TDD (getPrepareStatementCount N개 단언) | ✅ 완료 | `OrderRepositoryTest` GREEN |
-| 4 | k6 분포 (파라미터 랜덤 배분) | ✅ 완료 | 3개 스크립트 가중 분포 적용 |
-| 5 | k6 스펙 (VU 50, 5분, Ramp-up 30초) | ✅ 완료 | 3개 스크립트 동일 스펙 |
+| 4 | k6 분포 (preset 기반 파라미터 배분) | ✅ 완료 | `k6/presets/*.json` 적용 |
+| 5 | k6 스펙 (constant-arrival-rate) | ✅ 완료 | `k6/run.sh`로 실행 |
 | 6 | 증빙 스크린샷 4장 보관 | ⬜ 미완 | 부하테스트 실행 후 직접 캡처 필요 |
 | 7 | BASELINE.md 정량 표 작성 | ⬜ 미완 | 부하테스트 결과값 채워넣기 필요 |
 
@@ -21,13 +24,13 @@
 
 ## ✅ 항목 2 — 변인통제 설정 확인
 
-**파일:** `ecommerce/src/main/resources/application.yaml`
+**파일:** `ecommerce/src/main/resources/application.yaml`, `application-pool*.yaml`
 
 ```yaml
 spring:
   datasource:
     hikari:
-      maximum-pool-size: 10   # ✅ 고정
+      maximum-pool-size: 10   # 기본값
   jpa:
     show-sql: false           # ✅ 로깅 I/O 병목 제거
     properties:
@@ -35,7 +38,13 @@ spring:
         format_sql: false
 ```
 
-→ **별도 조치 불필요.** 이미 올바른 값으로 설정됨.
+Hikari pool은 preset profile로 바꾼다.
+
+```bash
+./scripts/server.sh pool5
+./scripts/server.sh pool10
+./scripts/server.sh pool20
+```
 
 ---
 
@@ -67,18 +76,20 @@ cd ecommerce
 
 | 스크립트 | 대상 API | 파라미터 분포 |
 |----------|----------|--------------|
-| `orders-test.js` | `GET /api/orders?userId=` | userId: 1~1000 균등 랜덤 |
-| `products-test.js` | `GET /api/products?categoryId=&status=` | categoryId: 1~20 랜덤, status: 3종 랜덤 |
-| `points-test.js` | `GET /api/points?userId=&page=` | page: 50%→초반, 30%→중반, 20%→후반 가중 |
+| `orders-test.js` | `GET /api/orders?userId=` | preset의 user 범위 |
+| `products-test.js` | `GET /api/products?categoryId=&status=` | preset의 category 범위 + status 랜덤 |
+| `points-test.js` | `GET /api/points?userId=&page=` | preset page 또는 가중 랜덤 |
 
-**공통 부하 스펙 (3개 동일):**
+**실행 방법:**
+
+```bash
+./k6/run.sh orders baseline
+./k6/run.sh products baseline
+./k6/run.sh points points-page0
+./k6/run.sh points points-page500
 ```
-stages: [
-  { duration: '30s', target: 50 },   ← Ramp-up
-  { duration: '4m30s', target: 50 }, ← 지속
-]
-timeout: '5s' per request
-```
+
+상세 preset은 [PHASE1_LOAD_TEST_RUNBOOK.md](./PHASE1_LOAD_TEST_RUNBOOK.md)를 기준으로 한다.
 
 ---
 
@@ -94,9 +105,9 @@ docker-compose up -d
 
 ### Step 2. 더미 데이터 삽입
 ```bash
-cd ecommerce
-./gradlew bootRun --args='--spring.profiles.active=seeder'
-# "Seeding complete" 로그 확인 후 Ctrl+C
+./scripts/seed.sh small
+# 또는
+./scripts/seed.sh loadtest
 ```
 
 ### Step 3. VACUUM ANALYZE (DB 쿼리 플랜 캐시 일관성 확보)
@@ -125,14 +136,17 @@ UNION ALL SELECT 'delivery_tracking', COUNT(*) FROM delivery_tracking;
 
 앱 실행 후 k6를 돌리면서 아래 4장을 `docs/evidence/phase1/` 에 저장한다.
 
+서버와 k6는 다음 방식으로 실행한다.
+
 ```bash
 # 앱 실행 (별도 터미널)
-cd ecommerce && ./gradlew bootRun
+./scripts/server.sh pool10
 
-# k6 실행 (Docker)
-docker run --rm -i --network host grafana/k6 run - < k6/orders-test.js
-docker run --rm -i --network host grafana/k6 run - < k6/products-test.js
-docker run --rm -i --network host grafana/k6 run - < k6/points-test.js
+# k6 실행
+./k6/run.sh orders baseline
+./k6/run.sh products baseline
+./k6/run.sh points points-page0
+./k6/run.sh points points-page500
 ```
 
 | 파일명 | 캡처 대상 |
@@ -192,9 +206,11 @@ ecommerce/src/test/java/com/dblab/ecommerce/repository/
 └── PointHistoryRepositoryTest.java Offset 페이지 반환 단언 ✅ GREEN
 
 k6/
-├── orders-test.js                  userId 1~1000 균등 랜덤
-├── products-test.js                categoryId + status 조합 랜덤
-└── points-test.js                  page 가중 분포 (초반 50%/중반 30%/후반 20%)
+├── orders-test.js                  preset 기반 userId 분포
+├── products-test.js                preset 기반 category/status 분포
+├── points-test.js                  preset 기반 page 분포
+├── presets/                        smoke/baseline/stress/page preset
+└── run.sh                          k6 실행 runner
 ```
 
 ---

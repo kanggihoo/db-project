@@ -1,0 +1,11 @@
+seed:
+  user-count: 100
+  category-count: 20
+  coupon-count: 10
+  product-count: 200
+  order-count: 500
+  point-history-count: 1000
+  delivery-tracking-count: 2000
+  hot-user-ratio: 0.10
+  order-hot-traffic-ratio: 0.70
+  point-hot-traffic-ratio: 0.90
