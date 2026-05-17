@@ -6,7 +6,7 @@
 
 공통 대시보드는 `DB Lab Overview` 하나를 기준으로 한다. Phase별로 dashboard JSON을 나누지 않고, 공통 row와 Phase focus row를 함께 둔다.
 
-상세 요구사항은 [DB Lab Grafana Dashboard Spec](./db-lab-grafana-dashboard-spec.md)을 기준으로 한다. 이 결정의 배경은 [ADR 0005](../adr/0005-use-one-observability-dashboard-for-comparable-phase-evidence.md)에 기록한다.
+상세 요구사항은 [DB Lab Grafana Dashboard Spec](../superpowers/specs/db-lab-grafana-dashboard-spec.md)을 기준으로 한다. 이 결정의 배경은 [ADR 0005](../adr/0005-use-one-observability-dashboard-for-comparable-phase-evidence.md)에 기록한다.
 
 ## Measurement Conditions
 

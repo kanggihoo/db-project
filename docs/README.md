@@ -28,7 +28,7 @@
 - [Spring Profiles](./guides/spring-profiles.md)
 - [k6 Load Testing](./guides/k6-load-testing.md)
 - [Grafana Observability](./guides/grafana-observability.md)
-- [DB Lab Grafana Dashboard Spec](./guides/db-lab-grafana-dashboard-spec.md)
+- [DB Lab Grafana Dashboard Spec](./superpowers/specs/db-lab-grafana-dashboard-spec.md)
 - [Agentic Issue Workflow](./guides/agentic-issue-workflow.md)
 
 ## Roadmap

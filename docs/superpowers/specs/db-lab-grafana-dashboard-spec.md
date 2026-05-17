@@ -8,7 +8,7 @@
 
 이 대시보드는 Phase 1 baseline부터 Phase 2 indexes, Phase 3 N+1, Phase 7 pagination까지 반복해서 사용한다. Phase별로 별도 대시보드를 만들지 않고, 하나의 대시보드 안에서 공통 row와 Phase focus row를 둔다.
 
-이 결정은 [ADR 0005](../adr/0005-use-one-observability-dashboard-for-comparable-phase-evidence.md)를 따른다. `phase`, `scenario`, `preset`, `pool`은 Phase Evidence의 Measurement Condition을 표현하는 낮은 cardinality label이다.
+이 결정은 [ADR 0005](../../adr/0005-use-one-observability-dashboard-for-comparable-phase-evidence.md)를 따른다. `phase`, `scenario`, `preset`, `pool`은 Phase Evidence의 Measurement Condition을 표현하는 낮은 cardinality label이다.
 
 ## Non-Goals
 
