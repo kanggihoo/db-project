@@ -19,6 +19,7 @@ Phase 1은 완료된 상태다.
 | [runbook.md](./runbook.md) | Baseline 부하 테스트 실행 절차 |
 | [observability.md](./observability.md) | 시나리오별 관측 지표와 해석 기준 |
 | [report.md](./report.md) | Baseline 측정 결과와 다음 Phase 판단 |
+| [report.html](./report.html) | Baseline 보고서 보기용 HTML |
 
 ## 구현된 API
 
