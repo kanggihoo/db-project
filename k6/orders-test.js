@@ -8,7 +8,21 @@ const USER_START = Number(preset.userStart || 1);
 const USER_END = Number(preset.userEnd || USER_START);
 const TIMEOUT = preset.timeout || '5s';
 
+const commonTags = {
+    phase: __ENV.PHASE || 'phase-01',
+    scenario: __ENV.SCENARIO || 'orders',
+    preset: __ENV.PRESET_NAME || 'baseline',
+    pool: __ENV.POOL || 'pool10',
+};
+
+const requestTags = {
+    ...commonTags,
+    name: 'GET /api/orders',
+};
+
 export const options = {
+    tags: commonTags,
+    systemTags: ['status', 'method', 'name', 'expected_response'],
     scenarios: {
         steady: {
             executor: 'constant-arrival-rate',
@@ -33,6 +47,7 @@ export default function () {
     const userId = randomBetween(USER_START, USER_END);
     const res = http.get(`${BASE_URL}/api/orders?userId=${userId}`, {
         timeout: TIMEOUT,
+        tags: requestTags,
     });
 
     check(res, {
