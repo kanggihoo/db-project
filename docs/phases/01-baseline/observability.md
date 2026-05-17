@@ -1,4 +1,4 @@
-# Phase 1 Observability Strategy
+# Phase 1 관측 전략
 
 > 목적: k6 시나리오별로 Grafana와 PostgreSQL에서 어떤 지표를 봐야 하는지 정리한다.
 

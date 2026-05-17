@@ -10,12 +10,12 @@
 
 ### 관련 문서
 
-- Overview: [phases/01-baseline/overview.md](../phases/01-baseline/overview.md)
-- 계획: [phases/01-baseline/plan.md](../phases/01-baseline/plan.md)
-- 구현 기록: [phases/01-baseline/implementation.md](../phases/01-baseline/implementation.md)
-- 결과 보고서: [phases/01-baseline/report.md](../phases/01-baseline/report.md)
-- 실행 Runbook: [phases/01-baseline/runbook.md](../phases/01-baseline/runbook.md)
+- Phase 문서 허브: [phases/01-baseline/README.md](../phases/01-baseline/README.md)
+- 범위: [phases/01-baseline/scope.md](../phases/01-baseline/scope.md)
+- 실행 절차: [phases/01-baseline/runbook.md](../phases/01-baseline/runbook.md)
 - 관측 전략: [phases/01-baseline/observability.md](../phases/01-baseline/observability.md)
+- 결과 보고서: [phases/01-baseline/report.md](../phases/01-baseline/report.md)
+- 과거 계획: [superpowers/plans/phase-01-baseline/000-legacy-plan.md](../superpowers/plans/phase-01-baseline/000-legacy-plan.md)
 - k6 공통 가이드: [guides/k6-load-testing.md](../guides/k6-load-testing.md)
 - Grafana 공통 가이드: [guides/grafana-observability.md](../guides/grafana-observability.md)
 
@@ -40,10 +40,10 @@
 
 ### 완료 조건
 
-- [ ] 주문 목록, 상품 검색, 포인트 내역 조회 API 3종이 나이브한 방식으로 동작한다.
-- [ ] 주문 목록 조회에서 N+1 또는 과도한 쿼리 수를 확인했다.
-- [ ] 상품 검색 쿼리에서 풀스캔 또는 비효율적인 실행계획을 확인했다.
-- [ ] 포인트 내역 Offset 페이지네이션에서 뒤쪽 페이지 지연을 측정했다.
-- [ ] k6 결과와 SQL 분석 결과를 `BASELINE.md` 또는 동등한 기준선 문서에 기록했다.
+- [x] 주문 목록, 상품 검색, 포인트 내역 조회 API 3종이 나이브한 방식으로 동작한다.
+- [x] 주문 목록 조회에서 N+1 또는 과도한 쿼리 수를 확인했다.
+- [x] 상품 검색 쿼리에서 풀스캔 또는 비효율적인 실행계획을 확인했다.
+- [x] 포인트 내역 Offset 페이지네이션에서 뒤쪽 페이지 지연을 측정했다.
+- [x] k6 결과와 SQL 분석 결과를 `BASELINE.md` 또는 동등한 기준선 문서에 기록했다.
 
 ---

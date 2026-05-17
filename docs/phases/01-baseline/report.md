@@ -1,4 +1,4 @@
-# Phase 1 Baseline Report
+# Phase 1 베이스라인 보고서
 
 > 목적: `loadtest` 데이터와 `pool10` 조건에서 k6 부하 테스트를 실행했을 때 나온 지표를 해석하고, 다음 Phase에서 해결해야 할 병목을 정리한다.
 
