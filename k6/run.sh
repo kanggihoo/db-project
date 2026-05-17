@@ -2,11 +2,13 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SCENARIO="${1:-}"
 PRESET="${2:-baseline}"
+MODE="${3:-local}"
 
 if [[ -z "$SCENARIO" ]]; then
-  echo "Usage: $0 <orders|products|points> [preset]" >&2
+  echo "Usage: $0 <orders|products|points> [preset] [local|prometheus]" >&2
   exit 1
 fi
 
@@ -22,6 +24,23 @@ if [[ ! -f "$SCRIPT_DIR/$PRESET_FILE" ]]; then
   echo "Unknown k6 preset: $PRESET" >&2
   exit 1
 fi
+
+case "$MODE" in
+  local) ;;
+  prometheus)
+    cd "$ROOT_DIR"
+    exec docker compose --profile test run --rm k6 \
+      run \
+      --out experimental-prometheus-rw \
+      -e PRESET="$PRESET_FILE" \
+      "/scripts/$SCRIPT"
+    ;;
+  *)
+    echo "Unknown k6 mode: $MODE" >&2
+    echo "Usage: $0 <orders|products|points> [preset] [local|prometheus]" >&2
+    exit 1
+    ;;
+esac
 
 if command -v k6 >/dev/null 2>&1; then
   cd "$SCRIPT_DIR"
