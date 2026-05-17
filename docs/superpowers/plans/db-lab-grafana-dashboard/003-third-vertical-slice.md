@@ -18,7 +18,7 @@ Document how to run labeled k6 scenarios and use `DB Lab Overview` for Phase Evi
 Ensure the guide links to the spec at:
 
 ```markdown
-[DB Lab Grafana Dashboard Spec](../superpowers/specs/db-lab-grafana-dashboard-spec.md)
+[DB Lab Grafana Dashboard Spec](../../specs/db-lab-grafana-dashboard-spec.md)
 ```
 
 Add or keep a `DB Lab Overview` section that says:
