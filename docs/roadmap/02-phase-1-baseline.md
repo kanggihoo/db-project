@@ -13,6 +13,7 @@
 - Overview: [phases/01-baseline/overview.md](../phases/01-baseline/overview.md)
 - 계획: [phases/01-baseline/plan.md](../phases/01-baseline/plan.md)
 - 구현 기록: [phases/01-baseline/implementation.md](../phases/01-baseline/implementation.md)
+- 결과 보고서: [phases/01-baseline/report.md](../phases/01-baseline/report.md)
 - 실행 Runbook: [phases/01-baseline/runbook.md](../phases/01-baseline/runbook.md)
 - 관측 전략: [phases/01-baseline/observability.md](../phases/01-baseline/observability.md)
 - k6 공통 가이드: [guides/k6-load-testing.md](../guides/k6-load-testing.md)
