@@ -1,0 +1,1 @@
+{"status":"success","data":{"resultType":"vector","result":[{"metric":{"relname":"product"},"value":[1779021351.741,"15143.85439782566"]}]},"infos":["PromQL info: metric might not be a counter, name does not end in _total/_sum/_count/_bucket: \"pg_stat_user_tables_seq_scan\" (1:28)"]}
