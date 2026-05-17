@@ -1,0 +1,1290 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="data:,">
+    <title>Phase 1 베이스라인 보고서</title>
+    <style>
+      :root {
+        --bg: #f6f5f0;
+        --surface: #ffffff;
+        --surface-soft: #eef2f1;
+        --ink: #1b1f23;
+        --muted: #5d6670;
+        --line: #d9dedb;
+        --line-strong: #b8c0bc;
+        --accent: #0f766e;
+        --accent-dark: #115e59;
+        --danger: #b42318;
+        --danger-soft: #fbe9e7;
+        --warning: #a15c07;
+        --warning-soft: #fff1d6;
+        --success: #167044;
+        --success-soft: #e7f5ed;
+        --info: #2457a6;
+        --info-soft: #e8eef9;
+        --shadow: 0 12px 32px rgba(24, 35, 31, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          system-ui,
+          sans-serif;
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      a {
+        color: var(--accent-dark);
+        font-weight: 650;
+        text-decoration-color: rgba(15, 118, 110, 0.35);
+        text-underline-offset: 3px;
+      }
+
+      a:hover {
+        color: var(--accent);
+        text-decoration-color: currentColor;
+      }
+
+      code {
+        padding: 0.14rem 0.34rem;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #f8faf9;
+        color: #24302c;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+
+      pre {
+        overflow-x: auto;
+        margin: 0;
+        padding: 16px;
+        border: 1px solid #26342f;
+        border-radius: 8px;
+        background: #111916;
+        color: #eef8f4;
+        line-height: 1.55;
+      }
+
+      pre code {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--surface);
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #eef4f2;
+        color: #26342f;
+        font-size: 0.86rem;
+        font-weight: 750;
+      }
+
+      td.numeric,
+      th.numeric {
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .hero {
+        background: #15201d;
+        color: #f5fbf8;
+        border-bottom: 6px solid var(--accent);
+      }
+
+      .hero-inner {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 42px 0 36px;
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        color: #a8dad0;
+        font-size: 0.86rem;
+        font-weight: 750;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        line-height: 1.2;
+        letter-spacing: 0;
+        word-break: keep-all;
+      }
+
+      h1 {
+        max-width: 820px;
+        font-size: 2.45rem;
+      }
+
+      h2 {
+        font-size: 1.6rem;
+      }
+
+      h3 {
+        font-size: 1.15rem;
+      }
+
+      .hero p {
+        max-width: 760px;
+        margin: 16px 0 0;
+        color: #dceae5;
+        font-size: 1.02rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 22px;
+      }
+
+      .hero-actions a,
+      .hero-actions span {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        padding: 7px 12px;
+        border: 1px solid rgba(220, 234, 229, 0.28);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #f5fbf8;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .hero-actions a:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 32px;
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 34px 0 72px;
+      }
+
+      main {
+        min-width: 0;
+      }
+
+      .toc {
+        position: sticky;
+        top: 18px;
+        align-self: start;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: var(--shadow);
+      }
+
+      .toc strong {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 0.92rem;
+      }
+
+      .toc a {
+        display: block;
+        padding: 7px 0;
+        color: #35413c;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .toc a:hover {
+        color: var(--accent-dark);
+      }
+
+      .section {
+        padding: 34px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section:first-child {
+        padding-top: 0;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+
+      .section-header p {
+        max-width: 70ch;
+        margin: 8px 0 0;
+        color: var(--muted);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .summary-card,
+      .metric-card,
+      .callout,
+      .scenario-card,
+      .evidence-card,
+      .image-frame {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .summary-card {
+        min-height: 156px;
+        padding: 18px;
+      }
+
+      .summary-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.02rem;
+      }
+
+      .summary-card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        margin-bottom: 12px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .badge-danger {
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      .badge-warning {
+        background: var(--warning-soft);
+        color: var(--warning);
+      }
+
+      .badge-success {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+
+      .badge-info {
+        background: var(--info-soft);
+        color: var(--info);
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .table-wrap + .table-wrap,
+      .table-wrap + .callout,
+      .callout + .table-wrap,
+      .code-block + .table-wrap,
+      .scenario-grid + .table-wrap {
+        margin-top: 18px;
+      }
+
+      .callout {
+        padding: 18px 20px;
+        border-left: 5px solid var(--accent);
+      }
+
+      .callout strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .callout p,
+      .callout ul {
+        margin: 0;
+      }
+
+      .callout ul {
+        padding-left: 20px;
+      }
+
+      .scenario {
+        padding-top: 26px;
+        margin-top: 26px;
+        border-top: 1px solid var(--line);
+      }
+
+      .scenario:first-of-type {
+        margin-top: 0;
+      }
+
+      .scenario-title {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .code-block {
+        margin: 12px 0 18px;
+      }
+
+      .scenario-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+        padding: 14px;
+      }
+
+      .metric-card {
+        padding: 14px;
+        box-shadow: none;
+      }
+
+      .metric-label {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 750;
+      }
+
+      .metric-value {
+        color: var(--ink);
+        font-size: 1.28rem;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+        gap: 18px;
+        margin-top: 18px;
+      }
+
+      .evidence-card {
+        padding: 18px;
+      }
+
+      .evidence-card ul {
+        margin: 10px 0 0;
+        padding-left: 20px;
+      }
+
+      .image-frame {
+        overflow: hidden;
+      }
+
+      .image-frame img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-frame figcaption {
+        padding: 10px 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .insight-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .insight-list li {
+        padding: 14px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+      }
+
+      .insight-list strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .footer-note {
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 980px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .toc {
+          position: static;
+        }
+
+        .summary-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .scenario-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .two-column {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 680px) {
+        body {
+          font-size: 15px;
+        }
+
+        .hero-inner,
+        .layout {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .hero-inner {
+          padding: 32px 0 28px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        h2 {
+          font-size: 1.38rem;
+        }
+
+        .section-header {
+          display: block;
+        }
+
+        .summary-grid,
+        .scenario-grid,
+        .insight-list {
+          grid-template-columns: 1fr;
+        }
+
+        th,
+        td {
+          padding: 10px 11px;
+        }
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+        }
+
+        .hero {
+          background: #ffffff;
+          color: #111111;
+          border-bottom-color: #111111;
+        }
+
+        .hero p,
+        .eyebrow {
+          color: #333333;
+        }
+
+        .toc {
+          display: none;
+        }
+
+        .layout,
+        .hero-inner {
+          width: 100%;
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        .summary-card,
+        .metric-card,
+        .callout,
+        .scenario-card,
+        .evidence-card,
+        .image-frame,
+        .table-wrap {
+          box-shadow: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-inner">
+        <p class="eyebrow">Ecommerce DB Optimization Lab · Phase 1</p>
+        <h1>나이브 구현과 베이스라인 보고서</h1>
+        <p>
+          <code>loadtest</code> 데이터와 <code>pool10</code> 조건에서 측정한 k6, Hikari,
+          <code>pg_stat_statements</code> 결과를 해석하고 다음 Learning Phase의 비교 기준선을 정리한다.
+        </p>
+        <div class="hero-actions" aria-label="문서 링크">
+          <span>Phase 2 진입 가능</span>
+          <a href="./report.md">Markdown 원문</a>
+          <a href="../../evidence/phase-01/BASELINE.md">Phase Evidence</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <main>
+        <section class="section" id="conclusion">
+          <div class="section-header">
+            <div>
+              <h2>결론</h2>
+              <p>Phase 1의 나이브 구현은 이후 최적화 실험의 기준선 역할을 충분히 한다.</p>
+            </div>
+          </div>
+
+          <div class="summary-grid">
+            <article class="summary-card">
+              <span class="badge badge-danger">Critical</span>
+              <strong>Orders</strong>
+              <p>반복적인 <code>order_item</code> 단건 조회가 폭증하고 Hikari pool이 포화된다.</p>
+            </article>
+            <article class="summary-card">
+              <span class="badge badge-success">Stable Baseline</span>
+              <strong>Products</strong>
+              <p>50 rps에서는 안정적이지만, 인덱스 전 상품 필터 쿼리의 비교 기준선을 확보했다.</p>
+            </article>
+            <article class="summary-card">
+              <span class="badge badge-warning">Unstable</span>
+              <strong>Points Page0</strong>
+              <p>얕은 페이지도 <code>count(*)</code> query 때문에 이미 불안정하다.</p>
+            </article>
+            <article class="summary-card">
+              <span class="badge badge-danger">Critical</span>
+              <strong>Points Page500</strong>
+              <p>deep offset 비용이 크게 증가하며 거의 모든 요청이 실패한다.</p>
+            </article>
+          </div>
+
+          <div class="callout" style="margin-top: 18px;">
+            <strong>다음 Learning Phase 연결</strong>
+            <p>
+              Phase 2에서는 <code>products</code>의 인덱스 설계와 실행계획 전환을 검증한다.
+              이후 Phase 3에서는 <code>orders</code>의 N+1 제거, Phase 7에서는
+              <code>points</code>의 offset pagination 제거를 비교하면 된다.
+            </p>
+          </div>
+        </section>
+
+        <section class="section" id="conditions">
+          <div class="section-header">
+            <div>
+              <h2>실행 조건</h2>
+              <p>동일 조건 재현과 이후 Phase 비교를 위한 Measurement Condition이다.</p>
+            </div>
+          </div>
+
+          <div class="two-column">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Date</td>
+                    <td>2026-05-17</td>
+                  </tr>
+                  <tr>
+                    <td>Seed preset</td>
+                    <td><code>loadtest</code></td>
+                  </tr>
+                  <tr>
+                    <td>Spring profile</td>
+                    <td><code>pool10</code></td>
+                  </tr>
+                  <tr>
+                    <td>k6 phase label</td>
+                    <td><code>phase-01</code></td>
+                  </tr>
+                  <tr>
+                    <td>k6 pool label</td>
+                    <td><code>pool10</code></td>
+                  </tr>
+                  <tr>
+                    <td>Dashboard</td>
+                    <td><code>DB Lab Overview</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Table</th>
+                    <th class="numeric">Rows</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>users</code></td>
+                    <td class="numeric">10,000</td>
+                  </tr>
+                  <tr>
+                    <td><code>product</code></td>
+                    <td class="numeric">100,000</td>
+                  </tr>
+                  <tr>
+                    <td><code>orders</code></td>
+                    <td class="numeric">500,000</td>
+                  </tr>
+                  <tr>
+                    <td><code>order_item</code></td>
+                    <td class="numeric">1,000,000</td>
+                  </tr>
+                  <tr>
+                    <td><code>point_history</code></td>
+                    <td class="numeric">2,000,000</td>
+                  </tr>
+                  <tr>
+                    <td><code>delivery_tracking</code></td>
+                    <td class="numeric">1,000,000</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="metrics">
+          <div class="section-header">
+            <div>
+              <h2>지표 해석 기준</h2>
+              <p>k6, connection pool, SQL snapshot을 함께 볼 때 사용하는 기준이다.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>해석</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>http_req_duration p95</code></td>
+                  <td>요청 95%가 이 시간 이하로 끝났다는 뜻이다. 이번 k6 timeout이 5초라서 p95가 <code>5s</code>이면 실제 지연이 timeout 상한에 닿았다는 의미다.</td>
+                </tr>
+                <tr>
+                  <td><code>http_req_failed</code></td>
+                  <td>k6 관점의 실패율이다. timeout, 5xx, expected response 실패가 여기에 반영된다.</td>
+                </tr>
+                <tr>
+                  <td><code>dropped_iterations</code></td>
+                  <td>목표 arrival rate를 맞추지 못해 실행하지 못한 iteration 수다. 부하 주입 자체가 밀렸다는 신호다.</td>
+                </tr>
+                <tr>
+                  <td><code>Hikari active</code></td>
+                  <td>사용 중인 DB connection 수다. <code>pool10</code>에서 10에 가까우면 pool 상한까지 사용 중이다.</td>
+                </tr>
+                <tr>
+                  <td><code>Hikari pending</code></td>
+                  <td>connection을 기다리는 thread 수다. 0보다 크면 connection pool 대기가 발생한다.</td>
+                </tr>
+                <tr>
+                  <td><code>pg_stat_statements.calls</code></td>
+                  <td>같은 SQL shape가 실행된 횟수다. N+1은 여기서 반복 호출로 드러난다.</td>
+                </tr>
+                <tr>
+                  <td><code>pg_stat_statements.mean_exec_time</code></td>
+                  <td>DB 내부에서 SQL 한 번이 평균적으로 걸린 시간이다. API latency보다 병목 원인을 더 직접적으로 보여준다.</td>
+                </tr>
+                <tr>
+                  <td><code>pg_stat_statements.total_exec_time</code></td>
+                  <td>전체 DB 시간을 가장 많이 쓴 SQL을 찾는 데 사용한다.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="overview">
+          <div class="section-header">
+            <div>
+              <h2>전체 k6 결과</h2>
+              <p>같은 <code>pool10</code> 조건에서 시나리오별 실패율과 timeout 징후를 비교한다.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Scenario</th>
+                  <th>Preset</th>
+                  <th class="numeric">Requests</th>
+                  <th class="numeric">RPS</th>
+                  <th class="numeric">Failed</th>
+                  <th class="numeric">p95</th>
+                  <th class="numeric">Dropped</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>orders</code></td>
+                  <td><code>baseline</code></td>
+                  <td class="numeric">14,844</td>
+                  <td class="numeric">48.67/s</td>
+                  <td class="numeric">100.00%</td>
+                  <td class="numeric">5s</td>
+                  <td class="numeric">157</td>
+                </tr>
+                <tr>
+                  <td><code>products</code></td>
+                  <td><code>baseline</code></td>
+                  <td class="numeric">15,001</td>
+                  <td class="numeric">50.00/s</td>
+                  <td class="numeric">0.00%</td>
+                  <td class="numeric">17.24ms</td>
+                  <td class="numeric">0</td>
+                </tr>
+                <tr>
+                  <td><code>points</code></td>
+                  <td><code>points-page0</code></td>
+                  <td class="numeric">14,835</td>
+                  <td class="numeric">48.64/s</td>
+                  <td class="numeric">60.44%</td>
+                  <td class="numeric">5s</td>
+                  <td class="numeric">166</td>
+                </tr>
+                <tr>
+                  <td><code>points</code></td>
+                  <td><code>points-page500</code></td>
+                  <td class="numeric">14,766</td>
+                  <td class="numeric">48.41/s</td>
+                  <td class="numeric">99.16%</td>
+                  <td class="numeric">5s</td>
+                  <td class="numeric">235</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="scenarios">
+          <div class="section-header">
+            <div>
+              <h2>상황별 해석</h2>
+              <p>각 API의 병목을 SQL 호출 수, 평균 실행 시간, connection pool 상태로 분리해서 본다.</p>
+            </div>
+          </div>
+
+          <article class="scenario" id="orders">
+            <div class="scenario-title">
+              <h3>Orders Baseline</h3>
+              <span class="badge badge-danger">N+1 · Pool Saturation</span>
+            </div>
+            <div class="code-block">
+              <pre><code>PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus</code></pre>
+            </div>
+
+            <div class="scenario-grid">
+              <div class="metric-card">
+                <span class="metric-label">Requests</span>
+                <span class="metric-value">14,844</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">RPS</span>
+                <span class="metric-value">48.67/s</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Failed</span>
+                <span class="metric-value">100.00%</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">p95</span>
+                <span class="metric-value">5s</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Hikari pending max</span>
+                <span class="metric-value">189</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Query</th>
+                    <th class="numeric">Calls</th>
+                    <th class="numeric">Mean</th>
+                    <th class="numeric">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>order_item where order_id = ?</code></td>
+                    <td class="numeric">36,631</td>
+                    <td class="numeric">87.72ms</td>
+                    <td class="numeric">3,213,308.15ms</td>
+                  </tr>
+                  <tr>
+                    <td><code>orders where user_id = ?</code></td>
+                    <td class="numeric">110</td>
+                    <td class="numeric">78.42ms</td>
+                    <td class="numeric">8,626.39ms</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="two-column">
+              <div class="callout">
+                <strong>해석</strong>
+                <ul>
+                  <li><code>orders</code> API는 baseline 부하를 버티지 못한다.</li>
+                  <li>p95가 <code>5s</code>인 것은 k6 timeout 상한에 닿았다는 뜻이다.</li>
+                  <li>Hikari active가 pool 상한인 10까지 차고 pending이 189까지 올라갔다.</li>
+                  <li>핵심은 connection pool 크기보다 요청 하나가 너무 많은 SQL을 발생시키는 N+1 구조다.</li>
+                </ul>
+              </div>
+              <figure class="image-frame">
+                <img src="../../evidence/phase-01/grafana-screenshots/orders-baseline.png" alt="Orders baseline Grafana screenshot" loading="lazy">
+                <figcaption>Orders baseline Grafana screenshot</figcaption>
+              </figure>
+            </div>
+
+            <div class="evidence-card" style="margin-top: 18px;">
+              <strong>Evidence</strong>
+              <ul>
+                <li><a href="../../evidence/phase-01/orders/pool10-baseline/k6-summary.txt">k6 summary</a></li>
+                <li><a href="../../evidence/phase-01/orders/pool10-baseline/pg-stat-statements.txt">pg_stat_statements</a></li>
+                <li><a href="../../evidence/phase-01/grafana-screenshots/orders-baseline.png">Grafana screenshot</a></li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="scenario" id="products">
+            <div class="scenario-title">
+              <h3>Products Baseline</h3>
+              <span class="badge badge-success">Index Baseline</span>
+            </div>
+            <div class="code-block">
+              <pre><code>PHASE=phase-01 POOL=pool10 ./k6/run.sh products baseline prometheus</code></pre>
+            </div>
+
+            <div class="scenario-grid">
+              <div class="metric-card">
+                <span class="metric-label">Requests</span>
+                <span class="metric-value">15,001</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">RPS</span>
+                <span class="metric-value">50.00/s</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Failed</span>
+                <span class="metric-value">0.00%</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">p95</span>
+                <span class="metric-value">17.24ms</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Dropped</span>
+                <span class="metric-value">0</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Query</th>
+                    <th class="numeric">Calls</th>
+                    <th class="numeric">Mean</th>
+                    <th class="numeric">Total</th>
+                    <th class="numeric">Rows</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>product where category_id = ? and status = ?</code></td>
+                    <td class="numeric">15,001</td>
+                    <td class="numeric">7.90ms</td>
+                    <td class="numeric">118,489.64ms</td>
+                    <td class="numeric">2,508,501</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="two-column">
+              <div class="callout">
+                <strong>해석</strong>
+                <ul>
+                  <li><code>products</code> API는 현재 50 rps에서는 안정적으로 동작한다.</li>
+                  <li>p95가 17.24ms이고 실패율이 0%라서 사용자 관점의 증상은 아직 크지 않다.</li>
+                  <li>상품 필터 SQL은 15,001회 실행되었고 총 250만 개 이상의 row를 반환했다.</li>
+                  <li>Phase 2에서 Seq Scan, Index Scan, Index Only Scan 전환을 검증하기 좋은 대상이다.</li>
+                </ul>
+              </div>
+              <figure class="image-frame">
+                <img src="../../evidence/phase-01/grafana-screenshots/products-baseline.png" alt="Products baseline Grafana screenshot" loading="lazy">
+                <figcaption>Products baseline Grafana screenshot</figcaption>
+              </figure>
+            </div>
+
+            <div class="evidence-card" style="margin-top: 18px;">
+              <strong>Evidence</strong>
+              <ul>
+                <li><a href="../../evidence/phase-01/products/pool10-baseline/k6-summary.txt">k6 summary</a></li>
+                <li><a href="../../evidence/phase-01/products/pool10-baseline/pg-stat-statements.txt">pg_stat_statements</a></li>
+                <li><a href="../../evidence/phase-01/products/pool10-baseline/product-seq-scan.json">product seq scan</a></li>
+                <li><a href="../../evidence/phase-01/grafana-screenshots/products-baseline.png">Grafana screenshot</a></li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="scenario" id="points-page0">
+            <div class="scenario-title">
+              <h3>Points Page0</h3>
+              <span class="badge badge-warning">Count Query Cost</span>
+            </div>
+            <div class="code-block">
+              <pre><code>PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page0 prometheus</code></pre>
+            </div>
+
+            <div class="scenario-grid">
+              <div class="metric-card">
+                <span class="metric-label">Requests</span>
+                <span class="metric-value">14,835</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">RPS</span>
+                <span class="metric-value">48.64/s</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Failed</span>
+                <span class="metric-value">60.44%</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">p95</span>
+                <span class="metric-value">5s</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Dropped</span>
+                <span class="metric-value">166</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Query</th>
+                    <th class="numeric">Calls</th>
+                    <th class="numeric">Mean</th>
+                    <th class="numeric">Total</th>
+                    <th class="numeric">Rows</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>count(*) from point_history where user_id = ?</code></td>
+                    <td class="numeric">13,273</td>
+                    <td class="numeric">186.30ms</td>
+                    <td class="numeric">2,472,750.61ms</td>
+                    <td class="numeric">13,273</td>
+                  </tr>
+                  <tr>
+                    <td><code>point_history where user_id = ? fetch first ? rows only</code></td>
+                    <td class="numeric">13,283</td>
+                    <td class="numeric">3.12ms</td>
+                    <td class="numeric">41,384.08ms</td>
+                    <td class="numeric">265,660</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="two-column">
+              <div class="callout">
+                <strong>해석</strong>
+                <ul>
+                  <li>얕은 page0도 50 rps에서 안정적이지 않다.</li>
+                  <li>실제 page0 데이터 조회 SQL은 평균 3.12ms로 빠르다.</li>
+                  <li>Spring Data <code>Page</code> 응답을 만들기 위한 <code>count(*)</code> query가 평균 186.30ms로 비싸다.</li>
+                  <li>page0의 병목은 offset 자체보다 count query와 connection 점유 시간이다.</li>
+                </ul>
+              </div>
+              <figure class="image-frame">
+                <img src="../../evidence/phase-01/grafana-screenshots/points-page0.png" alt="Points page0 Grafana screenshot" loading="lazy">
+                <figcaption>Points page0 Grafana screenshot</figcaption>
+              </figure>
+            </div>
+
+            <div class="evidence-card" style="margin-top: 18px;">
+              <strong>Evidence</strong>
+              <ul>
+                <li><a href="../../evidence/phase-01/points/pool10-page0/k6-summary.txt">k6 summary</a></li>
+                <li><a href="../../evidence/phase-01/points/pool10-page0/pg-stat-statements.txt">pg_stat_statements</a></li>
+                <li><a href="../../evidence/phase-01/grafana-screenshots/points-page0.png">Grafana screenshot</a></li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="scenario" id="points-page500">
+            <div class="scenario-title">
+              <h3>Points Page500</h3>
+              <span class="badge badge-danger">Deep Offset</span>
+            </div>
+            <div class="code-block">
+              <pre><code>PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus</code></pre>
+            </div>
+
+            <div class="scenario-grid">
+              <div class="metric-card">
+                <span class="metric-label">Requests</span>
+                <span class="metric-value">14,766</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">RPS</span>
+                <span class="metric-value">48.41/s</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Failed</span>
+                <span class="metric-value">99.16%</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">p95</span>
+                <span class="metric-value">5s</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">Dropped</span>
+                <span class="metric-value">235</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Query</th>
+                    <th class="numeric">Calls</th>
+                    <th class="numeric">Mean</th>
+                    <th class="numeric">Total</th>
+                    <th class="numeric">Rows</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>point_history where user_id = ? offset ? rows fetch first ? rows only</code></td>
+                    <td class="numeric">5,711</td>
+                    <td class="numeric">274.68ms</td>
+                    <td class="numeric">1,568,719.47ms</td>
+                    <td class="numeric">0</td>
+                  </tr>
+                  <tr>
+                    <td><code>count(*) from point_history where user_id = ?</code></td>
+                    <td class="numeric">5,704</td>
+                    <td class="numeric">269.47ms</td>
+                    <td class="numeric">1,537,065.92ms</td>
+                    <td class="numeric">5,704</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="two-column">
+              <div class="callout">
+                <strong>해석</strong>
+                <ul>
+                  <li>page500은 deep offset 병목이 명확하다.</li>
+                  <li>page0 main query 평균 3.12ms와 비교하면 page500 offset query 평균 274.68ms는 약 88배 느리다.</li>
+                  <li>반환 row가 0인데도 깊은 offset까지 건너뛰는 비용을 지불했다.</li>
+                  <li>실패율 99.16%와 dropped iteration 235는 deep page 요청을 거의 처리하지 못한다는 뜻이다.</li>
+                </ul>
+              </div>
+              <figure class="image-frame">
+                <img src="../../evidence/phase-01/grafana-screenshots/points-page500.png" alt="Points page500 Grafana screenshot" loading="lazy">
+                <figcaption>Points page500 Grafana screenshot</figcaption>
+              </figure>
+            </div>
+
+            <div class="evidence-card" style="margin-top: 18px;">
+              <strong>Evidence</strong>
+              <ul>
+                <li><a href="../../evidence/phase-01/points/pool10-page500/k6-summary.txt">k6 summary</a></li>
+                <li><a href="../../evidence/phase-01/points/pool10-page500/pg-stat-statements.txt">pg_stat_statements</a></li>
+                <li><a href="../../evidence/phase-01/grafana-screenshots/points-page500.png">Grafana screenshot</a></li>
+              </ul>
+            </div>
+          </article>
+        </section>
+
+        <section class="section" id="classification">
+          <div class="section-header">
+            <div>
+              <h2>문제 분류</h2>
+              <p>Baseline에서 드러난 병목과 다음 비교 Phase를 연결한다.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Problem</th>
+                  <th>Evidence</th>
+                  <th>Next Phase</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>N+1 / 반복 단건 조회</td>
+                  <td><code>order_item where order_id = ?</code> 36,631 calls</td>
+                  <td>Phase 3</td>
+                </tr>
+                <tr>
+                  <td>Hikari pool 고갈</td>
+                  <td>active max 10, pending max 189</td>
+                  <td>Phase 3, pool 비교 실험</td>
+                </tr>
+                <tr>
+                  <td>상품 필터 인덱스 전 기준선</td>
+                  <td>product filter 15,001 calls, 118,489.64ms total</td>
+                  <td>Phase 2</td>
+                </tr>
+                <tr>
+                  <td>Page count query 비용</td>
+                  <td>page0 count query mean 186.30ms</td>
+                  <td>Phase 7 또는 별도 pagination 개선</td>
+                </tr>
+                <tr>
+                  <td>Deep offset 비용</td>
+                  <td>page500 offset query mean 274.68ms</td>
+                  <td>Phase 7</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="section" id="phase2">
+          <div class="section-header">
+            <div>
+              <h2>Phase 2 진입 판단</h2>
+              <p>Phase 1은 완료된 Baseline으로 보고 다음 Learning Phase로 넘어갈 수 있다.</p>
+            </div>
+          </div>
+
+          <ul class="insight-list">
+            <li>
+              <strong>세 API의 실패 양상 확인</strong>
+              실제 부하에서 어떤 방식으로 깨지는지 확인했다.
+            </li>
+            <li>
+              <strong>Evidence 저장 완료</strong>
+              k6 summary, SQL snapshot, Grafana screenshot이 저장되어 있다.
+            </li>
+            <li>
+              <strong>Phase 2 대상 명확</strong>
+              상품 검색 API는 Phase 2 인덱스 실험의 직접 대상이다.
+            </li>
+            <li>
+              <strong>이후 Phase 기준선 확보</strong>
+              주문 목록과 포인트 내역의 병목도 이후 Phase에서 비교할 기준선으로 남겼다.
+            </li>
+          </ul>
+
+          <div class="callout" style="margin-top: 18px;">
+            <strong>Phase 2 주의점</strong>
+            <p>
+              <code>products</code> 쿼리만 보고 끝내지 말고
+              <code>EXPLAIN ANALYZE</code>로 실제 실행계획을 반드시 기록해야 한다.
+            </p>
+          </div>
+
+          <p class="footer-note">
+            HTML view generated from <a href="./report.md">report.md</a>. Source content remains the Markdown report.
+          </p>
+        </section>
+      </main>
+
+      <aside class="toc" aria-label="목차">
+        <strong>목차</strong>
+        <a href="#conclusion">결론</a>
+        <a href="#conditions">실행 조건</a>
+        <a href="#metrics">지표 해석 기준</a>
+        <a href="#overview">전체 k6 결과</a>
+        <a href="#orders">Orders Baseline</a>
+        <a href="#products">Products Baseline</a>
+        <a href="#points-page0">Points Page0</a>
+        <a href="#points-page500">Points Page500</a>
+        <a href="#classification">문제 분류</a>
+        <a href="#phase2">Phase 2 진입 판단</a>
+      </aside>
+    </div>
+  </body>
+</html>
