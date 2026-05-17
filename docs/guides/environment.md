@@ -29,14 +29,16 @@ docker compose up -d
 
 Prometheus는 k6 remote write를 받을 수 있게 `--web.enable-remote-write-receiver` 옵션으로 실행된다. Grafana는 `docker/grafana/provisioning`을 통해 Prometheus datasource를 자동 등록한다.
 
+공통 대시보드는 `DB Lab / DB Lab Overview`를 기준으로 한다. 대시보드는 Spring Boot 서버가 실행되고 k6가 `prometheus` 모드로 한 번 이상 실행된 뒤에 의미 있는 값을 보여준다.
+
 ## k6 with Prometheus
 
 k6 지표를 Prometheus와 Grafana에서 보려면 `prometheus` 모드로 실행한다.
 
 ```bash
-./k6/run.sh orders baseline prometheus
-./k6/run.sh products baseline prometheus
-./k6/run.sh points points-page500 prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh products baseline prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus
 ```
 
 이 모드는 `docker compose --profile test run --rm k6`를 사용하고, k6 결과를 `http://prometheus:9090/api/v1/write`로 remote write 한다.

@@ -50,7 +50,7 @@ VACUUM ANALYZE;
 | 관찰 | 해석 |
 |---|---|
 | pending > 0, active가 pool 상한 근처 | 커넥션 풀 대기 병목 |
-| pending = 0, p95 증가 | 풀보다 쿼리 자체 또는 DB CPU가 병목 |
+| pending = 0, p95 증가 | 풀보다 쿼리 형태, 반복 조회, 테이블 스캔, 데이터 규모가 병목 |
 | `order_item` 조회 calls가 요청 수보다 훨씬 큼 | N+1 재현 성공 |
 | pool20에서 p95가 줄어듦 | 풀 크기가 병목 완화에 일부 효과 |
 | pool20에서도 p95가 그대로 높음 | N+1 쿼리 수 자체가 문제 |
@@ -81,15 +81,16 @@ VACUUM ANALYZE;
 | pg_stat_statements mean_exec_time | 상품 조회 쿼리의 평균 실행시간 확인 |
 | pg_stat_statements total_exec_time | 상품 조회가 총 DB 시간 상위권에 올라옴 |
 | PostgreSQL seq scan count | product 테이블 스캔 증가 |
-| PostgreSQL CPU | RPS 증가 시 CPU 사용률 상승 |
+| PostgreSQL seq tuples read | product 테이블에서 읽은 tuple 증가 |
+| PostgreSQL index scan count | Phase 2 인덱스 후 비교 기준 |
 | Hikari pending threads | 없어도 응답시간은 느릴 수 있음 |
-| k6 p95/p99 | RPS 증가 시 DB CPU와 같이 상승 |
+| k6 p95/p99 | RPS 증가 시 테이블 스캔 비용과 같이 상승 가능 |
 
 해석 기준:
 
 | 관찰 | 해석 |
 |---|---|
-| Hikari pending이 낮고 DB CPU가 높음 | 커넥션 풀이 아니라 풀스캔 병목 |
+| Hikari pending이 낮고 seq scan / seq tuples read가 높음 | 커넥션 풀이 아니라 풀스캔 병목 |
 | mean_exec_time이 높고 calls가 많음 | 인덱스 없는 필터 조회 비용 누적 |
 | Phase 2 인덱스 후 mean_exec_time 감소 | 인덱스 최적화 효과 증명 |
 | seq scan count 감소, index scan 증가 | 실행 계획 전환 증명 |
@@ -98,7 +99,7 @@ VACUUM ANALYZE;
 
 - 상품 조회 쿼리의 `EXPLAIN ANALYZE`
 - `pg_stat_statements` 상위 쿼리
-- DB CPU 또는 seq scan 관련 Grafana 패널
+- seq scan, index scan, seq tuples read 관련 Grafana 패널
 - k6 p95/TPS/error rate
 
 ## 시나리오: points
@@ -128,7 +129,7 @@ VACUUM ANALYZE;
 | k6 p95/p99 | page500이 page0보다 높아야 함 |
 | pg_stat_statements mean_exec_time | page500 쿼리 평균 실행시간 증가 |
 | pg_stat_statements rows | 반환 row는 적어도 스캔 비용은 커짐 |
-| DB CPU / IO | deep page에서 증가 가능 |
+| PostgreSQL seq tuples read | deep page에서 읽는 tuple 증가 가능 |
 | Hikari active connections | 쿼리가 느릴수록 커넥션 점유 시간이 길어짐 |
 
 해석 기준:
@@ -178,7 +179,8 @@ Phase 1 대시보드는 [Grafana Observability Guide](../../guides/grafana-obser
 | error rate | k6 `http_req_failed` |
 | Hikari max active | Grafana |
 | Hikari pending max | Grafana |
-| DB CPU max | Grafana |
+| table seq/index scan delta | Grafana |
+| seq tuples read delta | Grafana |
 | top SQL mean/total time | pg_stat_statements |
 | 원인 해석 | notes.md 또는 BASELINE.md |
 

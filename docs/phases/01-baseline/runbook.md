@@ -72,17 +72,23 @@ k6는 `k6/run.sh`로 실행한다.
 ./k6/run.sh <scenario> <preset>
 ```
 
-scenario와 preset 상세는 [k6 Load Testing Guide](../../guides/k6-load-testing.md)를 기준으로 한다.
+Grafana 증빙까지 남길 때는 `prometheus` 모드와 측정 조건 label을 함께 사용한다.
+
+```bash
+PHASE=phase-01 POOL=pool10 ./k6/run.sh <scenario> <preset> prometheus
+```
+
+scenario와 preset 상세는 [k6 Load Testing Guide](../../guides/k6-load-testing.md)를 기준으로 한다. 공통 대시보드는 [Grafana Observability Guide](../../guides/grafana-observability.md)의 `DB Lab Overview`를 기준으로 한다.
 
 예시:
 
 ```bash
-./k6/run.sh orders smoke
-./k6/run.sh orders baseline
-./k6/run.sh products baseline
-./k6/run.sh products stress-100
-./k6/run.sh points points-page0
-./k6/run.sh points points-page500
+PHASE=phase-01 POOL=pool10 ./k6/run.sh orders smoke prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh products baseline prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh products stress-100 prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page0 prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus
 ```
 
 ## 테스트 전 DB 통계 초기화
@@ -107,16 +113,16 @@ docker compose exec postgres psql -U app -d ecommerce -c "VACUUM ANALYZE;"
 ```bash
 docker compose exec postgres psql -U app -d ecommerce -c "SELECT pg_stat_statements_reset();"
 docker compose exec postgres psql -U app -d ecommerce -c "VACUUM ANALYZE;"
-./k6/run.sh orders baseline
+PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 
 docker compose exec postgres psql -U app -d ecommerce -c "SELECT pg_stat_statements_reset();"
-./k6/run.sh products baseline
+PHASE=phase-01 POOL=pool10 ./k6/run.sh products baseline prometheus
 
 docker compose exec postgres psql -U app -d ecommerce -c "SELECT pg_stat_statements_reset();"
-./k6/run.sh points points-page0
+PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page0 prometheus
 
 docker compose exec postgres psql -U app -d ecommerce -c "SELECT pg_stat_statements_reset();"
-./k6/run.sh points points-page500
+PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus
 ```
 
 병목이 보이는 시나리오만 `pool5`, `pool20`으로 반복한다.

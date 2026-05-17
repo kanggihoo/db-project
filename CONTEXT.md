@@ -32,6 +32,10 @@ _Avoid_: Note, rough result
 Evidence recorded for a specific learning phase.
 _Avoid_: Screenshot dump, temporary result
 
+**Measurement Condition**:
+The workload and runtime condition under which evidence is captured so results can be compared.
+_Avoid_: Hyperparameter, random setting, environment note
+
 **Pre-change Evidence**:
 Evidence captured before applying the optimization, operational pattern, or mitigation being studied.
 _Avoid_: Old result
@@ -119,6 +123,7 @@ _Avoid_: Like count
 - A **Naive Implementation** exists to produce a measurable **Baseline**.
 - **Evidence** records whether a **Learning Phase** demonstrated the intended before/after behavior.
 - **Phase Evidence** belongs to one **Learning Phase**.
+- **Phase Evidence** should record its **Measurement Condition**.
 - **Pre-change Evidence** and **Post-change Evidence** should be comparable when a **Learning Phase** applies an optimization or mitigation.
 - A **User** can have addresses, carts, orders, coupons, points, and reviews.
 - A **Product** has one or more **Product Options**.
@@ -149,3 +154,4 @@ _Avoid_: Like count
 
 - "이커머스 프로젝트" can mean a production ecommerce service or this learning lab. Resolved: this repo is an **Ecommerce DB Optimization Lab**, not a production ecommerce platform.
 - "customer", "member", and "account" all refer to **User** unless a future bounded context explicitly separates them.
+- "hyperparameter" in load-test discussion usually means **Measurement Condition** when it refers to workload, scenario, preset, or runtime profile values.
