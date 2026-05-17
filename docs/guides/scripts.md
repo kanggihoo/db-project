@@ -1,0 +1,76 @@
+# Scripts Guide
+
+> 프로젝트 루트의 `scripts/` 디렉토리에 있는 실행 스크립트를 설명한다.
+
+## Directory
+
+```text
+scripts/
+├── seed.sh
+└── server.sh
+```
+
+## scripts/seed.sh
+
+더미 데이터를 생성하는 Spring Boot seeder를 실행한다.
+
+```bash
+./scripts/seed.sh small
+./scripts/seed.sh loadtest
+```
+
+| preset | 실행되는 Spring profiles | 목적 |
+|---|---|---|
+| `small` | `seeder,seed-small` | 빠른 로컬 확인 |
+| `loadtest` | `seeder,seed-loadtest` | 부하 테스트 기준선 데이터 생성 |
+
+언제 실행하는가:
+
+- DB 볼륨을 처음 만든 뒤 스키마만 있고 데이터가 없을 때
+- 데이터 규모나 hot user 분포를 바꿔 다시 실험할 때
+- Phase 1 기준선 측정 전
+
+주의 사항:
+
+- `users` 테이블에 데이터가 있으면 seeder는 데이터를 다시 넣지 않는다.
+- 같은 preset으로 다시 만들려면 `docker compose down -v`로 볼륨을 삭제한 뒤 실행한다.
+- `loadtest`는 데이터가 크므로 로컬 메모리와 디스크 여유를 확인한다.
+
+## scripts/server.sh
+
+Spring Boot API 서버를 HikariCP pool preset으로 실행한다.
+
+```bash
+./scripts/server.sh pool5
+./scripts/server.sh pool10
+./scripts/server.sh pool20
+```
+
+| preset | 실행되는 Spring profile | 목적 |
+|---|---|---|
+| `pool5` | `pool5` | 작은 커넥션 풀에서 대기 병목 확인 |
+| `pool10` | `pool10` | 기본 기준선 |
+| `pool20` | `pool20` | pool 확장 효과 확인 |
+
+언제 실행하는가:
+
+- k6 부하 테스트 전에 API 서버를 띄울 때
+- Hikari pool 크기별로 같은 k6 시나리오를 반복 비교할 때
+- Phase 1 이후에도 DB 병목 실험을 할 때
+
+주의 사항:
+
+- Hikari pool 값은 서버 재시작 후 적용된다.
+- pool 비교 실험은 같은 데이터, 같은 k6 preset, 같은 DB 통계 초기화 조건에서 반복한다.
+- 서버 실행 중 다른 pool preset으로 바꾸려면 기존 서버를 종료하고 다시 실행한다.
+
+## Typical Flow
+
+```bash
+docker compose up -d
+./scripts/seed.sh loadtest
+./scripts/server.sh pool10
+./k6/run.sh orders baseline
+```
+
+상세 시딩 설정은 [Seed Data Guide](./seed-data.md), Spring profile은 [Spring Profiles Guide](./spring-profiles.md), k6 실행은 [k6 Load Testing Guide](./k6-load-testing.md)를 기준으로 한다.

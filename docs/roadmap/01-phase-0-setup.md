@@ -7,6 +7,14 @@
 - 인프라 구성, 의존성 설정, 스키마 생성, 더미 데이터 삽입
 - **상세 가이드: [SETUP.md](../../SETUP.md) 참고**
 
+### 관련 문서
+
+- 작업 계획: [phases/00-setup/plan.md](../phases/00-setup/plan.md)
+- 구현 기록: [phases/00-setup/implementation.md](../phases/00-setup/implementation.md)
+- 환경 가이드: [guides/environment.md](../guides/environment.md)
+- 시딩 가이드: [guides/seed-data.md](../guides/seed-data.md)
+- Spring profile 가이드: [guides/spring-profiles.md](../guides/spring-profiles.md)
+
 ### 완료 조건
 
 - [ ] Docker Compose로 PostgreSQL, Prometheus, Grafana가 기동된다.

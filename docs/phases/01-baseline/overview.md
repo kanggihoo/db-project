@@ -3,8 +3,8 @@
 > 이 문서는 Phase 1 완료 조건 체크리스트를 기준으로,
 > **무엇이 구현되었고 / 무엇을 직접 실행해야 하는지**를 명확히 구분한다.
 
-> 최신 실행 방법은 [PHASE1_LOAD_TEST_RUNBOOK.md](./PHASE1_LOAD_TEST_RUNBOOK.md)를 기준으로 한다.
-> Grafana/DB 관측 전략은 [PHASE1_OBSERVABILITY_STRATEGY.md](./PHASE1_OBSERVABILITY_STRATEGY.md)를 기준으로 한다.
+> 최신 실행 방법은 [runbook.md](./runbook.md)를 기준으로 한다.
+> Grafana/DB 관측 전략은 [observability.md](./observability.md)를 기준으로 한다.
 
 ---
 
@@ -89,7 +89,7 @@ cd ecommerce
 ./k6/run.sh points points-page500
 ```
 
-상세 preset은 [PHASE1_LOAD_TEST_RUNBOOK.md](./PHASE1_LOAD_TEST_RUNBOOK.md)를 기준으로 한다.
+상세 preset은 [runbook.md](./runbook.md)를 기준으로 한다.
 
 ---
 

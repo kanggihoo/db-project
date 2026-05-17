@@ -21,22 +21,7 @@ VACUUM ANALYZE;
 
 ## 공통 지표
 
-모든 시나리오에서 공통으로 본다.
-
-| 영역 | 지표 | 보는 이유 |
-|---|---|---|
-| k6 | `http_req_duration p50/p95/p99` | 사용자 체감 지연 |
-| k6 | `http_req_failed` | 실패율, 타임아웃 |
-| k6 | `http_reqs rate` | 실제 처리량 |
-| Spring MVC | HTTP server request p95 | 애플리케이션 기준 응답시간 |
-| HikariCP | active connections | 커넥션 풀 사용량 |
-| HikariCP | pending threads | 커넥션 대기 발생 여부 |
-| HikariCP | connection acquire time | 커넥션 획득 지연 |
-| PostgreSQL | active sessions | DB가 실제 처리 중인 세션 수 |
-| PostgreSQL | CPU / IO | DB 자원 병목 여부 |
-| PostgreSQL | seq scan count | 인덱스 없는 스캔 증가 |
-| pg_stat_statements | calls, mean_exec_time, total_exec_time, rows | 쿼리별 비용 |
-| JVM | heap, GC pause | 앱 자체 병목 여부 |
+모든 시나리오에서 공통으로 보는 지표는 [Grafana Observability Guide](../../guides/grafana-observability.md)를 기준으로 한다.
 
 ## 시나리오: orders
 
@@ -174,31 +159,11 @@ pool5 같은 시나리오 반복
 pool20 같은 시나리오 반복
 ```
 
-해석:
-
-| 결과 | 의미 |
-|---|---|
-| pool5에서만 pending 증가 | 작은 풀 때문에 대기 발생 |
-| pool20에서 p95 개선 | 커넥션 풀이 병목 완화에 도움 |
-| pool20에서도 개선 없음 | 쿼리/DB CPU/IO 병목 |
-| pool20에서 더 나빠짐 | DB 동시 실행 경합 증가 |
+상세 해석 기준은 [Grafana Observability Guide](../../guides/grafana-observability.md)의 Hikari pool 해석을 따른다.
 
 ## Grafana 패널 구성 권장
 
-Phase 1 대시보드는 최소한 아래 패널을 가진다.
-
-| 패널 | Prometheus 예시 |
-|---|---|
-| HTTP p95 by URI | `histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket[1m])))` |
-| HTTP request rate by URI | `sum by (uri) (rate(http_server_requests_seconds_count[1m]))` |
-| Hikari active connections | `hikaricp_connections_active` |
-| Hikari pending threads | `hikaricp_connections_pending` |
-| Hikari max connections | `hikaricp_connections_max` |
-| JVM GC pause p95 | `histogram_quantile(0.95, sum by (le) (rate(jvm_gc_pause_seconds_bucket[1m])))` |
-| PostgreSQL active sessions | postgres-exporter의 activity 관련 metric |
-| PostgreSQL seq scan | postgres-exporter의 table scan 관련 metric |
-
-Metric 이름은 Spring Boot, Micrometer, postgres-exporter 버전에 따라 조금 다를 수 있다. Grafana에서 자동완성되는 실제 metric 이름을 기준으로 패널을 만든다.
+Phase 1 대시보드는 [Grafana Observability Guide](../../guides/grafana-observability.md)의 공통 패널을 먼저 구성하고, 시나리오별 패널은 이 문서의 각 섹션을 따른다.
 
 ## BASELINE.md에 기록할 값
 
