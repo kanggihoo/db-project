@@ -11,6 +11,7 @@
 | `phases/` | Phase별 계획, 구현 기록, 실행 가이드, 관측 전략 |
 | `evidence/` | 부하 테스트 결과, Grafana 캡처, SQL 분석 결과 |
 | `sql-quiz/` | SQL 학습 문제와 풀이 자료 |
+| `agents/` | 에이전트 스킬이 참조하는 issue tracker, triage label, domain docs 설정 |
 
 ## Phase Documents
 
@@ -27,6 +28,7 @@
 - [Spring Profiles](./guides/spring-profiles.md)
 - [k6 Load Testing](./guides/k6-load-testing.md)
 - [Grafana Observability](./guides/grafana-observability.md)
+- [Agentic Issue Workflow](./guides/agentic-issue-workflow.md)
 
 ## Roadmap
 
