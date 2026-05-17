@@ -9,7 +9,21 @@ const USER_END = Number(preset.userEnd || USER_START);
 const SIZE = Number(preset.size || 20);
 const TIMEOUT = preset.timeout || '5s';
 
+const commonTags = {
+    phase: __ENV.PHASE || 'phase-01',
+    scenario: __ENV.SCENARIO || 'points',
+    preset: __ENV.PRESET_NAME || 'baseline',
+    pool: __ENV.POOL || 'pool10',
+};
+
+const requestTags = {
+    ...commonTags,
+    name: 'GET /api/points',
+};
+
 export const options = {
+    tags: commonTags,
+    systemTags: ['status', 'method', 'name', 'expected_response'],
     scenarios: {
         steady: {
             executor: 'constant-arrival-rate',
@@ -46,6 +60,7 @@ export default function () {
     const page = preset.page === undefined ? randomWeightedPage() : Number(preset.page);
     const res = http.get(`${BASE_URL}/api/points?userId=${userId}&page=${page}&size=${SIZE}`, {
         timeout: TIMEOUT,
+        tags: requestTags,
     });
 
     check(res, {
