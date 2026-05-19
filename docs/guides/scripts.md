@@ -74,6 +74,49 @@ Spring Boot API 서버를 HikariCP pool preset으로 실행한다.
 - pool 비교 실험은 같은 데이터, 같은 k6 preset, 같은 DB 통계 초기화 조건에서 반복한다.
 - 서버 실행 중 다른 pool preset으로 바꾸려면 기존 서버를 종료하고 다시 실행한다.
 
+## k6/run.sh
+
+k6 부하 테스트 시나리오를 실행한다.
+
+```bash
+./k6/run.sh orders baseline local
+./k6/run.sh products baseline local
+./k6/run.sh points baseline prometheus
+```
+
+사용 형식:
+
+```bash
+./k6/run.sh <orders|products|points> [preset] [local|prometheus]
+```
+
+기본값:
+
+| 값 | 기본값 | 설명 |
+|---|---|---|
+| `preset` | `baseline` | `k6/presets/<preset>.json` |
+| `mode` | `local` | 로컬 `k6` 또는 Docker `grafana/k6` 실행 |
+| `PHASE` | `phase-01` | k6 스크립트에 전달되는 phase 이름 |
+| `POOL` | `pool10` | k6 스크립트에 전달되는 pool 이름 |
+| `K6_TAIL_LINES` | `120` | 콘솔에 보여줄 마지막 로그 줄 수 |
+
+로그 출력:
+
+- 전체 k6 stdout/stderr는 기본적으로 `k6/results/<scenario>-<preset>-<mode>.log`에 저장된다.
+- 콘솔에는 전체 로그를 직접 출력하지 않고 마지막 `K6_TAIL_LINES`줄만 출력한다.
+- 실행 종료 코드는 원래 k6 또는 Docker 실행 결과를 그대로 반환한다.
+- AI 에이전트가 실행할 때 전체 k6 진행 로그가 context에 들어가는 것을 줄이기 위한 동작이다.
+
+로그 위치나 tail 줄 수를 바꾸려면 환경변수를 사용한다.
+
+```bash
+K6_TAIL_LINES=40 ./k6/run.sh products baseline local
+K6_RESULTS_DIR=docs/evidence/phase-02/products ./k6/run.sh products baseline local
+K6_LOG_FILE=/tmp/products-baseline.log ./k6/run.sh products baseline local
+```
+
+`local` 모드는 로컬에 `k6` 명령이 있으면 그것을 사용하고, 없으면 `grafana/k6` Docker 이미지를 사용한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
+
 ## scripts/capture-grafana-dashboard.mjs
 
 Captures the provisioned Grafana dashboard with Playwright and stitches the dashboard body into one long PNG.
@@ -126,6 +169,7 @@ Useful options:
 | `--no-align-phase-rows` | Keep the dashboard's current phase row state. |
 
 Generated intermediate files are written under `docs/evidence/grafana-internal-scroll-captures/` and are ignored by git.
+
 ## scripts/phase-02/
 
 Phase 2 인덱스 실험용 SQL 스크립트다. 운영 migration이 아니라 Learning Phase evidence를 반복 생성하기 위한 도구다.
