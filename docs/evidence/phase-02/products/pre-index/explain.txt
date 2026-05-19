@@ -1,0 +1,13 @@
+Phase 2 main product query: pre-index
+                                                QUERY PLAN                                                 
+-----------------------------------------------------------------------------------------------------------
+ Seq Scan on product  (cost=0.00..4609.00 rows=397 width=214) (actual time=0.036..13.808 rows=394 loops=1)
+   Filter: ((category_id = 10) AND ((status)::text = 'ON_SALE'::text))
+   Rows Removed by Filter: 99606
+   Buffers: shared hit=3109
+ Planning:
+   Buffers: shared hit=137
+ Planning Time: 1.174 ms
+ Execution Time: 13.869 ms
+(8 rows)
+
