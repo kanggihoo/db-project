@@ -36,7 +36,7 @@ Phase 2는 완료된 상태다.
 
 ## 관련 산출물
 
-- [Phase 2 Evidence](../../evidence/phase-02/README.md)
+- [Phase 2 Evidence](../../evidence/phase-02/README.md) (`docs/evidence/phase-02/README.md`)
 - [k6 Load Testing Guide](../../guides/k6-load-testing.md)
 - [Grafana Observability Guide](../../guides/grafana-observability.md)
 
