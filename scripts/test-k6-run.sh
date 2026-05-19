@@ -31,12 +31,7 @@ if [[ "$STATUS" -ne 7 ]]; then
   exit 1
 fi
 
-if grep -q 'line-001' "$TMP_DIR/stdout"; then
-  echo "expected stdout to contain only the tail, but it included early k6 output" >&2
-  exit 1
-fi
-
-grep -q 'line-008' "$TMP_DIR/stdout"
+grep -q 'line-001' "$TMP_DIR/stdout"
 grep -q 'line-012' "$TMP_DIR/stdout"
 
 LOG_FILE="$TMP_DIR/k6/results/products-baseline-local.log"
@@ -47,6 +42,24 @@ fi
 
 grep -q 'line-001' "$LOG_FILE"
 grep -q 'line-012' "$LOG_FILE"
+
+set +e
+PATH="$TMP_DIR/bin:$PATH" K6_TAIL_ONLY=1 K6_TAIL_LINES=5 "$TMP_DIR/k6/run.sh" products baseline local > "$TMP_DIR/tail-stdout" 2> "$TMP_DIR/tail-stderr"
+STATUS=$?
+set -e
+
+if [[ "$STATUS" -ne 7 ]]; then
+  echo "expected tail-only k6 exit status 7, got $STATUS" >&2
+  exit 1
+fi
+
+if grep -q 'line-001' "$TMP_DIR/tail-stdout"; then
+  echo "expected tail-only stdout to omit early k6 output" >&2
+  exit 1
+fi
+
+grep -q 'line-008' "$TMP_DIR/tail-stdout"
+grep -q 'line-012' "$TMP_DIR/tail-stdout"
 
 cat > "$TMP_DIR/bin/docker" <<'FAKE_DOCKER'
 #!/usr/bin/env bash
@@ -65,7 +78,7 @@ FAKE_DOCKER
 chmod +x "$TMP_DIR/bin/docker"
 
 set +e
-PATH="$TMP_DIR/bin:$PATH" K6_TAIL_LINES=3 "$TMP_DIR/k6/run.sh" products baseline prometheus > "$TMP_DIR/prometheus-stdout" 2> "$TMP_DIR/prometheus-stderr"
+PATH="$TMP_DIR/bin:$PATH" K6_TAIL_ONLY=1 K6_TAIL_LINES=3 "$TMP_DIR/k6/run.sh" products baseline prometheus > "$TMP_DIR/prometheus-stdout" 2> "$TMP_DIR/prometheus-stderr"
 STATUS=$?
 set -e
 

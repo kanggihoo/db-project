@@ -8,6 +8,7 @@ PRESET="${2:-baseline}"
 MODE="${3:-local}"
 PHASE="${PHASE:-phase-01}"
 POOL="${POOL:-pool10}"
+K6_TAIL_ONLY="${K6_TAIL_ONLY:-0}"
 K6_TAIL_LINES="${K6_TAIL_LINES:-120}"
 
 if [[ -z "$SCENARIO" ]]; then
@@ -41,6 +42,11 @@ if ! [[ "$K6_TAIL_LINES" =~ ^[0-9]+$ ]] || [[ "$K6_TAIL_LINES" -eq 0 ]]; then
   exit 1
 fi
 
+if [[ "$K6_TAIL_ONLY" != "0" && "$K6_TAIL_ONLY" != "1" ]]; then
+  echo "Invalid K6_TAIL_ONLY: $K6_TAIL_ONLY" >&2
+  exit 1
+fi
+
 RESULTS_DIR="${K6_RESULTS_DIR:-$SCRIPT_DIR/results}"
 LOG_PRESET="${PRESET//\//_}"
 LOG_FILE="${K6_LOG_FILE:-$RESULTS_DIR/${SCENARIO}-${LOG_PRESET}-${MODE}.log}"
@@ -50,8 +56,10 @@ case "$MODE" in
   local) ;;
   prometheus)
     RUN_DIR="$ROOT_DIR"
+    # Prevent Git Bash from rewriting Docker container paths like /scripts/*.js.
+    export MSYS_NO_PATHCONV="${MSYS_NO_PATHCONV:-1}"
     K6_CMD=(
-      env MSYS_NO_PATHCONV=1 docker compose --profile test run --rm k6 \
+      docker compose --profile test run --rm k6 \
       run \
       --out experimental-prometheus-rw \
       "${K6_ARGS[@]}" \
@@ -81,16 +89,27 @@ fi
 
 mkdir -p "$(dirname "$LOG_FILE")"
 
+echo "k6 log: $LOG_FILE"
+
 set +e
-(
-  cd "$RUN_DIR"
-  "${K6_CMD[@]}"
-) > "$LOG_FILE" 2>&1
-STATUS=$?
+if [[ "$K6_TAIL_ONLY" == "1" ]]; then
+  (
+    cd "$RUN_DIR"
+    "${K6_CMD[@]}"
+  ) > "$LOG_FILE" 2>&1
+  STATUS=$?
+else
+  (
+    cd "$RUN_DIR"
+    "${K6_CMD[@]}"
+  ) 2>&1 | tee "$LOG_FILE"
+  STATUS=${PIPESTATUS[0]}
+fi
 set -e
 
-echo "k6 log: $LOG_FILE"
-echo "Showing last $K6_TAIL_LINES lines:"
-tail -n "$K6_TAIL_LINES" "$LOG_FILE"
+if [[ "$K6_TAIL_ONLY" == "1" ]]; then
+  echo "Showing last $K6_TAIL_LINES lines:"
+  tail -n "$K6_TAIL_LINES" "$LOG_FILE"
+fi
 
 exit "$STATUS"

@@ -124,7 +124,13 @@ Run:
 PHASE=phase-02 POOL=pool10 K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt ./k6/run.sh products baseline prometheus
 ```
 
-Expected: k6 completes, full stdout/stderr is saved to `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`, and the console shows only the final tail of that log. The saved log contains `http_req_duration`, `http_req_failed`, and `dropped_iterations`.
+Expected: k6 completes, full stdout/stderr is saved to `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`, and the console shows live k6 progress. The saved log contains `http_req_duration`, `http_req_failed`, and `dropped_iterations`.
+
+If an AI agent runs this step and should avoid loading the full k6 output into context, add `K6_TAIL_ONLY=1`:
+
+```bash
+PHASE=phase-02 POOL=pool10 K6_TAIL_ONLY=1 K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt ./k6/run.sh products baseline prometheus
+```
 
 - [ ] **Step 11: Capture post-index pg_stat_statements**
 
