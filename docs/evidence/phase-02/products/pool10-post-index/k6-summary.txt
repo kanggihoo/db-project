@@ -1,3 +1,10 @@
+ Container postgres Running 
+ Container postgres_exporter Running 
+ Container prometheus Running 
+ Container postgres Waiting 
+ Container postgres Healthy 
+ Container db-project-k6-run-8f7f6af54bb3 Creating 
+ Container db-project-k6-run-8f7f6af54bb3 Created 
 
          /\      Grafana   /‾‾/  
     /\  /  \     |\  __   /  /   
@@ -14,80 +21,44 @@
               * steady: 50.00 iterations/s for 5m0s (maxVUs: 100-300, gracefulStop: 30s)
 
 
-running (0m01.0s), 001/100 VUs, 49 complete and 0 interrupted iterations
-steady   [   0% ] 001/100 VUs  0m01.0s/5m0s  50.00 iters/s
+running (0m01.0s), 003/100 VUs, 46 complete and 0 interrupted iterations
+steady   [   0% ] 003/100 VUs  0m01.0s/5m0s  50.00 iters/s
 
-running (0m02.0s), 001/100 VUs, 99 complete and 0 interrupted iterations
+running (0m02.0s), 001/100 VUs, 98 complete and 0 interrupted iterations
 steady   [   1% ] 001/100 VUs  0m02.0s/5m0s  50.00 iters/s
 
-running (0m03.0s), 001/100 VUs, 149 complete and 0 interrupted iterations
+running (0m03.0s), 001/100 VUs, 148 complete and 0 interrupted iterations
 steady   [   1% ] 001/100 VUs  0m03.0s/5m0s  50.00 iters/s
 
-running (4m51.0s), 001/100 VUs, 14549 complete and 0 interrupted iterations
-steady   [  97% ] 001/100 VUs  4m51.0s/5m0s  50.00 iters/s
+running (0m04.0s), 001/100 VUs, 198 complete and 0 interrupted iterations
+steady   [   1% ] 001/100 VUs  0m04.0s/5m0s  50.00 iters/s
 
-running (4m52.0s), 000/100 VUs, 14600 complete and 0 interrupted iterations
-steady   [  97% ] 000/100 VUs  4m52.0s/5m0s  50.00 iters/s
+running (0m05.0s), 002/100 VUs, 247 complete and 0 interrupted iterations
+steady   [   2% ] 002/100 VUs  0m05.0s/5m0s  50.00 iters/s
 
-running (4m53.0s), 001/100 VUs, 14649 complete and 0 interrupted iterations
-steady   [  98% ] 001/100 VUs  4m53.0s/5m0s  50.00 iters/s
+running (0m06.0s), 001/100 VUs, 298 complete and 0 interrupted iterations
+steady   [   2% ] 001/100 VUs  0m06.0s/5m0s  50.00 iters/s
 
-running (4m54.0s), 000/100 VUs, 14700 complete and 0 interrupted iterations
-steady   [  98% ] 000/100 VUs  4m54.0s/5m0s  50.00 iters/s
+running (0m07.0s), 001/100 VUs, 348 complete and 0 interrupted iterations
+steady   [   2% ] 001/100 VUs  0m07.0s/5m0s  50.00 iters/s
 
-running (4m55.0s), 001/100 VUs, 14749 complete and 0 interrupted iterations
-steady   [  98% ] 001/100 VUs  4m55.0s/5m0s  50.00 iters/s
+running (0m08.0s), 001/100 VUs, 398 complete and 0 interrupted iterations
+steady   [   3% ] 001/100 VUs  0m08.0s/5m0s  50.00 iters/s
 
-running (4m56.0s), 001/100 VUs, 14799 complete and 0 interrupted iterations
-steady   [  99% ] 001/100 VUs  4m56.0s/5m0s  50.00 iters/s
+running (0m09.0s), 001/100 VUs, 448 complete and 0 interrupted iterations
+steady   [   3% ] 001/100 VUs  0m09.0s/5m0s  50.00 iters/s
 
-running (4m57.0s), 001/100 VUs, 14849 complete and 0 interrupted iterations
-steady   [  99% ] 001/100 VUs  4m57.0s/5m0s  50.00 iters/s
+running (0m10.0s), 001/100 VUs, 498 complete and 0 interrupted iterations
+steady   [   3% ] 001/100 VUs  0m10.0s/5m0s  50.00 iters/s
 
-running (4m58.0s), 001/100 VUs, 14899 complete and 0 interrupted iterations
-steady   [  99% ] 001/100 VUs  4m58.0s/5m0s  50.00 iters/s
+running (0m11.0s), 003/100 VUs, 546 complete and 0 interrupted iterations
+steady   [   4% ] 003/100 VUs  0m11.0s/5m0s  50.00 iters/s
 
-running (4m59.0s), 001/100 VUs, 14949 complete and 0 interrupted iterations
-steady   [ 100% ] 001/100 VUs  4m59.0s/5m0s  50.00 iters/s
+running (0m12.0s), 001/100 VUs, 598 complete and 0 interrupted iterations
+steady   [   4% ] 001/100 VUs  0m12.0s/5m0s  50.00 iters/s
 
-running (5m00.0s), 001/100 VUs, 14999 complete and 0 interrupted iterations
-steady   [ 100% ] 001/100 VUs  5m00.0s/5m0s  50.00 iters/s
+running (0m13.0s), 001/100 VUs, 648 complete and 0 interrupted iterations
+steady   [   4% ] 001/100 VUs  0m13.0s/5m0s  50.00 iters/s
 
-
-  █ THRESHOLDS 
-
-    http_req_duration
-    ✓ 'p(95)<5000' p(95)=12.14ms
-
-    http_req_failed
-    ✓ 'rate<0.05' rate=0.00%
-
-
-  █ TOTAL RESULTS 
-
-    checks_total.......: 30002   100.009677/s
-    checks_succeeded...: 100.00% 30002 out of 30002
-    checks_failed......: 0.00%   0 out of 30002
-
-
-    HTTP
-    http_req_duration..............: avg=7.53ms min=3.27ms med=5.87ms max=89.91ms p(90)=11.33ms p(95)=12.14ms
-      { expected_response:true }...: avg=7.53ms min=3.27ms med=5.87ms max=89.91ms p(90)=11.33ms p(95)=12.14ms
-    http_req_failed................: 0.00%  0 out of 15001
-    http_reqs......................: 15001  50.004839/s
-
-    EXECUTION
-    iteration_duration.............: avg=7.77ms min=3.66ms med=6.1ms  max=90.14ms p(90)=11.58ms p(95)=12.4ms 
-    iterations.....................: 15001  50.004839/s
-    vus............................: 1      min=0          max=3  
-    vus_max........................: 100    min=100        max=100
-
-    NETWORK
-    data_received..................: 263 MB 876 kB/s
-    data_sent......................: 1.9 MB 6.2 kB/s
-
-
-
-
-running (5m00.0s), 000/100 VUs, 15001 complete and 0 interrupted iterations
-steady ✓ [ 100% ] 000/100 VUs  5m0s  50.00 iters/s
+running (0m14.0s), 001/100 VUs, 698 complete and 0 interrupted iterations
+steady   [   5% ] 001/100 VUs  0m14.0s/5m0s  50.00 iters/s
