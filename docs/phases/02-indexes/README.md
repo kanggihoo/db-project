@@ -4,7 +4,12 @@ Phase 2는 Phase 1 상품 검색 Baseline을 기준으로 `product(category_id, 
 
 ## 현재 상태
 
-준비 중
+Phase 2는 완료된 상태다.
+
+- 메인 상품 검색 쿼리의 pre-index/post-index 실행계획 기록 완료
+- `idx_product_category_status` 적용 후 k6, `pg_stat_statements`, Grafana evidence 저장 완료
+- SQL-only 보조 실험으로 단일/복합/커버링/부분 인덱스 동작 확인 완료
+- Phase 3 N+1 최적화로 넘길 근거 기록 완료
 
 ## 실험 기준
 
