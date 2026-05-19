@@ -17,6 +17,7 @@
 - The pre-index EXPLAIN output records the representative product query before `idx_product_category_status`.
 - The post-index EXPLAIN output records the same query after `idx_product_category_status`.
 - The k6 and `pg_stat_statements` files use `phase=phase-02`, `scenario=products`, `preset=baseline`, and `pool=pool10`.
+- The final Phase 2 report uses these files as the closeout source and links SQL-only evidence separately.
 
 ## SQL-only Auxiliary Experiments
 
