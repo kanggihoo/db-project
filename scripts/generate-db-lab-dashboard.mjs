@@ -11,6 +11,7 @@ const datasource = {
 };
 
 const k6Filter = 'phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"';
+const zeroWhenNoData = (expr) => `(${expr}) or vector(0)`;
 
 let nextPanelId = 1;
 let nextRefCode = 'A'.charCodeAt(0);
@@ -201,7 +202,7 @@ addRowWithPanels(panels, 'Run Summary', (rowY, targetPanels) => {
     stat('k6 p99', `histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 4, rowY),
     stat('Error Rate', `avg(k6_http_req_failed_rate{${k6Filter}})`, 8, rowY),
     stat('Actual RPS', `sum(rate(k6_http_reqs_total{${k6Filter}}[$__rate_interval]))`, 12, rowY),
-    stat('Dropped Iterations', `sum(increase(k6_dropped_iterations_total{${k6Filter}}[$__range]))`, 16, rowY),
+    stat('Dropped Iterations', zeroWhenNoData(`sum(increase(k6_dropped_iterations_total{${k6Filter}}[$__range]))`), 16, rowY),
     stat('Hikari Pending Max', 'max_over_time(hikaricp_connections_pending[$__range])', 20, rowY),
   );
   y = rowY + 4;
@@ -212,7 +213,7 @@ addRowWithPanels(panels, 'k6 Load', (rowY, targetPanels) => {
     timeSeries('Actual RPS', `sum(rate(k6_http_reqs_total{${k6Filter}}[$__rate_interval]))`, 'rps', 0, rowY),
     timeSeries('k6 Latency p95', `histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 'p95', 12, rowY),
     timeSeries('Error Rate', `avg(k6_http_req_failed_rate{${k6Filter}})`, 'failed', 0, rowY + 8),
-    timeSeries('Dropped Iterations', `sum(rate(k6_dropped_iterations_total{${k6Filter}}[$__rate_interval]))`, 'dropped', 12, rowY + 8),
+    timeSeries('Dropped Iterations', zeroWhenNoData(`sum(rate(k6_dropped_iterations_total{${k6Filter}}[$__rate_interval]))`), 'dropped', 12, rowY + 8),
   );
   y = rowY + 16;
 });
