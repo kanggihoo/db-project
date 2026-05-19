@@ -351,7 +351,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__range]))",
+          "expr": "(sum(increase(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "E"
         }
@@ -812,7 +812,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))",
+          "expr": "(sum(rate(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "dropped",
           "range": true,
           "refId": "J"
