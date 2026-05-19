@@ -6,6 +6,16 @@
 
 ```text
 scripts/
+├── phase-02/
+│   ├── 00-clean-product-indexes.sql
+│   ├── 01-main-pre-index-explain.sql
+│   ├── 02-create-main-index.sql
+│   ├── 03-main-post-index-explain.sql
+│   ├── 04-product-pg-stat-statements.sql
+│   ├── 10-single-status-index.sql
+│   ├── 20-composite-order-index.sql
+│   ├── 30-covering-index.sql
+│   └── 40-partial-index.sql
 ├── seed.sh
 └── server.sh
 ```
@@ -63,6 +73,24 @@ Spring Boot API 서버를 HikariCP pool preset으로 실행한다.
 - Hikari pool 값은 서버 재시작 후 적용된다.
 - pool 비교 실험은 같은 데이터, 같은 k6 preset, 같은 DB 통계 초기화 조건에서 반복한다.
 - 서버 실행 중 다른 pool preset으로 바꾸려면 기존 서버를 종료하고 다시 실행한다.
+
+## scripts/phase-02/
+
+Phase 2 인덱스 실험용 SQL 스크립트다. 운영 migration이 아니라 Learning Phase evidence를 반복 생성하기 위한 도구다.
+
+주요 스크립트:
+
+| Script | Purpose |
+|---|---|
+| `00-clean-product-indexes.sql` | product 실험 인덱스 정리 |
+| `01-main-pre-index-explain.sql` | 메인 상품 검색 pre-index 실행계획 |
+| `02-create-main-index.sql` | `idx_product_category_status` 생성 |
+| `03-main-post-index-explain.sql` | 메인 상품 검색 post-index 실행계획 |
+| `04-product-pg-stat-statements.sql` | product query snapshot |
+| `10-single-status-index.sql` | 단일 status 인덱스 선택도 실험 |
+| `20-composite-order-index.sql` | 복합 인덱스 순서 실험 |
+| `30-covering-index.sql` | 커버링 인덱스 실험 |
+| `40-partial-index.sql` | soft delete 부분 인덱스 실험 |
 
 ## Typical Flow
 
