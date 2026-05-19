@@ -98,21 +98,23 @@ k6 부하 테스트 시나리오를 실행한다.
 | `mode` | `local` | 로컬 `k6` 또는 Docker `grafana/k6` 실행 |
 | `PHASE` | `phase-01` | k6 스크립트에 전달되는 phase 이름 |
 | `POOL` | `pool10` | k6 스크립트에 전달되는 pool 이름 |
-| `K6_TAIL_LINES` | `120` | 콘솔에 보여줄 마지막 로그 줄 수 |
+| `K6_TAIL_ONLY` | `0` | `1`이면 실행 중 출력은 숨기고 종료 후 tail만 출력 |
+| `K6_TAIL_LINES` | `120` | `K6_TAIL_ONLY=1`일 때 보여줄 마지막 로그 줄 수 |
 
 로그 출력:
 
 - 전체 k6 stdout/stderr는 기본적으로 `k6/results/<scenario>-<preset>-<mode>.log`에 저장된다.
-- 콘솔에는 전체 로그를 직접 출력하지 않고 마지막 `K6_TAIL_LINES`줄만 출력한다.
+- 기본 실행은 콘솔에 k6 출력을 실시간으로 보여주면서 같은 내용을 로그 파일에도 저장한다.
+- `K6_TAIL_ONLY=1`이면 콘솔에는 전체 로그를 직접 출력하지 않고 마지막 `K6_TAIL_LINES`줄만 출력한다.
 - 실행 종료 코드는 원래 k6 또는 Docker 실행 결과를 그대로 반환한다.
-- AI 에이전트가 실행할 때 전체 k6 진행 로그가 context에 들어가는 것을 줄이기 위한 동작이다.
+- `K6_TAIL_ONLY=1`은 AI 에이전트가 실행할 때 전체 k6 진행 로그가 context에 들어가는 것을 줄이기 위한 옵션이다.
 
 로그 위치나 tail 줄 수를 바꾸려면 환경변수를 사용한다.
 
 ```bash
-K6_TAIL_LINES=40 ./k6/run.sh products baseline local
 K6_RESULTS_DIR=docs/evidence/phase-02/products ./k6/run.sh products baseline local
 K6_LOG_FILE=/tmp/products-baseline.log ./k6/run.sh products baseline local
+K6_TAIL_ONLY=1 K6_TAIL_LINES=40 ./k6/run.sh products baseline local
 ```
 
 `local` 모드는 로컬에 `k6` 명령이 있으면 그것을 사용하고, 없으면 `grafana/k6` Docker 이미지를 사용한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
