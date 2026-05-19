@@ -51,7 +51,7 @@ case "$MODE" in
   prometheus)
     RUN_DIR="$ROOT_DIR"
     K6_CMD=(
-      docker compose --profile test run --rm k6 \
+      env MSYS_NO_PATHCONV=1 docker compose --profile test run --rm k6 \
       run \
       --out experimental-prometheus-rw \
       "${K6_ARGS[@]}" \
