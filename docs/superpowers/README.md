@@ -13,6 +13,7 @@
 
 - [DB Lab Grafana Dashboard Spec](./specs/db-lab-grafana-dashboard-spec.md)
 - [Phase 2 Index Optimization Spec](./specs/phase-2-index-optimization-spec.md)
+- [Phase 3 N+1 Loading Strategy Spec](./specs/phase-3-n-plus-one-spec.md)
 - [DB Lab Grafana Dashboard Plan](./plans/db-lab-grafana-dashboard/000-plan-index.md)
 - [Phase 2 Index Optimization Plan](./plans/phase-2-index-optimization/000-plan-index.md)
 - [Phase 0 Legacy Plan](./plans/phase-00-setup/000-legacy-plan.md)
