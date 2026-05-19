@@ -26,3 +26,9 @@
 | Composite index order | [sql-only/composite-order-index.txt](./sql-only/composite-order-index.txt) |
 | Covering index | [sql-only/covering-index.txt](./sql-only/covering-index.txt) |
 | Partial index | [sql-only/partial-index.txt](./sql-only/partial-index.txt) |
+
+## SQL-only Notes
+
+- SQL-only evidence is captured through `psql`, not the product API.
+- These files explain index behavior and are not compared directly with k6 latency.
+- Each SQL-only script cleans unrelated experimental indexes before running its own experiment.
