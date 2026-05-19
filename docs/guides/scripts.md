@@ -119,6 +119,8 @@ K6_TAIL_ONLY=1 K6_TAIL_LINES=40 ./k6/run.sh products baseline local
 
 `local` 모드는 로컬에 `k6` 명령이 있으면 그것을 사용하고, 없으면 `grafana/k6` Docker 이미지를 사용한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
 
+Windows Git Bash에서 `prometheus` 모드를 실행할 때 `/scripts/*.js` 같은 Docker 컨테이너 내부 경로가 `C:/Program Files/Git/...` 형태로 바뀌지 않도록 `run.sh`가 `MSYS_NO_PATHCONV=1`을 설정한다. 사용자가 별도로 설정할 필요는 없다.
+
 ## scripts/capture-grafana-dashboard.mjs
 
 Captures the provisioned Grafana dashboard with Playwright and stitches the dashboard body into one long PNG.

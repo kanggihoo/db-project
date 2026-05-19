@@ -11,6 +11,7 @@ const datasource = {
 };
 
 const k6Filter = 'phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"';
+const apiUriFilter = 'uri=~"$uri", uri!="/actuator/prometheus", uri!="/**"';
 const zeroWhenNoData = (expr) => `(${expr}) or vector(0)`;
 
 let nextPanelId = 1;
@@ -220,10 +221,9 @@ addRowWithPanels(panels, 'k6 Load', (rowY, targetPanels) => {
 
 addRowWithPanels(panels, 'Spring API', (rowY, targetPanels) => {
   targetPanels.push(
-    timeSeries('HTTP Request Rate by URI', 'sum by (uri) (rate(http_server_requests_seconds_count{uri=~"$uri"}[$__rate_interval]))', '{{uri}}', 0, rowY),
-    timeSeries('HTTP p95 by URI', 'histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~"$uri"}[$__rate_interval])))', '{{uri}}', 12, rowY),
-    timeSeries('HTTP Errors by Status', 'sum by (status) (rate(http_server_requests_seconds_count{status!~"2.."}[$__rate_interval]))', '{{status}}', 0, rowY + 8),
-    table('Slowest URI', 'sort_desc(histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~"$uri"}[$__rate_interval]))))', 12, rowY + 8),
+    timeSeries('HTTP Request Rate by URI', `sum by (uri) (rate(http_server_requests_seconds_count{${apiUriFilter}}[$__rate_interval]))`, '{{uri}}', 0, rowY),
+    timeSeries('HTTP p95 by URI', `histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{${apiUriFilter}}[$__rate_interval])))`, '{{uri}}', 12, rowY),
+    timeSeries('HTTP Errors by Status', 'sum by (status) (rate(http_server_requests_seconds_count{status!~"2..", uri!="/actuator/prometheus", uri!="/**"}[$__rate_interval]))', '{{status}}', 0, rowY + 8, 24),
   );
   y = rowY + 16;
 });
@@ -252,8 +252,8 @@ addRowWithPanels(panels, 'Table Access', (rowY, targetPanels) => {
   targetPanels.push(
     timeSeries('Seq Scan by Table', 'sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 0, rowY),
     timeSeries('Index Scan by Table', 'sum by (relname) (rate(pg_stat_user_tables_idx_scan{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 12, rowY),
-    table('Seq Tuples Read Top N', 'topk(10, increase(pg_stat_user_tables_seq_tup_read[$__range]))', 0, rowY + 8),
-    table('Index Tuples Fetch Top N', 'topk(10, increase(pg_stat_user_tables_idx_tup_fetch[$__range]))', 12, rowY + 8),
+    timeSeries('Seq Tuples Read Rate by Table', 'sum by (relname) (rate(pg_stat_user_tables_seq_tup_read{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 0, rowY + 8),
+    timeSeries('Index Tuples Fetch Rate by Table', 'sum by (relname) (rate(pg_stat_user_tables_idx_tup_fetch{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 12, rowY + 8),
   );
   y = rowY + 16;
 });
