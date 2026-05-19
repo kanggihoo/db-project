@@ -12,6 +12,12 @@
 | Post-index pg_stat_statements | [products/pool10-post-index/pg-stat-statements.txt](./products/pool10-post-index/pg-stat-statements.txt) |
 | Post-index Grafana screenshot | [grafana-screenshots/products-post-index.png](./grafana-screenshots/products-post-index.png) |
 
+## Main API Comparison Notes
+
+- The pre-index EXPLAIN output records the representative product query before `idx_product_category_status`.
+- The post-index EXPLAIN output records the same query after `idx_product_category_status`.
+- The k6 and `pg_stat_statements` files use `phase=phase-02`, `scenario=products`, `preset=baseline`, and `pool=pool10`.
+
 ## SQL-only Auxiliary Experiments
 
 | Experiment | Path |
