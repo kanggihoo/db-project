@@ -1,4 +1,5 @@
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -14,11 +15,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--input-dir", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
-    parser.add_argument("--header-height", type=int, required=True)
-    parser.add_argument("--body-x", type=int, required=True)
-    parser.add_argument("--body-y", type=int, required=True)
-    parser.add_argument("--body-width", type=int, required=True)
-    parser.add_argument("--body-height", type=int, required=True)
+    parser.add_argument(
+        "--metadata",
+        type=Path,
+        default=None,
+        help="capture-meta.json from scripts/capture-grafana-dashboard.mjs.",
+    )
+    parser.add_argument("--header-height", type=int, default=None)
+    parser.add_argument("--body-x", type=int, default=None)
+    parser.add_argument("--body-y", type=int, default=None)
+    parser.add_argument("--body-width", type=int, default=None)
+    parser.add_argument("--body-height", type=int, default=None)
     parser.add_argument(
         "--scroll-height",
         type=int,
@@ -47,8 +54,64 @@ def load_captures(input_dir: Path, body_height: int) -> list[tuple[Path, int]]:
     return sorted(captures, key=lambda item: item[1])
 
 
+def paste_clipped_captures(args: argparse.Namespace) -> None:
+    if args.metadata is None:
+        raise SystemExit("--metadata is required for clipped capture stitching")
+
+    metadata = json.loads(args.metadata.read_text(encoding="utf-8"))
+    captures = sorted(
+        metadata["captures"],
+        key=lambda capture: capture["actualOffset"],
+    )
+    if not captures:
+        raise SystemExit("No captures found in metadata")
+
+    first_capture = captures[0]
+    first_image = Image.open(args.input_dir / first_capture["file"]).convert("RGB")
+    scale_y = first_image.height / first_capture["rect"]["height"]
+    output_width = first_image.width
+    output_height = round(metadata["initial"]["scrollHeight"] * scale_y)
+    stitched = Image.new("RGB", (output_width, output_height), (17, 18, 23))
+
+    covered_until = 0
+    for capture in captures:
+        image = Image.open(args.input_dir / capture["file"]).convert("RGB")
+        offset = round(capture["actualOffset"] * scale_y)
+        capture_end = min(offset + image.height, output_height)
+        source_y = max(0, covered_until - offset)
+        paste_y = offset + source_y
+        visible_height = capture_end - paste_y
+        covered_until = max(covered_until, capture_end)
+
+        if visible_height <= 0:
+            continue
+
+        body = image.crop((0, source_y, output_width, source_y + visible_height))
+        stitched.paste(body, (0, paste_y))
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    stitched.save(args.output)
+    print(args.output)
+    print(f"{stitched.width}x{stitched.height}")
+
+
 def main() -> None:
     args = parse_args()
+    if args.metadata is not None:
+        paste_clipped_captures(args)
+        return
+
+    required = {
+        "--header-height": args.header_height,
+        "--body-x": args.body_x,
+        "--body-y": args.body_y,
+        "--body-width": args.body_width,
+        "--body-height": args.body_height,
+    }
+    missing = [name for name, value in required.items() if value is None]
+    if missing:
+        raise SystemExit(f"Missing required arguments: {', '.join(missing)}")
+
     captures = load_captures(args.input_dir, args.body_height)
 
     first_image = Image.open(captures[0][0]).convert("RGB")

@@ -74,6 +74,58 @@ Spring Boot API 서버를 HikariCP pool preset으로 실행한다.
 - pool 비교 실험은 같은 데이터, 같은 k6 preset, 같은 DB 통계 초기화 조건에서 반복한다.
 - 서버 실행 중 다른 pool preset으로 바꾸려면 기존 서버를 종료하고 다시 실행한다.
 
+## scripts/capture-grafana-dashboard.mjs
+
+Captures the provisioned Grafana dashboard with Playwright and stitches the dashboard body into one long PNG.
+
+Setup once:
+
+```powershell
+rtk npm install
+rtk python -c "import PIL; print('ok')"
+rtk docker compose up -d --force-recreate grafana
+```
+
+`docker-compose.yml` enables Grafana anonymous Viewer access, so this script opens dashboard URLs directly without login cookies.
+
+Default capture:
+
+```powershell
+rtk npm run grafana:capture
+```
+
+The default output path is built from dashboard variables:
+
+```text
+docs/evidence/<phase>/grafana-screenshots/<scenario>-<preset>-<pool>.png
+```
+
+Examples:
+
+```powershell
+rtk npm run grafana:capture -- --phase phase-02 --scenario products --preset baseline --pool pool10
+rtk npm run grafana:capture -- --phase phase-03 --scenario orders --preset baseline --pool pool10
+```
+
+The script also updates the dashboard URL variables. For example, `--phase phase-03` opens the dashboard with `var-phase=phase-03`, collapses all phase focus rows, expands only `Phase 3 N+1 Focus`, resets the internal Grafana scroll container to the top, captures clipped container images, then runs the Python stitch step.
+
+Useful options:
+
+| Option | Purpose |
+|---|---|
+| `--url <url>` | Start from a custom Grafana dashboard URL. Explicit variable options still override matching `var-*` parameters. |
+| `--output <path>` | Override the final PNG path. |
+| `--parts-dir <path>` | Override the temporary part capture directory. |
+| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-07`. |
+| `--scenario <name>` | Set `var-scenario`. |
+| `--preset <name>` | Set `var-preset`. |
+| `--pool <name>` | Set `var-pool`. |
+| `--uri <pattern>` | Set `var-uri`. |
+| `--table <pattern>` | Set `var-table`. |
+| `--no-stitch` | Save only part captures and `capture-meta.json`. |
+| `--no-align-phase-rows` | Keep the dashboard's current phase row state. |
+
+Generated intermediate files are written under `docs/evidence/grafana-internal-scroll-captures/` and are ignored by git.
 ## scripts/phase-02/
 
 Phase 2 인덱스 실험용 SQL 스크립트다. 운영 migration이 아니라 Learning Phase evidence를 반복 생성하기 위한 도구다.

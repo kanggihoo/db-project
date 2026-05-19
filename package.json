@@ -1,0 +1,13 @@
+{
+  "name": "db-project",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "grafana:capture": "node scripts/capture-grafana-dashboard.mjs",
+    "grafana:capture:parts": "node scripts/capture-grafana-dashboard.mjs --no-stitch",
+    "test:grafana-capture": "node --test scripts/grafana-capture-plan.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

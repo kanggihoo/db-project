@@ -23,6 +23,9 @@ out/
 # VS Code
 .vscode/
 
+# Node.js
+node_modules/
+
 # macOS
 .DS_Store
 
@@ -41,3 +44,7 @@ logs/
 # 환경변수
 .env
 .env.local
+
+# Generated Grafana capture artifacts
+docs/evidence/grafana-internal-scroll-captures/
+docs/evidence/grafana-dashboard-stitched-full.png
