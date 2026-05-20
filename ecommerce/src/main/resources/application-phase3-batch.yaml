@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  jpa:
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100

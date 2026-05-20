@@ -24,7 +24,8 @@ public class OrderService {
         return switch (strategy) {
             case LAZY -> getOrdersByUserIdLazy(userId);
             case FETCH_JOIN -> getOrdersByUserIdFetchJoin(userId);
-            case BATCH_SIZE, ENTITY_GRAPH -> getOrdersByUserIdLazy(userId);
+            case BATCH_SIZE -> getOrdersByUserIdLazy(userId);
+            case ENTITY_GRAPH -> getOrdersByUserIdLazy(userId);
         };
     }
 

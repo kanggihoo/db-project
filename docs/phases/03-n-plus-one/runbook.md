@@ -19,3 +19,14 @@ PHASE=phase-03 STRATEGY=fetch-join ./k6/run.sh orders smoke prometheus
 PHASE=phase-03 STRATEGY=batch-size ./k6/run.sh orders smoke prometheus
 PHASE=phase-03 STRATEGY=entity-graph ./k6/run.sh orders smoke prometheus
 ```
+
+## BatchSize profile
+
+BatchSize evidence must run with the isolated profile:
+
+```bash
+./scripts/server.sh phase3-batch
+PHASE=phase-03 POOL=pool10 STRATEGY=batch-size ./k6/run.sh orders baseline prometheus
+```
+
+Lazy, Fetch Join, and EntityGraph evidence must run without the `phase3-batch` profile so global batch fetching does not affect their SQL count.
