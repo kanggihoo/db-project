@@ -68,7 +68,9 @@ Run slices in order. Each slice leaves the repository in a reviewable state.
 - Order name, option, price, and quantity come from `OrderItem` snapshot fields.
 - Product image comes from `OrderItem.productSku.product.images`.
 - Entity fetch type stays `LAZY`; do not set persistent associations to `EAGER`.
-- BatchSize evidence is collected only under the `phase3-batch` profile.
+- Lazy, Fetch Join, and EntityGraph evidence is collected under the default profile without Hibernate batch fetching.
+- BatchSize evidence is collected only under the `phase3-batch` profile with `application-phase3-batch.yaml`.
+- Lazy SQL-count evidence records selected `userId`, order count, order item count, distinct SKU count, and distinct Product count so repeated-select growth can be interpreted correctly when SKUs or Products repeat.
 - Evidence is stored under `docs/evidence/phase-03/orders/<strategy>/`.
 - `pg_stat_statements_reset()` runs before each strategy measurement.
 

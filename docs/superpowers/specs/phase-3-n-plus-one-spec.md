@@ -51,14 +51,14 @@ Lazy naive 전략은 이 연관 경로를 그대로 접근해 `1 + N + 3M` 형�
 
 ### Treat Fetch Join And BatchSize As Required Comparisons
 
-Phase 3의 최소 비교 대상은 Lazy naive, Fetch Join, BatchSize다. EntityGraph는 선택 비교 대상으로 둔다.
+Phase 3의 비교 대상은 Lazy naive, Fetch Join, BatchSize, EntityGraph다. Lazy naive, Fetch Join, BatchSize는 핵심 비교 대상이고, EntityGraph는 plan 결정에 따라 네 번째 비교 전략으로 구현한다.
 
 | Strategy | Required | Purpose |
 |---|---|---|
 | Lazy naive | Yes | N+1 baseline 재현 |
 | Fetch Join | Yes | join 기반 eager loading 효과와 한계 확인 |
 | BatchSize | Yes | `IN (...)` 기반 batch loading 효과 확인 |
-| EntityGraph | Optional | annotation 기반 조회 시점 로딩 계획 비교 |
+| EntityGraph | Yes | annotation 기반 조회 시점 로딩 계획 비교 |
 
 ### Use Grafana For Pressure, Not SQL Text
 
@@ -73,10 +73,12 @@ Grafana는 strategy별 latency, failure, dropped iterations, Hikari pressure, ac
 The implementation plan must produce one comparable order-list response across strategies.
 
 1. Add JPA associations for the required path while keeping default loading lazy.
-2. Extend the order-list response to include a product thumbnail URL or equivalent thumbnail field.
+2. Extend each order item response with `thumbnailUrl`.
 3. Keep order name, option, price fields sourced from `OrderItem` snapshot values.
 4. Route the request by `strategy` while keeping the same endpoint and response contract.
 5. Reject or default unknown strategy values consistently.
+
+The thumbnail must be selected from `OrderItem.productSku.product.images` by choosing the first image where `isMain = true`. If no main image exists, fall back to the first image ordered by `sortOrder ASC, id ASC`. If no product image exists, return `null`.
 
 ### Loading Strategies
 
@@ -87,9 +89,11 @@ The implementation plan must provide these loading strategies.
 | `lazy` | Access lazy associations naturally and reproduce repeated select queries. |
 | `fetch-join` | Use JPQL `join fetch` for the main association path where safe. Document row duplication or collection fetch limits. |
 | `batch-size` | Use Hibernate batch loading through `default_batch_fetch_size` profile/config or targeted `@BatchSize`. Show `IN (...)` query shape. |
-| `entity-graph` | If implemented, use `@EntityGraph` on repository methods and document generated SQL shape. |
+| `entity-graph` | Use `@EntityGraph` on repository methods and document generated SQL shape. |
 
-BatchSize configuration must be isolated enough that it does not contaminate the Lazy or Fetch Join evidence. A separate Spring profile is acceptable.
+BatchSize must be enabled only through `application-phase3-batch.yaml`. The `phase3-batch` Spring profile is used only when collecting `strategy=batch-size` evidence. Lazy, Fetch Join, and EntityGraph evidence must be collected with the default profile, without Hibernate batch fetching.
+
+Lazy naive evidence should record the selected `userId`, order count `N`, order item count `M`, distinct SKU count, and distinct Product count. The expected query growth is approximately `1 + N + distinctSku + distinctProduct + distinctProductImageCollections`, and approaches `1 + N + 3M` when order items mostly reference distinct SKUs and Products.
 
 ### Evidence Layout
 
@@ -132,6 +136,11 @@ PHASE=phase-03 STRATEGY=batch-size ./k6/run.sh orders baseline prometheus
 ```
 
 The k6 order script must pass `strategy` as both a query parameter and a low-cardinality metric label.
+
+Server profile is part of the measurement condition:
+
+- `lazy`, `fetch-join`, and `entity-graph` runs use the default Spring profile.
+- `batch-size` runs use the `phase3-batch` Spring profile.
 
 ### Phase Documentation
 
@@ -179,9 +188,9 @@ Phase 3 must compare these metrics by strategy:
 - Phase 3 report states which strategy is safest for order-list style pagination and why.
 - Phase 3 report hands off the remaining consistency/concurrency question to Phase 4.
 
-## Open Questions
+## Resolved Questions
 
-- Should `entity-graph` be implemented in Phase 3 or left as a documented optional comparison?
-- Should `batch-size` use a separate Spring profile or targeted `@BatchSize` annotations?
-- Should product image loading fetch all images or only the representative main image?
-- Should the Phase 3 Grafana dashboard generator add an explicit `$strategy` variable before the implementation work starts?
+- EntityGraph is implemented in Phase 3 as a fourth comparable strategy.
+- BatchSize uses the dedicated `phase3-batch` Spring profile and `application-phase3-batch.yaml`.
+- Product image loading returns one representative `thumbnailUrl`: the main image first, then the first sorted fallback image, then `null`.
+- The Phase 3 Grafana dashboard generator adds an explicit low-cardinality `$strategy` variable before evidence collection.
