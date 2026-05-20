@@ -21,10 +21,10 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 주문 항목 식별 PK
 
-    @Column(nullable = false)
+    @Column(name = "order_id", nullable = false)
     private Long orderId; // 해당 주문의 식별 번호 (Orders 테이블 FK)
 
-    @Column(nullable = false)
+    @Column(name = "sku_id", nullable = false)
     private Long skuId; // 주문한 상품 SKU 식별 번호 (ProductSku 테이블 FK)
 
     @Column(nullable = false)
@@ -40,5 +40,12 @@ public class OrderItem {
 
     @Column(nullable = false)
     private String status; // 개별 상품의 상태 (배송준비, 취소 등)
-}
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    private Orders order;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sku_id", insertable = false, updatable = false)
+    private ProductSku productSku;
+}

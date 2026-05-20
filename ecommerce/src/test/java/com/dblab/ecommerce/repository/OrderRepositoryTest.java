@@ -1,9 +1,12 @@
 package com.dblab.ecommerce.repository;
 
 import com.dblab.ecommerce.TestcontainersConfiguration;
+import com.dblab.ecommerce.entity.OrderItem;
 import com.dblab.ecommerce.entity.Orders;
+import com.dblab.ecommerce.entity.ProductImage;
 import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -34,7 +37,8 @@ class OrderRepositoryTest {
     private final Long savedUserId = 100L; // SQL 파일에서 지정한 고정 ID
 
     @Test
-    void 주문_목록_조회_후_OrderItem_루프_접근시_N개_추가쿼리_발생_SQL버전() {
+    @DisplayName("주문 목록 조회 후 OrderItem 루프 접근 시 주문 수만큼 추가 쿼리가 발생한다")
+    void shouldIssueOneAdditionalQueryPerOrderWhenLoadingItemsInLoop() {
         // Given
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
@@ -57,5 +61,20 @@ class OrderRepositoryTest {
 
         assertThat(extraSqlCount).isEqualTo(orders.size());
         System.out.println("[@Sql 버전] N+1 발생 확인 — 루프 추가 SQL 수: " + extraSqlCount);
+    }
+
+    @Test
+    @DisplayName("주문상품에서 SKU, 상품, 대표 이미지까지 LAZY 연관 경로로 탐색한다")
+    void shouldTraverseLazyAssociationPathFromOrderItemToProductImage() {
+        List<Orders> orders = orderRepository.findByUserId(savedUserId);
+        assertThat(orders).hasSize(3);
+
+        OrderItem firstItem = orders.getFirst().getOrderItems().getFirst();
+
+        assertThat(firstItem.getProductSku().getId()).isEqualTo(100L);
+        assertThat(firstItem.getProductSku().getProduct().getId()).isEqualTo(100L);
+        assertThat(firstItem.getProductSku().getProduct().getImages())
+                .extracting(ProductImage::getImageUrl)
+                .contains("https://example.com/product-100-main.jpg");
     }
 }

@@ -3,6 +3,8 @@ package com.dblab.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 주문 마스터(Header) 엔티티
@@ -48,6 +50,11 @@ public class Orders {
 
     @Column(nullable = false)
     private LocalDateTime createdAt; // 주문 일시
+
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    @OrderBy("id ASC")
+    @Builder.Default
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     public enum Status {
         PENDING, PAID, PREPARING, SHIPPED, DELIVERED, CANCELLED
