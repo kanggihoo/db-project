@@ -11,3 +11,7 @@ Phase 3의 핵심 지표는 요청당 SQL 수와 query shape별 calls다. Grafan
 | `k6-summary.txt` | p95/p99, failure, dropped iterations 확인 |
 | `grafana-screenshot.png` | 커넥션 점유와 latency 흐름 확인 |
 | `explain.txt` | 대표 SQL 하나의 실행계획 확인 |
+
+## Fetch Join 해석
+
+Fetch Join은 `Orders -> OrderItems -> ProductSku -> Product` 구간의 반복 select를 줄인다. `Product.images`는 두 번째 collection이므로 동시에 fetch join하면 row multiplication이 커질 수 있다. Phase 3 report는 fetch join SQL count와 row duplication 위험을 함께 기록한다.
