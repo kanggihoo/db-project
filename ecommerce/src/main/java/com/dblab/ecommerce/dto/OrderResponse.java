@@ -40,13 +40,13 @@ public record OrderResponse(
         }
     }
 
-    public static OrderResponse of(Orders order, List<OrderItem> items) {
+    public static OrderResponse from(Orders order) {
         return new OrderResponse(
                 order.getId(),
                 order.getUserId(),
                 order.getStatus(),
                 order.getFinalPrice(),
                 order.getCreatedAt(),
-                items.stream().map(OrderItemDto::from).toList());
+                order.getOrderItems().stream().map(OrderItemDto::from).toList());
     }
 }
