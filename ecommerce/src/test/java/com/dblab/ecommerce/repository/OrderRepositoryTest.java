@@ -77,4 +77,23 @@ class OrderRepositoryTest {
                 .extracting(ProductImage::getImageUrl)
                 .contains("https://example.com/product-100-main.jpg");
     }
+
+    @Test
+    @DisplayName("LAZY 연관 접근은 OrderItem, SKU, Product, Image 조회 SQL을 추가로 발생시킨다")
+    void shouldIssueAdditionalQueriesWhenTraversingLazyAssociations() {
+        Session session = entityManager.unwrap(Session.class);
+        Statistics statistics = session.getSessionFactory().getStatistics();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        List<Orders> orders = orderRepository.findByUserId(savedUserId);
+        long beforeTraversal = statistics.getPrepareStatementCount();
+
+        orders.forEach(order -> order.getOrderItems().forEach(item -> {
+            item.getProductSku().getProduct().getImages().forEach(ProductImage::getImageUrl);
+        }));
+
+        long extraSqlCount = statistics.getPrepareStatementCount() - beforeTraversal;
+        assertThat(extraSqlCount).isGreaterThanOrEqualTo(4);
+    }
 }
