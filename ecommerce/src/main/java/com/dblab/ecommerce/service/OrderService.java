@@ -25,7 +25,7 @@ public class OrderService {
             case LAZY -> getOrdersByUserIdLazy(userId);
             case FETCH_JOIN -> getOrdersByUserIdFetchJoin(userId);
             case BATCH_SIZE -> getOrdersByUserIdLazy(userId);
-            case ENTITY_GRAPH -> getOrdersByUserIdLazy(userId);
+            case ENTITY_GRAPH -> getOrdersByUserIdEntityGraph(userId);
         };
     }
 
@@ -36,6 +36,13 @@ public class OrderService {
 
     private List<OrderResponse> getOrdersByUserIdFetchJoin(Long userId) {
         return orderRepository.findByUserIdWithFetchJoin(userId)
+                .stream()
+                .map(OrderResponse::from)
+                .toList();
+    }
+
+    private List<OrderResponse> getOrdersByUserIdEntityGraph(Long userId) {
+        return orderRepository.findGraphByUserId(userId)
                 .stream()
                 .map(OrderResponse::from)
                 .toList();
