@@ -1,34 +1,48 @@
-# 007 k6 And Grafana Strategy Observability
+# 007 k6 Strategy Evidence Naming
 
 ## Goal
 
-Make strategy visible in k6 metrics and Grafana so Phase 3 evidence can compare Lazy, Fetch Join, BatchSize, and EntityGraph runs under the same phase/scenario/preset/pool conditions.
+Run Phase 3 order load tests with different loading strategies by passing `STRATEGY` to k6, then keep each strategy's Phase Evidence separate through the evidence condition directory and Grafana screenshot filename.
+
+## Decision
+
+Do not add a Grafana `strategy` variable or strategy-by-strategy dashboard panels in this slice. The shared `DB Lab Overview` dashboard already has common k6, Spring API, Hikari, and PostgreSQL rows. Phase 3 strategy comparison will use separate fixed run windows, condition names, screenshots, k6 summaries, and `pg_stat_statements` snapshots.
+
+## Prerequisite
+
+Execute this plan after the Phase 2 shared observability tooling has been brought into the Phase 3 branch. Required shared files include `k6/run.sh`, `package.json`, `scripts/run-k6-evidence.mjs`, `scripts/capture-grafana-dashboard.mjs`, `scripts/grafana-capture-utils.mjs`, and `docs/guides/scripts.md`.
 
 ## Files
 
-- Modify: `k6/orders-test.js`
 - Modify: `k6/run.sh`
-- Modify: `scripts/generate-db-lab-dashboard.mjs`
-- Modify: `docs/guides/grafana-observability.md`
+- Modify: `k6/orders-test.js`
+- Modify: `docs/guides/scripts.md`
 - Modify: `docs/guides/k6-load-testing.md`
 
 ## Steps
 
 - [ ] **Step 1: Add strategy env propagation to k6 runner**
 
-Modify `k6/run.sh`:
+Modify `k6/run.sh` near the existing `PHASE` and `POOL` defaults:
 
 ```bash
 STRATEGY="${STRATEGY:-lazy}"
 ```
 
-Add to `K6_ARGS`:
+Add `STRATEGY` to `K6_ARGS`:
 
 ```bash
--e STRATEGY="$STRATEGY"
+K6_ARGS=(
+  -e PRESET="$PRESET_FILE"
+  -e PHASE="$PHASE"
+  -e SCENARIO="$SCENARIO"
+  -e PRESET_NAME="$PRESET"
+  -e POOL="$POOL"
+  -e STRATEGY="$STRATEGY"
+)
 ```
 
-- [ ] **Step 2: Add strategy query parameter and label**
+- [ ] **Step 2: Add strategy query parameter to the orders scenario**
 
 Modify `k6/orders-test.js`:
 
@@ -36,13 +50,7 @@ Modify `k6/orders-test.js`:
 const STRATEGY = __ENV.STRATEGY || 'lazy';
 ```
 
-Add to `commonTags`:
-
-```js
-strategy: STRATEGY,
-```
-
-Modify request URL:
+Modify the request URL:
 
 ```js
 const res = http.get(`${BASE_URL}/api/orders?userId=${userId}&strategy=${STRATEGY}`, {
@@ -51,97 +59,78 @@ const res = http.get(`${BASE_URL}/api/orders?userId=${userId}&strategy=${STRATEG
 });
 ```
 
-- [ ] **Step 3: Add strategy dashboard variable**
+Do not add `strategy` to `commonTags` in this plan. Strategy separation is handled by evidence condition names and fixed `run-window.json` capture windows.
 
-Modify `scripts/generate-db-lab-dashboard.mjs`.
+- [ ] **Step 3: Document strategy-specific evidence capture**
 
-Change:
+Update `docs/guides/scripts.md` in the `k6/run.sh` or evidence wrapper section with Phase 3 examples:
 
-```js
-const k6Filter = 'phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"';
+```bash
+STRATEGY=lazy rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-lazy \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-lazy.png
+
+STRATEGY=fetch-join rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-fetch-join \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-fetch-join.png
+
+STRATEGY=batch-size rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-batch-size \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-batch-size.png
+
+STRATEGY=entity-graph rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-entity-graph \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-entity-graph.png
 ```
 
-To:
+State that `evidence:capture` passes the current environment through to `k6/run.sh`, so `STRATEGY=...` controls the API strategy while `--condition` and `--output` control evidence naming.
 
-```js
-const k6Filter = 'phase="$phase", scenario="$scenario", preset="$preset", pool="$pool", strategy=~"$strategy"';
+- [ ] **Step 4: Document Phase 3 strategy usage in the k6 guide**
+
+Update `docs/guides/k6-load-testing.md`:
+
+```markdown
+Phase 3 orders runs can set `STRATEGY=lazy|fetch-join|batch-size|entity-graph`.
+The value is sent to `GET /api/orders` as the `strategy` query parameter.
+Keep strategy evidence separate by using matching `--condition` and `--output` names, for example `pool10-lazy` and `orders-pool10-lazy.png`.
 ```
 
-Add a templating variable after `$pool`:
-
-```js
-{
-  current: { selected: true, text: 'All', value: '$__all' },
-  datasource,
-  definition: 'label_values(k6_http_reqs_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}, strategy)',
-  includeAll: true,
-  label: 'Strategy',
-  multi: true,
-  name: 'strategy',
-  options: [],
-  query: { query: 'label_values(k6_http_reqs_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}, strategy)', refId: 'PrometheusVariableQueryEditor-VariableQuery' },
-  refresh: 1,
-  sort: 1,
-  type: 'query',
-}
-```
-
-- [ ] **Step 4: Change Phase 3 focus row panels**
-
-In `scripts/generate-db-lab-dashboard.mjs`, replace the generic Phase 3 row builder behavior with Phase 3-specific panels:
-
-```js
-addRowWithPanels(panels, 'Phase 3 N+1 Focus', (rowY, targetPanels) => {
-  targetPanels.push(
-    timeSeries('Phase 3 p95 by Strategy', `histogram_quantile(0.95, sum by (le, strategy) (rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, '{{strategy}}', 0, rowY),
-    timeSeries('Phase 3 Error Rate by Strategy', `avg by (strategy) (k6_http_req_failed_rate{${k6Filter}})`, '{{strategy}}', 12, rowY),
-    timeSeries('Phase 3 Dropped Iterations by Strategy', zeroWhenNoData(`sum by (strategy) (rate(k6_dropped_iterations_total{${k6Filter}}[$__rate_interval]))`), '{{strategy}}', 0, rowY + 8),
-    timeSeries('Phase 3 Hikari Pending', 'hikaricp_connections_pending', 'pending', 12, rowY + 8),
-  );
-  y = rowY + 16;
-});
-```
-
-Keep Phase 1, Phase 2, and Phase 7 focus rows intact.
-
-- [ ] **Step 5: Regenerate dashboard**
+- [ ] **Step 5: Verify runner and scenario changes**
 
 Run:
 
 ```bash
-rtk npm run grafana:generate
+rtk grep "STRATEGY" k6/run.sh k6/orders-test.js
 ```
 
-Expected: `docker/grafana/dashboards/db-lab-overview.json` updates and contains `"name": "strategy"` and `"Phase 3 p95 by Strategy"`.
+Expected: matches show `STRATEGY` defaulting in `k6/run.sh`, being passed in `K6_ARGS`, and being read by `k6/orders-test.js`.
 
-- [ ] **Step 6: Update docs**
-
-In `docs/guides/grafana-observability.md`, add `strategy` to Measurement Conditions:
-
-```markdown
-| `strategy` | `lazy` | Low-cardinality Phase 3 loading strategy |
-```
-
-In `docs/guides/k6-load-testing.md`, add:
-
-```markdown
-Phase 3 orders runs can set `STRATEGY=lazy|fetch-join|batch-size|entity-graph`; the value is sent as a query parameter and a low-cardinality k6 label.
-```
-
-- [ ] **Step 7: Verify generated dashboard and scripts**
+- [ ] **Step 6: Verify docs**
 
 Run:
 
 ```bash
-rtk grep "strategy" k6/run.sh k6/orders-test.js scripts/generate-db-lab-dashboard.mjs docker/grafana/dashboards/db-lab-overview.json
-rtk grep "Phase 3 p95 by Strategy" docker/grafana/dashboards/db-lab-overview.json
+rtk grep "pool10-lazy" docs/guides/scripts.md docs/guides/k6-load-testing.md
+rtk grep "entity-graph" docs/guides/scripts.md docs/guides/k6-load-testing.md
 ```
 
 Expected: both commands return matches.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add k6/orders-test.js k6/run.sh scripts/generate-db-lab-dashboard.mjs docker/grafana/dashboards/db-lab-overview.json docs/guides/grafana-observability.md docs/guides/k6-load-testing.md
-git commit -m "feat: add phase 3 strategy observability"
+git add k6/run.sh k6/orders-test.js docs/guides/scripts.md docs/guides/k6-load-testing.md docs/superpowers/plans/phase-03-n-plus-one/007-k6-and-grafana-strategy-observability.md
+git commit -m "docs: simplify phase 3 strategy evidence plan"
 ```
