@@ -1,7 +1,10 @@
 package com.dblab.ecommerce.repository;
 
 import com.dblab.ecommerce.TestcontainersConfiguration;
+import com.dblab.ecommerce.dto.OrderResponse;
+import com.dblab.ecommerce.entity.OrderItem;
 import com.dblab.ecommerce.entity.Orders;
+import com.dblab.ecommerce.entity.ProductImage;
 import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
@@ -57,5 +60,24 @@ class OrderRepositoryTest {
 
         assertThat(extraSqlCount).isEqualTo(orders.size());
         System.out.println("[@Sql 버전] N+1 발생 확인 — 루프 추가 SQL 수: " + extraSqlCount);
+    }
+
+    @Test
+    void 주문상품에서_SKU_상품_대표이미지까지_LAZY_연관경로를_탐색한다() {
+        List<Orders> orders = orderRepository.findByUserId(savedUserId);
+        assertThat(orders).hasSize(3);
+
+        OrderItem firstItem = orders.getFirst().getOrderItems().getFirst();
+
+        assertThat(firstItem.getProductSku().getId()).isEqualTo(100L);
+        assertThat(firstItem.getProductSku().getProduct().getId()).isEqualTo(100L);
+        assertThat(firstItem.getProductSku().getProduct().getImages())
+                .extracting(ProductImage::getImageUrl)
+                .contains("https://example.com/product-100-main.jpg");
+
+        OrderResponse response = OrderResponse.of(orders.getFirst(), orders.getFirst().getOrderItems());
+
+        assertThat(response.items().getFirst().thumbnailUrl())
+                .isEqualTo("https://example.com/product-100-main.jpg");
     }
 }

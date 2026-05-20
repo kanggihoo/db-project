@@ -3,6 +3,8 @@ package com.dblab.ecommerce.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 상품 엔티티
@@ -45,6 +47,11 @@ public class Product {
 
     @Column(nullable = false)
     private LocalDateTime updatedAt; // 수정 일시
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    @OrderBy("isMain DESC, sortOrder ASC, id ASC")
+    @Builder.Default
+    private List<ProductImage> images = new ArrayList<>();
 
     public enum Status { ON_SALE, SOLD_OUT, DISCONTINUED }
 }

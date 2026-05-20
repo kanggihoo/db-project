@@ -21,7 +21,7 @@ public class ProductSku {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // SKU 식별 PK
 
-    @Column(nullable = false)
+    @Column(name = "product_id", nullable = false)
     private Long productId; // 상품 식별 번호 (Product 테이블 FK)
 
     @Column(nullable = false, unique = true)
@@ -32,5 +32,9 @@ public class ProductSku {
 
     @Column(nullable = false)
     private Integer extraPrice; // 해당 옵션 조합 선택 시 추가되는 금액
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    private Product product;
 }
 
