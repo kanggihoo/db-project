@@ -80,4 +80,22 @@ class OrderRepositoryTest {
         assertThat(response.items().getFirst().thumbnailUrl())
                 .isEqualTo("https://example.com/product-100-main.jpg");
     }
+
+    @Test
+    void LAZY_연관접근은_OrderItem_SKU_Product_Image_조회_SQL을_추가로_발생시킨다() {
+        Session session = entityManager.unwrap(Session.class);
+        Statistics statistics = session.getSessionFactory().getStatistics();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        List<Orders> orders = orderRepository.findByUserId(savedUserId);
+        long beforeTraversal = statistics.getPrepareStatementCount();
+
+        orders.forEach(order -> order.getOrderItems().forEach(item -> {
+            item.getProductSku().getProduct().getImages().forEach(ProductImage::getImageUrl);
+        }));
+
+        long extraSqlCount = statistics.getPrepareStatementCount() - beforeTraversal;
+        assertThat(extraSqlCount).isGreaterThanOrEqualTo(4);
+    }
 }
