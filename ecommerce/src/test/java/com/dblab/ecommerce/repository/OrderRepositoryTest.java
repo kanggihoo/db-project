@@ -124,4 +124,26 @@ class OrderRepositoryTest {
         assertThat(orders).allSatisfy(order -> assertThat(order.getOrderItems()).hasSize(1));
         assertThat(afterTraversal).isEqualTo(afterQuery);
     }
+
+    @Test
+    @DisplayName("EntityGraph 조회는 OrderItem, SKU, Product 연관을 조회 시점에 로딩한다")
+    void entityGraphLoadsOrderItemSkuAndProductAssociationsAtQueryTime() {
+        Session session = entityManager.unwrap(Session.class);
+        Statistics statistics = session.getSessionFactory().getStatistics();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        List<Orders> orders = orderRepository.findGraphByUserId(savedUserId);
+        long afterQuery = statistics.getPrepareStatementCount();
+
+        orders.forEach(order -> order.getOrderItems().forEach(item -> {
+            item.getProductSku().getProduct().getId();
+        }));
+
+        long afterTraversal = statistics.getPrepareStatementCount();
+        assertThat(afterQuery).isEqualTo(1);
+        assertThat(orders).hasSize(3);
+        assertThat(orders).allSatisfy(order -> assertThat(order.getOrderItems()).hasSize(1));
+        assertThat(afterTraversal).isEqualTo(afterQuery);
+    }
 }
