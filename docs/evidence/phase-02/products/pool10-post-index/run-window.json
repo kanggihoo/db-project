@@ -1,0 +1,11 @@
+{
+  "phase": "phase-02",
+  "scenario": "products",
+  "preset": "baseline",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "startedAt": 1779263780223,
+  "endedAt": 1779264090383,
+  "grafanaFrom": 1779263770223,
+  "grafanaTo": 1779264110383
+}

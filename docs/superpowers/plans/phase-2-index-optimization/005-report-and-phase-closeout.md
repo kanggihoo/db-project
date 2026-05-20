@@ -101,7 +101,7 @@ Add this section:
 - [post-index EXPLAIN](../../evidence/phase-02/products/pool10-post-index/explain.txt)
 - [post-index k6 summary](../../evidence/phase-02/products/pool10-post-index/k6-summary.txt)
 - [post-index pg_stat_statements](../../evidence/phase-02/products/pool10-post-index/pg-stat-statements.txt)
-- [Grafana screenshot](../../evidence/phase-02/grafana-screenshots/products-post-index.png)
+- [Grafana screenshot](../../evidence/phase-02/grafana-screenshots/products-pool10-post-index.png)
 - [SQL-only evidence index](../../evidence/phase-02/README.md)
 ```
 

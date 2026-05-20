@@ -77,7 +77,9 @@ Expected output includes:
 products/pre-index/explain.txt
 products/pool10-post-index/explain.txt
 products/pool10-post-index/k6-summary.txt
+products/pool10-post-index/run-window.json
 products/pool10-post-index/pg-stat-statements.txt
+grafana-screenshots/products-pool10-post-index.png
 sql-only/single-status-index.txt
 sql-only/composite-order-index.txt
 sql-only/covering-index.txt
@@ -112,10 +114,10 @@ Only run if the main baseline comparison is too small to show a visible API-leve
 
 ```bash
 rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT pg_stat_statements_reset();"
-PHASE=phase-02 POOL=pool10 ./k6/run.sh products stress-100 prometheus | tee docs/evidence/phase-02/products/pool10-post-index/k6-stress-100-summary.txt
+rtk npm run k6:evidence -- --phase phase-02 --scenario products --preset stress-100 --condition pool10-post-index-stress-100
 ```
 
-Expected: k6 completes and output contains `http_req_duration`.
+Expected: k6 completes, output contains `http_req_duration`, and the stress run stores its own `k6-summary.txt` and `run-window.json` under `docs/evidence/phase-02/products/pool10-post-index-stress-100/`.
 
 - [ ] **Step 8: Final git status**
 

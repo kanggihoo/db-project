@@ -1,4 +1,4 @@
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,10 +8,12 @@ import {
   buildCapturePlan,
   buildEvidenceOutputPath,
   buildGrafanaDashboardUrl,
+  getGrafanaTimeRangeFromRunWindow,
   getFocusRowTitleForPhase,
   getDashboardVarsFromUrl,
   getPhaseFromUrl,
-} from './grafana-capture-plan.mjs';
+  shouldRequireRunWindow,
+} from './grafana-capture-utils.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DEFAULT_SELECTOR = '[data-testid="data-testid DashboardEditPaneSplitter body container"]';
@@ -32,6 +34,11 @@ const DEFAULTS = {
   pool: undefined,
   uri: undefined,
   table: undefined,
+  from: undefined,
+  to: undefined,
+  refresh: undefined,
+  windowFile: undefined,
+  allowLive: false,
   alignPhaseRows: true,
 };
 
@@ -56,6 +63,14 @@ function parseArgs(argv) {
     else if (arg === '--pool') args.pool = value;
     else if (arg === '--uri') args.uri = value;
     else if (arg === '--table') args.table = value;
+    else if (arg === '--from') args.from = value;
+    else if (arg === '--to') args.to = value;
+    else if (arg === '--refresh') args.refresh = value;
+    else if (arg === '--window-file') args.windowFile = resolve(ROOT, value);
+    else if (arg === '--live') {
+      args.allowLive = true;
+      i -= 1;
+    }
     else if (arg === '--no-stitch') {
       args.stitch = false;
       i -= 1;
@@ -76,6 +91,48 @@ function parseArgs(argv) {
   return args;
 }
 
+async function collectRunWindowFiles(dir) {
+  const entries = await readdir(dir, { withFileTypes: true }).catch((error) => {
+    if (error.code === 'ENOENT') {
+      return [];
+    }
+    throw error;
+  });
+
+  const files = [];
+  for (const entry of entries) {
+    const entryPath = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await collectRunWindowFiles(entryPath));
+    } else if (entry.isFile() && entry.name === 'run-window.json') {
+      files.push(entryPath);
+    }
+  }
+  return files;
+}
+
+async function findLatestRunWindowFile(vars) {
+  const baseDir = join(ROOT, 'docs/evidence', vars.phase, vars.scenario);
+  const files = await collectRunWindowFiles(baseDir);
+  const matches = [];
+
+  for (const file of files) {
+    const metadata = JSON.parse(await readFile(file, 'utf8'));
+    if (
+      metadata.phase === vars.phase
+      && metadata.scenario === vars.scenario
+      && metadata.preset === vars.preset
+      && metadata.pool === vars.pool
+    ) {
+      const fileStat = await stat(file);
+      matches.push({ file, mtimeMs: fileStat.mtimeMs });
+    }
+  }
+
+  matches.sort((a, b) => b.mtimeMs - a.mtimeMs);
+  return matches[0]?.file;
+}
+
 function printHelp() {
   console.log(`Usage: node scripts/capture-grafana-dashboard.mjs [options]
 
@@ -94,12 +151,17 @@ Options:
   --pool <name>               Dashboard pool variable
   --uri <pattern>             Dashboard URI variable
   --table <pattern>           Dashboard table variable
+  --from <time>               Grafana time range start, for example epoch milliseconds
+  --to <time>                 Grafana time range end, for example epoch milliseconds
+  --refresh <value>           Grafana refresh parameter, use an empty value to disable refresh
+  --window-file <path>        Read grafanaFrom/grafanaTo from a k6 run-window JSON file. If omitted, the latest matching file under docs/evidence/<phase>/<scenario>/ is used when present.
+  --live                      Allow live now-30m capture when no run-window file is found
   --no-stitch                 Save parts only, skip final PNG stitching
   --no-align-phase-rows       Keep existing phase focus row states
 `);
 }
 
-function resolveCaptureConfig(args) {
+async function resolveCaptureConfig(args) {
   const url = args.url ?? buildGrafanaDashboardUrl(args);
   const urlVars = getDashboardVarsFromUrl(url);
   const vars = {
@@ -110,13 +172,34 @@ function resolveCaptureConfig(args) {
     uri: args.uri ?? urlVars.uri,
     table: args.table ?? urlVars.table,
   };
-  const finalUrl = args.url ? applyDashboardVarsToUrl(url, vars) : buildGrafanaDashboardUrl(vars);
+  const windowFile = args.windowFile ?? await findLatestRunWindowFile(vars);
+  const hasExplicitTimeRange = args.from !== undefined || args.to !== undefined;
+  const hasExplicitDashboardVars = Boolean(args.phase || args.scenario || args.preset || args.pool);
+  if (!windowFile && shouldRequireRunWindow({
+    hasExplicitDashboardVars,
+    hasExplicitTimeRange,
+    hasUrl: Boolean(args.url),
+    allowLive: args.allowLive,
+  })) {
+    throw new Error(`No matching run-window.json found for phase=${vars.phase}, scenario=${vars.scenario}, preset=${vars.preset}, pool=${vars.pool}. Run k6 first or pass --live for an explicit live capture.`);
+  }
+
+  const windowTimeRange = windowFile
+    ? getGrafanaTimeRangeFromRunWindow(JSON.parse(await readFile(windowFile, 'utf8')))
+    : {};
+  const timeRange = { ...windowTimeRange };
+  if (args.from !== undefined) timeRange.from = args.from;
+  if (args.to !== undefined) timeRange.to = args.to;
+  if (args.refresh !== undefined) timeRange.refresh = args.refresh;
+  const finalUrl = args.url
+    ? applyDashboardConfigToUrl(url, vars, timeRange)
+    : buildGrafanaDashboardUrl({ ...vars, ...timeRange });
   const output = args.output ?? resolve(ROOT, buildEvidenceOutputPath(vars));
 
-  return { url: finalUrl, output, vars };
+  return { url: finalUrl, output, vars, windowFile };
 }
 
-function applyDashboardVarsToUrl(url, vars) {
+function applyDashboardConfigToUrl(url, vars, timeRange) {
   const nextUrl = new URL(url);
   nextUrl.searchParams.set('var-phase', vars.phase);
   nextUrl.searchParams.set('var-scenario', vars.scenario);
@@ -124,6 +207,9 @@ function applyDashboardVarsToUrl(url, vars) {
   nextUrl.searchParams.set('var-pool', vars.pool);
   nextUrl.searchParams.set('var-uri', vars.uri);
   nextUrl.searchParams.set('var-table', vars.table);
+  if (timeRange.from !== undefined) nextUrl.searchParams.set('from', timeRange.from);
+  if (timeRange.to !== undefined) nextUrl.searchParams.set('to', timeRange.to);
+  if (timeRange.refresh !== undefined) nextUrl.searchParams.set('refresh', timeRange.refresh);
   return nextUrl.toString();
 }
 
@@ -271,7 +357,7 @@ async function alignPhaseFocusRows(page, phase) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const config = resolveCaptureConfig(args);
+  const config = await resolveCaptureConfig(args);
   const chromium = await loadChromium();
   const browser = await launchBrowser(chromium);
 
@@ -320,6 +406,7 @@ async function main() {
       selector: args.selector,
       viewport: { width: args.viewportWidth, height: args.viewportHeight },
       variables: config.vars,
+      windowFile: config.windowFile,
       alignPhaseRows: args.alignPhaseRows,
       output: config.output,
       initial: initialInfo,
