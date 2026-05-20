@@ -7,6 +7,7 @@ import com.dblab.ecommerce.entity.Orders;
 import com.dblab.ecommerce.entity.ProductImage;
 import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -37,6 +38,7 @@ class OrderRepositoryTest {
     private final Long savedUserId = 100L; // SQL 파일에서 지정한 고정 ID
 
     @Test
+    @DisplayName("주문별 OrderItem 직접 조회는 주문 수만큼 추가 SQL을 발생시킨다")
     void orderItemLookupPerOrderAddsOneSqlPerOrder() {
         // Given
         Session session = entityManager.unwrap(Session.class);
@@ -63,6 +65,7 @@ class OrderRepositoryTest {
     }
 
     @Test
+    @DisplayName("OrderItem에서 SKU, Product, ProductImage까지 LAZY 연관 경로를 탐색한다")
     void traversesLazyAssociationPathFromOrderItemToProductImages() {
         List<Orders> orders = orderRepository.findByUserId(savedUserId);
         assertThat(orders).hasSize(3);
@@ -82,6 +85,7 @@ class OrderRepositoryTest {
     }
 
     @Test
+    @DisplayName("LAZY 연관 접근은 OrderItem, SKU, Product, Image 조회 SQL을 추가로 발생시킨다")
     void lazyAssociationTraversalAddsSqlForOrderItemsSkuProductAndImages() {
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
