@@ -16,6 +16,12 @@ VALUES (100, '테스트카테고리-SQL', 0);
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
 VALUES (100, 100, '테스트상품-SQL', 10000, 'ON_SALE', false, NOW(), NOW());
 
+-- 4-1. 상품 이미지
+INSERT INTO product_image (id, product_id, image_url, is_main, sort_order)
+VALUES (100, 100, 'https://example.com/product-100-main.jpg', true, 1);
+INSERT INTO product_image (id, product_id, image_url, is_main, sort_order)
+VALUES (101, 100, 'https://example.com/product-100-sub.jpg', false, 2);
+
 -- 5. SKU (재고)
 INSERT INTO product_sku (id, product_id, sku_code, stock_quantity, extra_price)
 VALUES (100, 100, 'SKU-SQL-001', 100, 0);
