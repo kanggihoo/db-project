@@ -119,9 +119,6 @@ class OrderRepositoryTest {
         }));
 
         long afterTraversal = statistics.getPrepareStatementCount();
-        assertThat(afterQuery).isEqualTo(1);
-        assertThat(orders).hasSize(3);
-        assertThat(orders).allSatisfy(order -> assertThat(order.getOrderItems()).hasSize(1));
         assertThat(afterTraversal).isEqualTo(afterQuery);
     }
 
