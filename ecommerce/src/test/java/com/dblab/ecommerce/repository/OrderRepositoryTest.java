@@ -37,7 +37,7 @@ class OrderRepositoryTest {
     private final Long savedUserId = 100L; // SQL 파일에서 지정한 고정 ID
 
     @Test
-    void 주문_목록_조회_후_OrderItem_루프_접근시_N개_추가쿼리_발생_SQL버전() {
+    void orderItemLookupPerOrderAddsOneSqlPerOrder() {
         // Given
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
@@ -63,7 +63,7 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void 주문상품에서_SKU_상품_대표이미지까지_LAZY_연관경로를_탐색한다() {
+    void traversesLazyAssociationPathFromOrderItemToProductImages() {
         List<Orders> orders = orderRepository.findByUserId(savedUserId);
         assertThat(orders).hasSize(3);
 
@@ -82,7 +82,7 @@ class OrderRepositoryTest {
     }
 
     @Test
-    void LAZY_연관접근은_OrderItem_SKU_Product_Image_조회_SQL을_추가로_발생시킨다() {
+    void lazyAssociationTraversalAddsSqlForOrderItemsSkuProductAndImages() {
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
         statistics.setStatisticsEnabled(true);
