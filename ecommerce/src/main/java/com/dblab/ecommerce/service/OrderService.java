@@ -23,12 +23,20 @@ public class OrderService {
     public List<OrderResponse> getOrdersByUserId(Long userId, OrderLoadingStrategy strategy) {
         return switch (strategy) {
             case LAZY -> getOrdersByUserIdLazy(userId);
-            case FETCH_JOIN, BATCH_SIZE, ENTITY_GRAPH -> getOrdersByUserIdLazy(userId);
+            case FETCH_JOIN -> getOrdersByUserIdFetchJoin(userId);
+            case BATCH_SIZE, ENTITY_GRAPH -> getOrdersByUserIdLazy(userId);
         };
     }
 
     private List<OrderResponse> getOrdersByUserIdLazy(Long userId) {
         List<Orders> orders = orderRepository.findByUserId(userId);
         return orders.stream().map(OrderResponse::from).toList();
+    }
+
+    private List<OrderResponse> getOrdersByUserIdFetchJoin(Long userId) {
+        return orderRepository.findByUserIdWithFetchJoin(userId)
+                .stream()
+                .map(OrderResponse::from)
+                .toList();
     }
 }

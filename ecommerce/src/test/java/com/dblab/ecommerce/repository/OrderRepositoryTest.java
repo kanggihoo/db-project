@@ -96,4 +96,23 @@ class OrderRepositoryTest {
         long extraSqlCount = statistics.getPrepareStatementCount() - beforeTraversal;
         assertThat(extraSqlCount).isGreaterThanOrEqualTo(4);
     }
+
+    @Test
+    @DisplayName("Fetch Join 조회는 OrderItem, SKU, Product 반복 조회를 줄인다")
+    void shouldReduceRepeatedItemSkuProductQueriesWithFetchJoin() {
+        Session session = entityManager.unwrap(Session.class);
+        Statistics statistics = session.getSessionFactory().getStatistics();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        List<Orders> orders = orderRepository.findByUserIdWithFetchJoin(savedUserId);
+        long afterQuery = statistics.getPrepareStatementCount();
+
+        orders.forEach(order -> order.getOrderItems().forEach(item -> {
+            item.getProductSku().getProduct().getId();
+        }));
+
+        long afterTraversal = statistics.getPrepareStatementCount();
+        assertThat(afterTraversal).isEqualTo(afterQuery);
+    }
 }
