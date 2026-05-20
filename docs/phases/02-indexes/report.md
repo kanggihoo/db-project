@@ -6,7 +6,7 @@
 
 Phase 2는 기존 `GET /api/products?categoryId=&status=` API 흐름을 바꾸지 않고 PostgreSQL 인덱스만 적용했다. 메인 인덱스는 `idx_product_category_status ON product(category_id, status)`이며, 대표 product 필터 쿼리의 실행계획은 `Seq Scan on product`에서 `Bitmap Index Scan on idx_product_category_status` + `Bitmap Heap Scan on product`로 전환됐다.
 
-같은 `loadtest`, `pool10`, `products baseline` 조건에서 API p95는 17.24ms에서 12.14ms로 낮아졌고, `pg_stat_statements` 기준 SQL 평균 실행시간은 7.90ms에서 0.40ms로 낮아졌다. Phase 2의 핵심 결과는 상품 검색 병목이 애플리케이션 경로 변경 없이 product 필터 인덱스로 줄어든다는 점이다.
+같은 `loadtest`, `pool10`, `products baseline` 조건에서 API p95는 17.24ms에서 25.77ms로 측정됐고, `pg_stat_statements` 기준 SQL 평균 실행시간은 7.90ms에서 0.49ms로 낮아졌다. Phase 2의 핵심 결과는 상품 검색 SQL 자체가 애플리케이션 경로 변경 없이 product 필터 인덱스로 줄어든다는 점이다.
 
 SQL-only 보조 실험은 API latency와 직접 비교하지 않는다. 해당 결과는 단일 컬럼, 복합 순서, covering index, partial index가 planner 선택에 어떤 차이를 만드는지 설명하는 concept evidence로 사용한다.
 
@@ -28,23 +28,23 @@ SQL-only 보조 실험은 API latency와 직접 비교하지 않는다. 해당 �
 
 | Metric | Phase 1 Baseline | Phase 2 Post-index | 변화 |
 |---|---:|---:|---:|
-| API p95 | 17.24ms | 12.14ms | 29.6% 감소 |
-| SQL mean time | 7.90ms | 0.40ms | 94.9% 감소 |
-| SQL total time | 118,489.64ms | 5,986.88ms | 94.9% 감소 |
+| API p95 | 17.24ms | 25.77ms | 49.5% 증가 |
+| SQL mean time | 7.90ms | 0.49ms | 93.8% 감소 |
+| SQL total time | 118,489.64ms | 7,278.71ms | 93.9% 감소 |
 | requests | 15,001 | 15,001 | 동일 |
 | failed | 0.00% | 0.00% | 동일 |
 | dropped iterations | 0 | 0 | 동일 |
 
-Phase 2 post-index k6 summary는 `http_req_duration p(95)=12.14ms`, `http_req_failed=0.00%`, `http_reqs=15001`을 기록했다. `dropped_iterations` 항목은 별도 출력되지 않았고, 최종 상태가 `15001 complete and 0 interrupted iterations`였으므로 dropped iterations는 0으로 기록한다.
+Phase 2 post-index k6 summary는 `http_req_duration p(95)=25.77ms`, `http_req_failed=0.00%`, `http_reqs=15001`을 기록했다. `dropped_iterations` 항목은 별도 출력되지 않았고, 최종 상태가 `15001 complete and 0 interrupted iterations`였으므로 dropped iterations는 0으로 기록한다.
 
-Phase 2 post-index `pg_stat_statements`에서 product query는 `calls=15001`, `mean_ms=0.40`, `total_ms=5986.88`, `rows=2476309`로 기록됐다.
+Phase 2 post-index `pg_stat_statements`에서 product query는 `calls=15001`, `mean_ms=0.49`, `total_ms=7278.71`, `rows=2504135`로 기록됐다.
 
 ## 실행계획 비교
 
 | Evidence | Plan | Rows | Buffers | Execution Time | 해석 |
 |---|---|---:|---|---:|---|
-| pre-index | `Seq Scan on product` | 394 | `shared hit=3109` | 13.869ms | product 100,000건을 순차 스캔하고 99,606건을 필터링했다. |
-| post-index | `Bitmap Index Scan` + `Bitmap Heap Scan` | 394 | `shared hit=366 read=2` | 1.584ms | `idx_product_category_status`로 후보 row를 먼저 찾고 필요한 heap block만 읽었다. |
+| pre-index | `Seq Scan on product` | 394 | `shared hit=3109` | 8.935ms | product 100,000건을 순차 스캔하고 99,606건을 필터링했다. |
+| post-index | `Bitmap Index Scan` + `Bitmap Heap Scan` | 394 | `shared hit=366 read=2` | 0.929ms | `idx_product_category_status`로 후보 row를 먼저 찾고 필요한 heap block만 읽었다. |
 
 post-index plan은 단순 `Index Scan`이 아니라 bitmap 계열 plan을 선택했다. 이 planner 선택은 Phase 2의 목표와 충돌하지 않는다. 핵심은 `(category_id, status)` 조건을 인덱스로 처리하면서 heap 접근 범위와 실행시간이 크게 줄었다는 점이다.
 

@@ -14,8 +14,9 @@ Run the main Phase 2 experiment against the existing product API path and captur
 - Create: `docs/evidence/phase-02/products/pre-index/explain.txt`
 - Create: `docs/evidence/phase-02/products/pool10-post-index/explain.txt`
 - Create: `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`
+- Create: `docs/evidence/phase-02/products/pool10-post-index/run-window.json`
 - Create: `docs/evidence/phase-02/products/pool10-post-index/pg-stat-statements.txt`
-- Create: `docs/evidence/phase-02/grafana-screenshots/products-post-index.png`
+- Create: `docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png`
 - Modify: `docs/evidence/phase-02/README.md`
 
 ## Steps
@@ -116,21 +117,23 @@ rtk docker compose exec -T postgres psql -U app -d ecommerce -c "VACUUM ANALYZE 
 
 Expected: first command returns one row; second command returns `VACUUM`.
 
-- [ ] **Step 10: Run post-index product k6 scenario**
+- [ ] **Step 10: Run post-index product k6 scenario and capture Grafana**
 
 Run:
 
 ```bash
-PHASE=phase-02 POOL=pool10 K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt ./k6/run.sh products baseline prometheus
+rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition pool10-post-index --table product
 ```
 
-Expected: k6 completes, full stdout/stderr is saved to `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`, and the console shows live k6 progress. The saved log contains `http_req_duration`, `http_req_failed`, and `dropped_iterations`.
+Expected: k6 completes, full stdout/stderr is shown in the terminal and saved to `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`, `run-window.json` is saved next to the k6 log, and Grafana is captured to `docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png`. The saved log contains `http_req_duration`, `http_req_failed`, and `dropped_iterations`.
 
 If an AI agent runs this step and should avoid loading the full k6 output into context, add `K6_TAIL_ONLY=1`:
 
 ```bash
-PHASE=phase-02 POOL=pool10 K6_TAIL_ONLY=1 K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt ./k6/run.sh products baseline prometheus
+K6_TAIL_ONLY=1 rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition pool10-post-index --table product
 ```
+
+`run.sh` records host-side `startedAt` and `endedAt`, then stores `grafanaFrom=<startedAt-10s>` and `grafanaTo=<endedAt+20s>` in `run-window.json` next to `K6_LOG_FILE`. The capture step passes that exact `run-window.json` through `--window-file`, so it does not rely on searching for the latest matching run window.
 
 - [ ] **Step 11: Capture post-index pg_stat_statements**
 
@@ -142,24 +145,24 @@ rtk docker compose exec -T postgres psql -U app -d ecommerce < scripts/phase-02/
 
 Expected: output contains the product query shape with `from product` and timing columns `mean_ms` and `total_ms`.
 
-- [ ] **Step 12: Capture Grafana screenshot**
+- [ ] **Step 12: Recapture fixed-window Grafana screenshot if needed**
 
-Open Grafana at `http://localhost:3000`, select `DB Lab Overview`, and set variables:
+Skip this step if Step 10 already produced the screenshot and the dashboard JSON did not change.
 
-| Variable | Value |
-|---|---|
-| `$phase` | `phase-02` |
-| `$scenario` | `products` |
-| `$preset` | `baseline` |
-| `$pool` | `pool10` |
+If dashboard JSON changed, regenerate it and restart Grafana first:
 
-Save the screenshot as:
-
-```text
-docs/evidence/phase-02/grafana-screenshots/products-post-index.png
+```bash
+rtk node scripts/generate-db-lab-dashboard.mjs
+rtk docker compose restart grafana
 ```
 
-Expected: screenshot shows product post-index run summary or table access panels.
+Run:
+
+```bash
+rtk npm run grafana:capture -- --phase phase-02 --scenario products --preset baseline --pool pool10 --table product --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json --output docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png
+```
+
+Expected: `products-pool10-post-index.png` is captured through the fixed k6 run window from `docs/evidence/phase-02/products/pool10-post-index/run-window.json`. This reuses existing Prometheus data and does not rerun k6. Do not use a live `now-30m` dashboard URL for Phase evidence, because the final idle samples can make summary panels show `0`.
 
 - [ ] **Step 13: Verify main evidence files**
 
@@ -169,7 +172,9 @@ Run:
 rtk grep "Phase 2 main product query: pre-index" docs/evidence/phase-02/products/pre-index/explain.txt
 rtk grep "Phase 2 main product query: post-index" docs/evidence/phase-02/products/pool10-post-index/explain.txt
 rtk grep "http_req_duration" docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt
+rtk grep "grafanaFrom" docs/evidence/phase-02/products/pool10-post-index/run-window.json
 rtk grep "from product" docs/evidence/phase-02/products/pool10-post-index/pg-stat-statements.txt
+rtk powershell -NoProfile -Command "Test-Path 'docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png'"
 ```
 
 Expected: all commands return at least one matching line.
@@ -184,6 +189,7 @@ In `docs/evidence/phase-02/README.md`, keep the main comparison table and add no
 - The pre-index EXPLAIN output records the representative product query before `idx_product_category_status`.
 - The post-index EXPLAIN output records the same query after `idx_product_category_status`.
 - The k6 and `pg_stat_statements` files use `phase=phase-02`, `scenario=products`, `preset=baseline`, and `pool=pool10`.
+- The Grafana screenshot was captured with the fixed `run-window.json` time range, not a live `now-30m` window.
 ```
 
 - [ ] **Step 15: Commit**

@@ -211,7 +211,7 @@ addRowWithPanels(panels, 'Run Summary', (rowY, targetPanels) => {
     stat('Checks Success', `avg(k6_checks_rate{${k6Filter}}) * 100`, 0, rowY + 4, 6, 'percent'),
     stat('Dropped Iterations', zeroWhenNoData(`sum(increase(k6_dropped_iterations_total{${k6Filter}}[$__range]))`), 6, rowY + 4, 6),
     stat('PG Connections Used', 'sum(pg_stat_database_numbackends) / max(pg_settings_max_connections) * 100', 12, rowY + 4, 6, 'percent'),
-    stat('Hikari Pending Max', 'max_over_time(hikaricp_connections_pending[$__range])', 18, rowY + 4, 6),
+    stat('Hikari Pending Max', 'max(max_over_time(hikaricp_connections_pending[$__range]))', 18, rowY + 4, 6),
   );
   y = rowY + 8;
 });

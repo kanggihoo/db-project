@@ -552,7 +552,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(max_over_time(hikaricp_connections_pending[$__range])) or vector(0)",
+          "expr": "(max(max_over_time(hikaricp_connections_pending[$__range]))) or vector(0)",
           "range": true,
           "refId": "H"
         }
