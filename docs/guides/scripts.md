@@ -6,6 +6,9 @@
 
 ```text
 scripts/
+├── capture-grafana-dashboard.mjs
+├── generate-db-lab-dashboard.mjs
+├── grafana-capture-utils.mjs
 ├── phase-02/
 │   ├── 00-clean-product-indexes.sql
 │   ├── 01-main-pre-index-explain.sql
@@ -115,11 +118,54 @@ k6 부하 테스트 시나리오를 실행한다.
 K6_RESULTS_DIR=docs/evidence/phase-02/products ./k6/run.sh products baseline local
 K6_LOG_FILE=/tmp/products-baseline.log ./k6/run.sh products baseline local
 K6_TAIL_ONLY=1 K6_TAIL_LINES=40 ./k6/run.sh products baseline local
+K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt ./k6/run.sh products baseline prometheus
 ```
+
+Evidence용으로는 긴 환경변수 조합 대신 npm wrapper를 쓴다.
+
+```powershell
+npm run k6:evidence -- --phase phase-02 --scenario products --condition pool10-post-index
+```
+
+기본값은 `preset=baseline`, `pool=pool10`, `mode=prometheus`다. 위 명령은 `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`와 같은 디렉토리의 `run-window.json`을 자동으로 만든다.
+
+`run.sh`는 기본적으로 k6 log와 같은 디렉토리에 `run-window.json`을 저장한다. 파일에는 host-side `startedAt`, `endedAt`, `grafanaFrom`, `grafanaTo`가 들어간다. 기본 padding은 시작 전 10초, 종료 후 20초이며 `K6_WINDOW_START_PADDING_MS`, `K6_WINDOW_END_PADDING_MS`로 조정할 수 있다. `K6_RUN_WINDOW_FILE=0`을 지정하면 window 파일 생성을 끈다. k6 실행이 실패하면 실패한 실행 구간을 evidence로 쓰지 않도록 `run-window.json`을 만들지 않는다.
+
+k6 실행 직후 같은 `run-window.json`으로 Grafana를 캡처하고 stitch까지 끝내려면 같은 wrapper의 capture alias를 쓴다.
+
+```powershell
+rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition pool10-post-index --table product
+```
+
+위 명령은 `npm run k6:evidence -- --capture ...`와 같은 흐름이다. 순서대로 `k6/run.sh`를 실행하고, 성공하면 `scripts/capture-grafana-dashboard.mjs --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json`을 호출한다. 기본 PNG는 `docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png`에 저장된다. 파일명을 직접 정하려면 `--output <path>`를 넘긴다.
 
 `local` 모드는 로컬에 `k6` 명령이 있으면 그것을 사용하고, 없으면 `grafana/k6` Docker 이미지를 사용한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
 
 Windows Git Bash에서 `prometheus` 모드를 실행할 때 `/scripts/*.js` 같은 Docker 컨테이너 내부 경로가 `C:/Program Files/Git/...` 형태로 바뀌지 않도록 `run.sh`가 `MSYS_NO_PATHCONV=1`을 설정한다. 사용자가 별도로 설정할 필요는 없다.
+
+## scripts/generate-db-lab-dashboard.mjs
+
+Grafana provisioning용 dashboard JSON을 생성한다.
+
+```powershell
+rtk node scripts/generate-db-lab-dashboard.mjs
+```
+
+출력 파일:
+
+```text
+docker/grafana/dashboards/db-lab-overview.json
+```
+
+언제 실행하는가:
+
+- Grafana dashboard 패널, row, PromQL, variable 구성을 바꿨을 때
+- `docker/grafana/dashboards/db-lab-overview.json`을 코드 정의에서 다시 생성할 때
+
+주의 사항:
+
+- k6 실행이나 Playwright 캡처 중에 자동으로 호출되지는 않는다.
+- dashboard JSON을 다시 만든 뒤 Grafana 컨테이너가 이미 떠 있다면 dashboard reload 또는 컨테이너 재시작이 필요할 수 있다.
 
 ## scripts/capture-grafana-dashboard.mjs
 
@@ -156,6 +202,12 @@ rtk npm run grafana:capture -- --phase phase-03 --scenario orders --preset basel
 
 The script also updates the dashboard URL variables. For example, `--phase phase-03` opens the dashboard with `var-phase=phase-03`, collapses all phase focus rows, expands only `Phase 3 N+1 Focus`, resets the internal Grafana scroll container to the top, captures clipped container images, then runs the Python stitch step.
 
+Related module:
+
+- `scripts/grafana-capture-utils.mjs` is imported by `capture-grafana-dashboard.mjs`.
+- It is used during capture to build the Grafana URL, convert `run-window.json` into fixed `from/to` values, choose the phase focus row, and calculate scroll offsets.
+- It is not a standalone command. Do not run it directly.
+
 Useful options:
 
 | Option | Purpose |
@@ -169,10 +221,23 @@ Useful options:
 | `--pool <name>` | Set `var-pool`. |
 | `--uri <pattern>` | Set `var-uri`. |
 | `--table <pattern>` | Set `var-table`. |
+| `--from <time>` | Set Grafana `from`, usually epoch milliseconds for evidence captures. |
+| `--to <time>` | Set Grafana `to`, usually epoch milliseconds for evidence captures. |
+| `--refresh <value>` | Set Grafana refresh. Pass an empty value from automation to disable refresh for fixed evidence windows. |
+| `--window-file <path>` | Read `grafanaFrom` and `grafanaTo` from a k6 `run-window.json` file and disable refresh. If omitted, the latest matching file under `docs/evidence/<phase>/<scenario>/` is used when present. Explicit `--from`, `--to`, or `--refresh` still override the file. |
 | `--no-stitch` | Save only part captures and `capture-meta.json`. |
 | `--no-align-phase-rows` | Keep the dashboard's current phase row state. |
 
 Generated intermediate files are written under `docs/evidence/grafana-internal-scroll-captures/` and are ignored by git.
+
+필요하면 k6 실행과 Playwright 캡처를 두 명령으로 분리할 수도 있다.
+
+```powershell
+npm run k6:evidence -- --phase phase-02 --scenario products --condition pool10-post-index
+rtk npm run grafana:capture -- --phase phase-02 --scenario products --preset baseline --pool pool10 --table product --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json --output docs/evidence/phase-02/grafana-screenshots/products-post-index.png
+```
+
+이 경우에도 `--window-file`을 명시해서 방금 만든 k6 실행 구간을 사용해야 한다. `--window-file`을 생략하면 같은 phase/scenario/preset/pool의 최신 파일을 다시 찾으므로, 여러 condition을 반복 측정할 때 다른 실행 구간을 캡처할 수 있다.
 
 ## scripts/phase-02/
 

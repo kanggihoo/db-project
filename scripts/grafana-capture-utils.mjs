@@ -87,6 +87,27 @@ export function buildGrafanaDashboardUrl({
   return url.toString();
 }
 
+export function getGrafanaTimeRangeFromRunWindow(runWindow) {
+  if (!Number.isFinite(runWindow?.grafanaFrom) || !Number.isFinite(runWindow?.grafanaTo)) {
+    throw new Error('run window must include numeric grafanaFrom and grafanaTo');
+  }
+
+  return {
+    from: String(runWindow.grafanaFrom),
+    to: String(runWindow.grafanaTo),
+    refresh: '',
+  };
+}
+
+export function shouldRequireRunWindow({
+  hasExplicitDashboardVars,
+  hasExplicitTimeRange,
+  hasUrl,
+  allowLive,
+}) {
+  return hasExplicitDashboardVars && !hasExplicitTimeRange && !hasUrl && !allowLive;
+}
+
 export function buildEvidenceOutputPath({
   phase,
   scenario,

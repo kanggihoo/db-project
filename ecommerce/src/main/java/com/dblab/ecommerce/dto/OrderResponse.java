@@ -49,14 +49,4 @@ public record OrderResponse(
                 order.getCreatedAt(),
                 order.getOrderItems().stream().map(OrderItemDto::from).toList());
     }
-
-    public static OrderResponse of(Orders order, List<OrderItem> items) {
-        return new OrderResponse(
-                order.getId(),
-                order.getUserId(),
-                order.getStatus(),
-                order.getFinalPrice(),
-                order.getCreatedAt(),
-                items.stream().map(OrderItemDto::from).toList());
-    }
 }

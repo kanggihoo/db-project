@@ -37,4 +37,3 @@ public class ProductSku {
     @JoinColumn(name = "product_id", insertable = false, updatable = false)
     private Product product;
 }
-
