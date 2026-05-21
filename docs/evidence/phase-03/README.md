@@ -27,3 +27,17 @@ Phase 3 evidence는 주문 목록 API의 N+1 재현과 로딩 전략별 개선 �
 - 각 전략 측정 전 `pg_stat_statements_reset()`을 실행한다.
 - k6 실행은 `phase=phase-03`, `scenario=orders`, `preset=<preset>`, `pool=<pool>` 컨텍스트를 사용하고, 전략 구분은 `STRATEGY` 환경변수와 condition/output 파일명으로 분리한다.
 - SQL 원문은 Prometheus label로 올리지 않고 evidence 파일로만 저장한다.
+
+## Capture Workflow
+
+Use `docs/phases/03-n-plus-one/runbook.md` for the strategy evidence capture sequence. The SQL helpers live under `scripts/phase-03/`:
+
+| Script | Purpose |
+|---|---|
+| `00-reset-statistics.sql` | Reset `pg_stat_statements` and refresh table statistics before each strategy run |
+| `01-pg-stat-statements.sql` | Capture top order-related SQL statements after k6 |
+| `02-order-shape.sql` | Snapshot selected order-list shape for one `user_id` |
+| `10-lazy-explain.sql` | Capture representative Lazy `EXPLAIN` |
+| `20-fetch-join-explain.sql` | Capture representative Fetch Join `EXPLAIN` |
+| `30-batch-size-explain.sql` | Capture representative BatchSize `EXPLAIN` |
+| `40-entity-graph-explain.sql` | Capture representative EntityGraph `EXPLAIN` |
