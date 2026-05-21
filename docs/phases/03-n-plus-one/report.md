@@ -31,6 +31,53 @@ SQL calls/request는 `pg_stat_statements`의 반복 app query calls를 k6 `http_
 
 단일 shape snapshot은 모든 strategy에서 동일하게 `user_id=100` 기준 `orders=381`, `order_item=762`, `distinct_sku=761`, `distinct_product=760`이었다.
 
+## 지표 산출 방식
+
+이번 report의 지표는 단일 파일에서 나온 값이 아니라 k6, `pg_stat_statements`, Grafana를 역할별로 나눠 사용했다.
+
+| 지표 | 출처 | 산출 방식 | 의미 |
+|---|---|---|---|
+| `SQL calls/request` | `docs/evidence/phase-03/orders/<strategy>/pg-stat-statements.txt`, `k6-summary.txt` | 비교 대상 app query의 `calls` 합계를 k6 `http_reqs`로 나눈 평균값 | API 요청 1번을 만들기 위해 DB SQL이 평균 몇 번 실행됐는지 |
+| `k6 p95` | `k6-summary.txt` 마지막 summary의 `http_req_duration p(95)` | k6가 측정한 HTTP 요청 duration의 95 percentile | 사용자 요청 latency 상위 5% 경계 |
+| `failed rate` | `k6-summary.txt`의 `http_req_failed` | 실패 HTTP 요청 수 / 전체 HTTP 요청 수 | timeout, connection failure, 4xx/5xx 등 k6 기준 실패율 |
+| `dropped` | `k6-summary.txt`, Grafana `Dropped Iterations` | k6가 목표 arrival rate를 맞추지 못해 시작하지 못한 iteration 수 | 부하 발생기 관점의 처리 지연 신호 |
+| `Hikari pending max` | Grafana `Hikari Pending Max`, `Pending Threads` | 측정 window에서 connection 획득 대기 thread의 최대값 | 애플리케이션 connection pool 병목 여부 |
+| Grafana p95/p99 | Grafana Run Summary, k6 Load panels | Prometheus에 적재된 k6 metric의 time-series 집계 | k6 summary 값이 시간 흐름상 어떻게 나타났는지 확인 |
+
+`SQL calls/request`는 "단일 요청이 항상 정확히 이만큼 SQL을 실행한다"는 뜻이 아니다. k6가 5분 동안 여러 `userId`로 실행한 전체 SQL calls를 전체 HTTP 요청 수로 나눈 평균값이다. 같은 preset, 같은 API, 같은 데이터 범위에서 측정했기 때문에 strategy 간 비교 지표로 사용한다.
+
+## SQL calls/request 계산 상세
+
+`pg_stat_statements`에는 helper query도 함께 들어갈 수 있으므로, 아래 계산에서는 주문 API 응답 조립 과정에서 반복 실행된 app query만 포함했다. 예를 들어 `VACUUM ANALYZE`, 대표 `EXPLAIN` 수집용 단발 query는 제외했다.
+
+| Strategy | 포함한 app query calls | k6 `http_reqs` | 계산식 | SQL calls/request |
+|---|---:|---:|---|---:|
+| lazy | 738,528 | 301 | `738,528 / 301` | 약 2,454 |
+| fetch-join | 210,519 | 301 | `210,519 / 301` | 약 699 |
+| batch-size | 8,165 | 300 | `8,165 / 300` | 약 27.2 |
+| entity-graph | 210,108 | 301 | `210,108 / 301` | 약 698 |
+
+Lazy의 738,528 calls는 `orders` 301회, `order_item` 105,695회, `product_sku` 211,164회, `product` 210,684회, `product_image` 210,684회를 합산한 값이다. 요청 301회 동안 하위 연관 조회가 수십만 번 반복되었으므로 N+1이 실제 부하에서 재현됐다고 판단한다.
+
+Fetch Join은 main query가 301회로 줄었지만 `product_image where product_id=$1`가 210,218회 남아 있다. 따라서 SQL calls/request가 Lazy보다는 크게 줄었지만 약 699에서 멈췄다.
+
+BatchSize는 `order_item`, `product_sku`, `product`, `product_image` 조회가 `= any ($1)` batch query로 묶였다. 같은 5분 구간에서 포함한 app query calls가 8,165회로 줄어 SQL calls/request가 약 27.2까지 낮아졌다.
+
+EntityGraph는 main path를 left join으로 가져왔지만 `ProductImages` 반복 조회가 남았다. 그래서 Fetch Join과 유사하게 약 698 SQL calls/request를 기록했다.
+
+## k6 지표 계산 상세
+
+`k6-summary.txt`는 progress line이 많기 때문에 각 파일의 마지막 summary 영역만 사용했다.
+
+| Strategy | k6 `http_reqs` | `http_req_duration p(95)` | `http_req_failed` | `dropped_iterations` | 해석 |
+|---|---:|---:|---:|---:|---|
+| lazy | 301 | 3.49s | 0.00% | 0 | 실패는 없지만 같은 rate에서 latency가 가장 큼 |
+| fetch-join | 301 | 1.06s | 0.00% | 0 | Lazy 대비 p95가 약 69.6% 감소 |
+| batch-size | 300 | 155.85ms | 0.00% | 0 | Lazy 대비 p95가 약 95.5% 감소 |
+| entity-graph | 301 | 1.07s | 0.00% | 0 | Fetch Join과 거의 같은 latency 구간 |
+
+`failed rate=0.00%`와 `dropped=0`은 최종 `rate=1` 비교 구간이 장애 상황이 아니라 정상 처리 상태였다는 뜻이다. 따라서 이 구간에서는 "어느 전략이 서버를 죽였는가"가 아니라 "같은 요청을 처리할 때 어떤 SQL shape가 더 적은 round-trip과 낮은 latency를 만드는가"를 비교한다.
+
 ## 측정 조정 기록
 
 초기 Lazy baseline은 `orders baseline` preset의 `rate=50`, `timeout=5s` 조건으로 실행했다. 이 실행에서는 k6가 초당 약 50회 요청을 시작했고, Lazy N+1 경로가 빠르게 누적되면서 서버가 정상적인 HTTP 응답을 거의 반환하지 못했다. k6 summary에는 `http_req_failed=100%`, `data_received=0 B`, 다수의 `connect: connection refused`가 기록되었고, host 측 8080 포트에는 `CLOSE_WAIT`/`FIN_WAIT_2` 연결이 대량으로 누적되었다.
@@ -67,6 +114,29 @@ CREATE INDEX IF NOT EXISTS idx_product_image_product_id ON product_image (produc
 | fetch-join | 약 699 | 1.06s | 0.00% | 0 | 0 | join fetch | main path join fetch, `ProductImages` 반복 select 잔존 |
 | batch-size | 약 27.2 | 155.85ms | 0.00% | 0 | 0 | `IN (...)` | 연관 조회가 `ANY ($1)` batch query로 묶임 |
 | entity-graph | 약 698 | 1.07s | 0.00% | 0 | 0 | graph loading | fetch-join과 유사한 main path join, `ProductImages` 반복 select 잔존 |
+
+## 측정 지표 기반 분석
+
+Lazy를 기준으로 보면 Fetch Join과 EntityGraph는 SQL calls/request를 약 71.5% 줄였고, k6 p95도 약 69% 낮췄다. 두 전략은 main path의 반복 select를 join query로 바꾸는 효과가 있었지만, `ProductImages`는 여전히 product별 lazy select로 남았기 때문에 SQL calls/request가 약 700 수준에서 멈췄다.
+
+BatchSize는 SQL calls/request를 약 98.9% 줄였고, k6 p95도 Lazy 대비 약 95.5% 낮췄다. `pg_stat_statements`에서 product, sku, image 조회가 개별 `id=$1` lookup이 아니라 `ANY ($1)` batch query로 바뀐 것이 latency 감소와 직접 연결된다. 이번 데이터 shape에서는 주문 381건, order item 762건, distinct product 760건이 한 요청에 걸려 있으므로, 개별 product/image 접근을 batch로 묶는 효과가 가장 크게 나타났다.
+
+모든 최종 `rate=1` 실행은 failure `0.00%`, dropped iterations `0`, Hikari pending max `0`이었다. 따라서 최종 비교 구간은 장애 재현 구간이 아니라 정상 처리 상태에서 로딩 전략별 SQL shape와 latency를 비교한 구간이다. 반대로 Lazy `rate=5` 실행은 p95 약 31.9초, Error Rate 약 50%, Dropped Iterations 428, Hikari Pending Max 100을 기록했으므로 capacity collapse evidence로 별도 분리한다.
+
+## Grafana 관측 요약
+
+Grafana는 k6 summary와 같은 구간을 time-series로 확인하기 위한 보조 evidence다. Actual RPS panel의 마지막 값은 window padding과 마지막 scrape 시점의 영향을 받아 k6 summary의 전체 평균보다 낮게 보일 수 있다. 최종 처리량 판단은 k6 summary의 `http_reqs`를 우선하고, Grafana는 latency 흐름과 runtime pressure 확인에 사용한다.
+
+| Strategy | Grafana p95 | Grafana p99 | Actual RPS panel | Error Rate | Checks Success | PG Connections Used | Hikari Pending Max | Interpretation |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| lazy | 3.76s | 3.95s | 0.820 req/s | 0% | 100% | 10% | 0 | 실패는 없지만 latency가 가장 높고, `/api/orders` p95도 약 3.70s로 유지됨 |
+| fetch-join | 1.06s | 1.08s | 0.821 req/s | 0% | 100% | 8% | 0 | main path join으로 latency가 낮아졌지만 image 반복 select는 남음 |
+| batch-size | 142ms | 169ms | 0.876 req/s | 0% | 100% | 8% | 0 | p95/p99가 가장 낮고 runtime pressure도 낮음 |
+| entity-graph | 1.11s | 1.17s | 0.850 req/s | 0% | 100% | 8% | 0 | Fetch Join과 비슷한 latency와 connection profile |
+
+Grafana의 Hikari Pool 패널에서는 최종 네 전략 모두 pending thread가 0으로 유지됐다. 이는 `rate=1` 비교 구간에서는 커넥션 풀이 병목이 아니라는 뜻이다. PostgreSQL activity와 table access 패널도 seq scan 증가 없이 index access 중심으로 유지되어, 기본 FK 인덱스 적용 후 비교가 진행됐음을 뒷받침한다.
+
+CPU, heap, GC pause도 낮은 범위에서 유지됐다. 따라서 최종 비교의 병목 해석은 CPU saturation이나 GC pressure가 아니라, 한 요청을 만들기 위해 발생한 SQL shape와 round-trip 수 차이에 집중하는 것이 맞다.
 
 ## pg_stat_statements 요약
 
