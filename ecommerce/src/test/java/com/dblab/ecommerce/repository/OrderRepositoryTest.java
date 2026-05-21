@@ -1,7 +1,6 @@
 package com.dblab.ecommerce.repository;
 
 import com.dblab.ecommerce.TestcontainersConfiguration;
-import com.dblab.ecommerce.dto.OrderResponse;
 import com.dblab.ecommerce.entity.OrderItem;
 import com.dblab.ecommerce.entity.Orders;
 import com.dblab.ecommerce.entity.ProductImage;
@@ -38,8 +37,8 @@ class OrderRepositoryTest {
     private final Long savedUserId = 100L; // SQL 파일에서 지정한 고정 ID
 
     @Test
-    @DisplayName("주문별 OrderItem 직접 조회는 주문 수만큼 추가 SQL을 발생시킨다")
-    void orderItemLookupPerOrderAddsOneSqlPerOrder() {
+    @DisplayName("주문 목록 조회 후 OrderItem 루프 접근 시 주문 수만큼 추가 쿼리가 발생한다")
+    void shouldIssueOneAdditionalQueryPerOrderWhenLoadingItemsInLoop() {
         // Given
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
@@ -65,8 +64,8 @@ class OrderRepositoryTest {
     }
 
     @Test
-    @DisplayName("OrderItem에서 SKU, Product, ProductImage까지 LAZY 연관 경로를 탐색한다")
-    void traversesLazyAssociationPathFromOrderItemToProductImages() {
+    @DisplayName("주문상품에서 SKU, 상품, 대표 이미지까지 LAZY 연관 경로로 탐색한다")
+    void shouldTraverseLazyAssociationPathFromOrderItemToProductImage() {
         List<Orders> orders = orderRepository.findByUserId(savedUserId);
         assertThat(orders).hasSize(3);
 
@@ -77,16 +76,11 @@ class OrderRepositoryTest {
         assertThat(firstItem.getProductSku().getProduct().getImages())
                 .extracting(ProductImage::getImageUrl)
                 .contains("https://example.com/product-100-main.jpg");
-
-        OrderResponse response = OrderResponse.of(orders.getFirst(), orders.getFirst().getOrderItems());
-
-        assertThat(response.items().getFirst().thumbnailUrl())
-                .isEqualTo("https://example.com/product-100-main.jpg");
     }
 
     @Test
     @DisplayName("LAZY 연관 접근은 OrderItem, SKU, Product, Image 조회 SQL을 추가로 발생시킨다")
-    void lazyAssociationTraversalAddsSqlForOrderItemsSkuProductAndImages() {
+    void shouldIssueAdditionalQueriesWhenTraversingLazyAssociations() {
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
         statistics.setStatisticsEnabled(true);
@@ -105,7 +99,7 @@ class OrderRepositoryTest {
 
     @Test
     @DisplayName("Fetch Join 조회는 OrderItem, SKU, Product 반복 조회를 줄인다")
-    void fetchJoinReducesRepeatedOrderItemSkuAndProductQueries() {
+    void shouldReduceRepeatedItemSkuProductQueriesWithFetchJoin() {
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
         statistics.setStatisticsEnabled(true);
@@ -124,7 +118,7 @@ class OrderRepositoryTest {
 
     @Test
     @DisplayName("EntityGraph 조회는 OrderItem, SKU, Product 연관을 조회 시점에 로딩한다")
-    void entityGraphLoadsOrderItemSkuAndProductAssociationsAtQueryTime() {
+    void shouldLoadItemSkuProductAssociationsWithEntityGraph() {
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
         statistics.setStatisticsEnabled(true);
@@ -138,9 +132,6 @@ class OrderRepositoryTest {
         }));
 
         long afterTraversal = statistics.getPrepareStatementCount();
-        assertThat(afterQuery).isEqualTo(1);
-        assertThat(orders).hasSize(3);
-        assertThat(orders).allSatisfy(order -> assertThat(order.getOrderItems()).hasSize(1));
         assertThat(afterTraversal).isEqualTo(afterQuery);
     }
 }

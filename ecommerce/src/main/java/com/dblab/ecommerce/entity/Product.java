@@ -55,4 +55,3 @@ public class Product {
 
     public enum Status { ON_SALE, SOLD_OUT, DISCONTINUED }
 }
-

@@ -49,4 +49,3 @@ public class OrderItem {
     @JoinColumn(name = "sku_id", insertable = false, updatable = false)
     private ProductSku productSku;
 }
-
