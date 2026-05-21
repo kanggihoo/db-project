@@ -8,6 +8,7 @@ PRESET="${2:-baseline}"
 MODE="${3:-local}"
 PHASE="${PHASE:-phase-01}"
 POOL="${POOL:-pool10}"
+STRATEGY="${STRATEGY:-lazy}"
 K6_TAIL_ONLY="${K6_TAIL_ONLY:-0}"
 K6_TAIL_LINES="${K6_TAIL_LINES:-120}"
 K6_RUN_WINDOW_FILE="${K6_RUN_WINDOW_FILE:-auto}"
@@ -38,6 +39,7 @@ K6_ARGS=(
   -e SCENARIO="$SCENARIO"
   -e PRESET_NAME="$PRESET"
   -e POOL="$POOL"
+  -e STRATEGY="$STRATEGY"
 )
 
 if ! [[ "$K6_TAIL_LINES" =~ ^[0-9]+$ ]] || [[ "$K6_TAIL_LINES" -eq 0 ]]; then

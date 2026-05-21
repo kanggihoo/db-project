@@ -21,7 +21,7 @@ Execute this plan after the Phase 2 shared observability tooling has been brough
 
 ## Steps
 
-- [ ] **Step 1: Add strategy env propagation to k6 runner**
+- [x] **Step 1: Add strategy env propagation to k6 runner**
 
 Modify `k6/run.sh` near the existing `PHASE` and `POOL` defaults:
 
@@ -42,7 +42,7 @@ K6_ARGS=(
 )
 ```
 
-- [ ] **Step 2: Add strategy query parameter to the orders scenario**
+- [x] **Step 2: Add strategy query parameter to the orders scenario**
 
 Modify `k6/orders-test.js`:
 
@@ -61,7 +61,7 @@ const res = http.get(`${BASE_URL}/api/orders?userId=${userId}&strategy=${STRATEG
 
 Do not add `strategy` to `commonTags` in this plan. Strategy separation is handled by evidence condition names and fixed `run-window.json` capture windows.
 
-- [ ] **Step 3: Document strategy-specific evidence capture**
+- [x] **Step 3: Document strategy-specific evidence capture**
 
 Update `docs/guides/scripts.md` in the `k6/run.sh` or evidence wrapper section with Phase 3 examples:
 
@@ -97,7 +97,7 @@ STRATEGY=entity-graph rtk npm run evidence:capture -- \
 
 State that `evidence:capture` passes the current environment through to `k6/run.sh`, so `STRATEGY=...` controls the API strategy while `--condition` and `--output` control evidence naming.
 
-- [ ] **Step 4: Document Phase 3 strategy usage in the k6 guide**
+- [x] **Step 4: Document Phase 3 strategy usage in the k6 guide**
 
 Update `docs/guides/k6-load-testing.md`:
 
@@ -107,7 +107,7 @@ The value is sent to `GET /api/orders` as the `strategy` query parameter.
 Keep strategy evidence separate by using matching `--condition` and `--output` names, for example `pool10-lazy` and `orders-pool10-lazy.png`.
 ```
 
-- [ ] **Step 5: Verify runner and scenario changes**
+- [x] **Step 5: Verify runner and scenario changes**
 
 Run:
 
@@ -117,7 +117,7 @@ rtk grep "STRATEGY" k6/run.sh k6/orders-test.js
 
 Expected: matches show `STRATEGY` defaulting in `k6/run.sh`, being passed in `K6_ARGS`, and being read by `k6/orders-test.js`.
 
-- [ ] **Step 6: Verify docs**
+- [x] **Step 6: Verify docs**
 
 Run:
 
@@ -128,7 +128,7 @@ rtk grep "entity-graph" docs/guides/scripts.md docs/guides/k6-load-testing.md
 
 Expected: both commands return matches.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add k6/run.sh k6/orders-test.js docs/guides/scripts.md docs/guides/k6-load-testing.md docs/superpowers/plans/phase-03-n-plus-one/007-k6-and-grafana-strategy-observability.md

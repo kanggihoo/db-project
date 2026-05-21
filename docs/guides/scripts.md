@@ -139,6 +139,40 @@ rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition
 
 위 명령은 `npm run k6:evidence -- --capture ...`와 같은 흐름이다. 순서대로 `k6/run.sh`를 실행하고, 성공하면 `scripts/capture-grafana-dashboard.mjs --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json`을 호출한다. 기본 PNG는 `docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png`에 저장된다. 파일명을 직접 정하려면 `--output <path>`를 넘긴다.
 
+Phase 3 orders strategy 증빙은 같은 wrapper에 `STRATEGY` 환경변수를 함께 넘긴다.
+
+```bash
+STRATEGY=lazy rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-lazy \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-lazy.png
+
+STRATEGY=fetch-join rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-fetch-join \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-fetch-join.png
+
+STRATEGY=batch-size rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-batch-size \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-batch-size.png
+
+STRATEGY=entity-graph rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-entity-graph \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-entity-graph.png
+```
+
+`evidence:capture`는 현재 환경변수를 `k6/run.sh`까지 전달한다. 따라서 `STRATEGY=...`는 API strategy를 제어하고, `--condition`과 `--output`은 evidence 디렉토리와 Grafana screenshot 이름을 제어한다.
+
 `local` 모드는 로컬에 `k6` 명령이 있으면 그것을 사용하고, 없으면 `grafana/k6` Docker 이미지를 사용한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
 
 Windows Git Bash에서 `prometheus` 모드를 실행할 때 `/scripts/*.js` 같은 Docker 컨테이너 내부 경로가 `C:/Program Files/Git/...` 형태로 바뀌지 않도록 `run.sh`가 `MSYS_NO_PATHCONV=1`을 설정한다. 사용자가 별도로 설정할 필요는 없다.

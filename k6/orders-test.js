@@ -7,6 +7,7 @@ const BASE_URL = preset.baseUrl || 'http://host.docker.internal:8080';
 const USER_START = Number(preset.userStart || 1);
 const USER_END = Number(preset.userEnd || USER_START);
 const TIMEOUT = preset.timeout || '5s';
+const STRATEGY = __ENV.STRATEGY || 'lazy';
 
 const commonTags = {
     phase: __ENV.PHASE || 'phase-01',
@@ -45,7 +46,7 @@ function randomBetween(start, end) {
 
 export default function () {
     const userId = randomBetween(USER_START, USER_END);
-    const res = http.get(`${BASE_URL}/api/orders?userId=${userId}`, {
+    const res = http.get(`${BASE_URL}/api/orders?userId=${userId}&strategy=${STRATEGY}`, {
         timeout: TIMEOUT,
         tags: requestTags,
     });
