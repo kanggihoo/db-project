@@ -24,9 +24,9 @@ Phase 3의 목표는 주문 목록 화면의 상품 썸네일 조회를 기준�
 
 ## 완료 조건
 
-- [ ] Lazy naive에서 `1 + N + 3M` 형태의 반복 쿼리가 재현됐다.
-- [ ] Fetch Join과 BatchSize 전략의 SQL count, `pg_stat_statements`, k6 결과를 저장했다.
-- [ ] EntityGraph 전략의 결과를 저장하거나 제외 사유를 report에 기록했다.
-- [ ] 대표 SQL의 `EXPLAIN (ANALYZE, BUFFERS)`를 저장했다.
-- [ ] Grafana Phase 3 evidence에서 latency, failure, dropped iterations, Hikari pressure를 비교했다.
-- [ ] Phase 4로 넘길 동시성/정합성 질문을 report에 기록했다.
+- [x] Lazy naive에서 `1 + N + 3M` 형태의 반복 쿼리가 재현됐다.
+- [x] Fetch Join과 BatchSize 전략의 SQL count, `pg_stat_statements`, k6 결과를 저장했다.
+- [x] EntityGraph 전략의 결과를 저장하거나 제외 사유를 report에 기록했다.
+- [x] 대표 SQL의 `EXPLAIN (ANALYZE, BUFFERS)`를 저장했다.
+- [x] Grafana Phase 3 evidence에서 latency, failure, dropped iterations, Hikari pressure를 비교했다.
+- [x] Phase 4로 넘길 동시성/정합성 질문을 report에 기록했다.

@@ -1,0 +1,1664 @@
+ Container postgres Running
+ Container postgres_exporter Running
+ Container prometheus Running
+ Container postgres Waiting
+ Container postgres Healthy
+ Container db-project-k6-run-05fadc03f688 Creating
+ Container db-project-k6-run-05fadc03f688 Created
+
+         /\      Grafana   /‾‾/
+    /\  /  \     |\  __   /  /
+   /  \/    \    | |/ /  /   ‾‾\
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/
+
+
+     execution: local
+        script: /scripts/orders-test.js
+        output: Prometheus remote write (http://prometheus:9090/api/v1/write)
+
+     scenarios: (100.00%) 1 scenario, 100 max VUs, 5m30s max duration (incl. graceful stop):
+              * steady: 5.00 iterations/s for 5m0s (maxVUs: 20-100, gracefulStop: 30s)
+
+
+running (0m01.0s), 005/020 VUs, 0 complete and 0 interrupted iterations
+steady   [   0% ] 005/020 VUs  0m01.0s/5m0s  5.00 iters/s
+
+running (0m02.0s), 010/020 VUs, 0 complete and 0 interrupted iterations
+steady   [   1% ] 010/020 VUs  0m02.0s/5m0s  5.00 iters/s
+
+running (0m03.0s), 012/020 VUs, 3 complete and 0 interrupted iterations
+steady   [   1% ] 012/020 VUs  0m03.0s/5m0s  5.00 iters/s
+
+running (0m04.0s), 015/020 VUs, 5 complete and 0 interrupted iterations
+steady   [   1% ] 015/020 VUs  0m04.0s/5m0s  5.00 iters/s
+
+running (0m05.0s), 015/020 VUs, 10 complete and 0 interrupted iterations
+steady   [   2% ] 015/020 VUs  0m05.0s/5m0s  5.00 iters/s
+
+running (0m06.0s), 017/020 VUs, 13 complete and 0 interrupted iterations
+steady   [   2% ] 017/020 VUs  0m06.0s/5m0s  5.00 iters/s
+
+running (0m07.0s), 016/020 VUs, 19 complete and 0 interrupted iterations
+steady   [   2% ] 016/020 VUs  0m07.0s/5m0s  5.00 iters/s
+
+running (0m08.0s), 019/020 VUs, 21 complete and 0 interrupted iterations
+steady   [   3% ] 019/020 VUs  0m08.0s/5m0s  5.00 iters/s
+
+running (0m09.0s), 019/021 VUs, 25 complete and 0 interrupted iterations
+steady   [   3% ] 019/021 VUs  0m09.0s/5m0s  5.00 iters/s
+
+running (0m10.0s), 018/022 VUs, 30 complete and 0 interrupted iterations
+steady   [   3% ] 018/022 VUs  0m10.0s/5m0s  5.00 iters/s
+
+running (0m11.0s), 022/022 VUs, 31 complete and 0 interrupted iterations
+steady   [   4% ] 022/022 VUs  0m11.0s/5m0s  5.00 iters/s
+
+running (0m12.0s), 022/023 VUs, 35 complete and 0 interrupted iterations
+steady   [   4% ] 022/023 VUs  0m12.0s/5m0s  5.00 iters/s
+
+running (0m13.0s), 022/023 VUs, 40 complete and 0 interrupted iterations
+steady   [   4% ] 022/023 VUs  0m13.0s/5m0s  5.00 iters/s
+
+running (0m14.0s), 022/025 VUs, 43 complete and 0 interrupted iterations
+steady   [   5% ] 022/025 VUs  0m14.0s/5m0s  5.00 iters/s
+
+running (0m15.0s), 024/025 VUs, 46 complete and 0 interrupted iterations
+steady   [   5% ] 024/025 VUs  0m15.0s/5m0s  5.00 iters/s
+
+running (0m16.0s), 024/026 VUs, 50 complete and 0 interrupted iterations
+steady   [   5% ] 024/026 VUs  0m16.0s/5m0s  5.00 iters/s
+
+running (0m17.0s), 025/027 VUs, 53 complete and 0 interrupted iterations
+steady   [   6% ] 025/027 VUs  0m17.0s/5m0s  5.00 iters/s
+
+running (0m18.0s), 026/027 VUs, 57 complete and 0 interrupted iterations
+steady   [   6% ] 026/027 VUs  0m18.0s/5m0s  5.00 iters/s
+
+running (0m19.0s), 027/028 VUs, 60 complete and 0 interrupted iterations
+steady   [   6% ] 027/028 VUs  0m19.0s/5m0s  5.00 iters/s
+
+running (0m20.0s), 029/030 VUs, 61 complete and 0 interrupted iterations
+steady   [   7% ] 029/030 VUs  0m20.0s/5m0s  5.00 iters/s
+
+running (0m21.0s), 030/031 VUs, 64 complete and 0 interrupted iterations
+steady   [   7% ] 030/031 VUs  0m21.0s/5m0s  5.00 iters/s
+
+running (0m22.0s), 031/032 VUs, 67 complete and 0 interrupted iterations
+steady   [   7% ] 031/032 VUs  0m22.0s/5m0s  5.00 iters/s
+
+running (0m23.0s), 032/032 VUs, 71 complete and 0 interrupted iterations
+steady   [   8% ] 032/032 VUs  0m23.0s/5m0s  5.00 iters/s
+
+running (0m24.0s), 032/034 VUs, 74 complete and 0 interrupted iterations
+steady   [   8% ] 032/034 VUs  0m24.0s/5m0s  5.00 iters/s
+
+running (0m25.0s), 032/035 VUs, 78 complete and 0 interrupted iterations
+steady   [   8% ] 032/035 VUs  0m25.0s/5m0s  5.00 iters/s
+
+running (0m26.0s), 034/035 VUs, 81 complete and 0 interrupted iterations
+steady   [   9% ] 034/035 VUs  0m26.0s/5m0s  5.00 iters/s
+
+running (0m27.0s), 035/036 VUs, 84 complete and 0 interrupted iterations
+steady   [   9% ] 035/036 VUs  0m27.0s/5m0s  5.00 iters/s
+
+running (0m28.0s), 034/037 VUs, 89 complete and 0 interrupted iterations
+steady   [   9% ] 034/037 VUs  0m28.0s/5m0s  5.00 iters/s
+
+running (0m29.0s), 036/038 VUs, 91 complete and 0 interrupted iterations
+steady   [  10% ] 036/038 VUs  0m29.0s/5m0s  5.00 iters/s
+
+running (0m30.0s), 038/038 VUs, 94 complete and 0 interrupted iterations
+steady   [  10% ] 038/038 VUs  0m30.0s/5m0s  5.00 iters/s
+
+running (0m31.0s), 036/039 VUs, 100 complete and 0 interrupted iterations
+steady   [  10% ] 036/039 VUs  0m31.0s/5m0s  5.00 iters/s
+
+running (0m32.0s), 038/039 VUs, 103 complete and 0 interrupted iterations
+steady   [  11% ] 038/039 VUs  0m32.0s/5m0s  5.00 iters/s
+
+running (0m33.0s), 037/041 VUs, 107 complete and 0 interrupted iterations
+steady   [  11% ] 037/041 VUs  0m33.0s/5m0s  5.00 iters/s
+
+running (0m34.0s), 039/041 VUs, 110 complete and 0 interrupted iterations
+steady   [  11% ] 039/041 VUs  0m34.0s/5m0s  5.00 iters/s
+
+running (0m35.0s), 040/042 VUs, 113 complete and 0 interrupted iterations
+steady   [  12% ] 040/042 VUs  0m35.0s/5m0s  5.00 iters/s
+
+running (0m36.0s), 041/043 VUs, 116 complete and 0 interrupted iterations
+steady   [  12% ] 041/043 VUs  0m36.0s/5m0s  5.00 iters/s
+
+running (0m37.0s), 042/043 VUs, 120 complete and 0 interrupted iterations
+steady   [  12% ] 042/043 VUs  0m37.0s/5m0s  5.00 iters/s
+
+running (0m38.0s), 042/044 VUs, 124 complete and 0 interrupted iterations
+steady   [  13% ] 042/044 VUs  0m38.0s/5m0s  5.00 iters/s
+
+running (0m39.0s), 042/045 VUs, 128 complete and 0 interrupted iterations
+steady   [  13% ] 042/045 VUs  0m39.0s/5m0s  5.00 iters/s
+
+running (0m40.0s), 045/045 VUs, 130 complete and 0 interrupted iterations
+steady   [  13% ] 045/045 VUs  0m40.0s/5m0s  5.00 iters/s
+
+running (0m41.0s), 045/047 VUs, 133 complete and 0 interrupted iterations
+steady   [  14% ] 045/047 VUs  0m41.0s/5m0s  5.00 iters/s
+
+running (0m42.0s), 046/047 VUs, 137 complete and 0 interrupted iterations
+steady   [  14% ] 046/047 VUs  0m42.0s/5m0s  5.00 iters/s
+
+running (0m43.0s), 047/048 VUs, 140 complete and 0 interrupted iterations
+steady   [  14% ] 047/048 VUs  0m43.0s/5m0s  5.00 iters/s
+
+running (0m44.0s), 047/049 VUs, 144 complete and 0 interrupted iterations
+steady   [  15% ] 047/049 VUs  0m44.0s/5m0s  5.00 iters/s
+
+running (0m45.0s), 048/051 VUs, 146 complete and 0 interrupted iterations
+steady   [  15% ] 048/051 VUs  0m45.0s/5m0s  5.00 iters/s
+
+running (0m46.0s), 049/051 VUs, 150 complete and 0 interrupted iterations
+steady   [  15% ] 049/051 VUs  0m46.0s/5m0s  5.00 iters/s
+
+running (0m47.0s), 049/052 VUs, 154 complete and 0 interrupted iterations
+steady   [  16% ] 049/052 VUs  0m47.0s/5m0s  5.00 iters/s
+
+running (0m48.0s), 050/052 VUs, 158 complete and 0 interrupted iterations
+steady   [  16% ] 050/052 VUs  0m48.0s/5m0s  5.00 iters/s
+
+running (0m49.0s), 052/053 VUs, 160 complete and 0 interrupted iterations
+steady   [  16% ] 052/053 VUs  0m49.0s/5m0s  5.00 iters/s
+
+running (0m50.0s), 052/054 VUs, 164 complete and 0 interrupted iterations
+steady   [  17% ] 052/054 VUs  0m50.0s/5m0s  5.00 iters/s
+
+running (0m51.0s), 053/054 VUs, 168 complete and 0 interrupted iterations
+steady   [  17% ] 053/054 VUs  0m51.0s/5m0s  5.00 iters/s
+
+running (0m52.0s), 055/055 VUs, 170 complete and 0 interrupted iterations
+steady   [  17% ] 055/055 VUs  0m52.0s/5m0s  5.00 iters/s
+
+running (0m53.0s), 054/056 VUs, 175 complete and 0 interrupted iterations
+steady   [  18% ] 054/056 VUs  0m53.0s/5m0s  5.00 iters/s
+
+running (0m54.0s), 056/056 VUs, 178 complete and 0 interrupted iterations
+steady   [  18% ] 056/056 VUs  0m54.0s/5m0s  5.00 iters/s
+
+running (0m55.0s), 057/058 VUs, 180 complete and 0 interrupted iterations
+steady   [  18% ] 057/058 VUs  0m55.0s/5m0s  5.00 iters/s
+
+running (0m56.0s), 057/059 VUs, 184 complete and 0 interrupted iterations
+steady   [  19% ] 057/059 VUs  0m56.0s/5m0s  5.00 iters/s
+
+running (0m57.0s), 057/059 VUs, 189 complete and 0 interrupted iterations
+steady   [  19% ] 057/059 VUs  0m57.0s/5m0s  5.00 iters/s
+
+running (0m58.0s), 060/060 VUs, 190 complete and 0 interrupted iterations
+steady   [  19% ] 060/060 VUs  0m58.0s/5m0s  5.00 iters/s
+
+running (0m59.0s), 060/061 VUs, 194 complete and 0 interrupted iterations
+steady   [  20% ] 060/061 VUs  0m59.0s/5m0s  5.00 iters/s
+
+running (1m00.0s), 058/062 VUs, 200 complete and 0 interrupted iterations
+steady   [  20% ] 058/062 VUs  1m00.0s/5m0s  5.00 iters/s
+
+running (1m01.0s), 062/063 VUs, 200 complete and 0 interrupted iterations
+steady   [  20% ] 062/063 VUs  1m01.0s/5m0s  5.00 iters/s
+
+running (1m02.0s), 063/063 VUs, 204 complete and 0 interrupted iterations
+steady   [  21% ] 063/063 VUs  1m02.0s/5m0s  5.00 iters/s
+
+running (1m03.0s), 064/065 VUs, 206 complete and 0 interrupted iterations
+steady   [  21% ] 064/065 VUs  1m03.0s/5m0s  5.00 iters/s
+
+running (1m04.0s), 065/066 VUs, 209 complete and 0 interrupted iterations
+steady   [  21% ] 065/066 VUs  1m04.0s/5m0s  5.00 iters/s
+
+running (1m05.0s), 067/068 VUs, 210 complete and 0 interrupted iterations
+steady   [  22% ] 067/068 VUs  1m05.0s/5m0s  5.00 iters/s
+
+running (1m06.0s), 069/069 VUs, 213 complete and 0 interrupted iterations
+steady   [  22% ] 069/069 VUs  1m06.0s/5m0s  5.00 iters/s
+
+running (1m07.0s), 069/070 VUs, 216 complete and 0 interrupted iterations
+steady   [  22% ] 069/070 VUs  1m07.0s/5m0s  5.00 iters/s
+
+running (1m08.0s), 070/070 VUs, 220 complete and 0 interrupted iterations
+steady   [  23% ] 070/070 VUs  1m08.0s/5m0s  5.00 iters/s
+
+running (1m09.0s), 072/072 VUs, 222 complete and 0 interrupted iterations
+steady   [  23% ] 072/072 VUs  1m09.0s/5m0s  5.00 iters/s
+
+running (1m10.0s), 071/074 VUs, 225 complete and 0 interrupted iterations
+steady   [  23% ] 071/074 VUs  1m10.0s/5m0s  5.00 iters/s
+
+running (1m11.0s), 071/074 VUs, 230 complete and 0 interrupted iterations
+steady   [  24% ] 071/074 VUs  1m11.0s/5m0s  5.00 iters/s
+
+running (1m12.0s), 074/075 VUs, 231 complete and 0 interrupted iterations
+steady   [  24% ] 074/075 VUs  1m12.0s/5m0s  5.00 iters/s
+
+running (1m13.0s), 074/076 VUs, 235 complete and 0 interrupted iterations
+steady   [  24% ] 074/076 VUs  1m13.0s/5m0s  5.00 iters/s
+
+running (1m14.0s), 076/077 VUs, 237 complete and 0 interrupted iterations
+steady   [  25% ] 076/077 VUs  1m14.0s/5m0s  5.00 iters/s
+
+running (1m15.0s), 077/078 VUs, 240 complete and 0 interrupted iterations
+steady   [  25% ] 077/078 VUs  1m15.0s/5m0s  5.00 iters/s
+
+running (1m16.0s), 078/079 VUs, 243 complete and 0 interrupted iterations
+steady   [  25% ] 078/079 VUs  1m16.0s/5m0s  5.00 iters/s
+
+running (1m17.0s), 080/080 VUs, 245 complete and 0 interrupted iterations
+steady   [  26% ] 080/080 VUs  1m17.0s/5m0s  5.00 iters/s
+
+running (1m18.0s), 080/082 VUs, 248 complete and 0 interrupted iterations
+steady   [  26% ] 080/082 VUs  1m18.0s/5m0s  5.00 iters/s
+
+running (1m19.0s), 082/083 VUs, 250 complete and 0 interrupted iterations
+steady   [  26% ] 082/083 VUs  1m19.0s/5m0s  5.00 iters/s
+
+running (1m20.0s), 082/085 VUs, 253 complete and 0 interrupted iterations
+steady   [  27% ] 082/085 VUs  1m20.0s/5m0s  5.00 iters/s
+
+running (1m21.0s), 085/085 VUs, 255 complete and 0 interrupted iterations
+steady   [  27% ] 085/085 VUs  1m21.0s/5m0s  5.00 iters/s
+
+running (1m22.0s), 084/086 VUs, 260 complete and 0 interrupted iterations
+steady   [  27% ] 084/086 VUs  1m22.0s/5m0s  5.00 iters/s
+
+running (1m23.0s), 087/088 VUs, 260 complete and 0 interrupted iterations
+steady   [  28% ] 087/088 VUs  1m23.0s/5m0s  5.00 iters/s
+
+running (1m24.0s), 087/089 VUs, 264 complete and 0 interrupted iterations
+steady   [  28% ] 087/089 VUs  1m24.0s/5m0s  5.00 iters/s
+
+running (1m25.0s), 089/090 VUs, 266 complete and 0 interrupted iterations
+steady   [  28% ] 089/090 VUs  1m25.0s/5m0s  5.00 iters/s
+
+running (1m26.0s), 089/091 VUs, 270 complete and 0 interrupted iterations
+steady   [  29% ] 089/091 VUs  1m26.0s/5m0s  5.00 iters/s
+
+running (1m27.0s), 090/092 VUs, 273 complete and 0 interrupted iterations
+steady   [  29% ] 090/092 VUs  1m27.0s/5m0s  5.00 iters/s
+
+running (1m28.0s), 092/092 VUs, 276 complete and 0 interrupted iterations
+steady   [  29% ] 092/092 VUs  1m28.0s/5m0s  5.00 iters/s
+
+running (1m29.0s), 092/093 VUs, 280 complete and 0 interrupted iterations
+steady   [  30% ] 092/093 VUs  1m29.0s/5m0s  5.00 iters/s
+
+running (1m30.0s), 095/095 VUs, 280 complete and 0 interrupted iterations
+steady   [  30% ] 095/095 VUs  1m30.0s/5m0s  5.00 iters/s
+
+running (1m31.0s), 095/098 VUs, 282 complete and 0 interrupted iterations
+steady   [  30% ] 095/098 VUs  1m31.0s/5m0s  5.00 iters/s
+
+running (1m32.0s), 098/098 VUs, 284 complete and 0 interrupted iterations
+steady   [  31% ] 098/098 VUs  1m32.0s/5m0s  5.00 iters/s
+
+running (1m33.0s), 098/100 VUs, 287 complete and 0 interrupted iterations
+steady   [  31% ] 098/100 VUs  1m33.0s/5m0s  5.00 iters/s
+
+running (1m34.0s), 100/100 VUs, 290 complete and 0 interrupted iterations
+steady   [  31% ] 100/100 VUs  1m34.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:27:54Z" level=warning msg="Insufficient VUs, reached 100 active VUs and cannot initialize more" executor=constant-arrival-rate scenario=steady
+
+running (1m35.0s), 098/100 VUs, 294 complete and 0 interrupted iterations
+steady   [  32% ] 098/100 VUs  1m35.0s/5m0s  5.00 iters/s
+
+running (1m36.0s), 100/100 VUs, 296 complete and 0 interrupted iterations
+steady   [  32% ] 100/100 VUs  1m36.0s/5m0s  5.00 iters/s
+
+running (1m37.0s), 100/100 VUs, 300 complete and 0 interrupted iterations
+steady   [  32% ] 100/100 VUs  1m37.0s/5m0s  5.00 iters/s
+
+running (1m38.0s), 099/100 VUs, 304 complete and 0 interrupted iterations
+steady   [  33% ] 099/100 VUs  1m38.0s/5m0s  5.00 iters/s
+
+running (1m39.0s), 100/100 VUs, 307 complete and 0 interrupted iterations
+steady   [  33% ] 100/100 VUs  1m39.0s/5m0s  5.00 iters/s
+
+running (1m40.0s), 100/100 VUs, 310 complete and 0 interrupted iterations
+steady   [  33% ] 100/100 VUs  1m40.0s/5m0s  5.00 iters/s
+
+running (1m41.0s), 098/100 VUs, 314 complete and 0 interrupted iterations
+steady   [  34% ] 098/100 VUs  1m41.0s/5m0s  5.00 iters/s
+
+running (1m42.0s), 099/100 VUs, 318 complete and 0 interrupted iterations
+steady   [  34% ] 099/100 VUs  1m42.0s/5m0s  5.00 iters/s
+
+running (1m43.0s), 100/100 VUs, 320 complete and 0 interrupted iterations
+steady   [  34% ] 100/100 VUs  1m43.0s/5m0s  5.00 iters/s
+
+running (1m44.0s), 100/100 VUs, 324 complete and 0 interrupted iterations
+steady   [  35% ] 100/100 VUs  1m44.0s/5m0s  5.00 iters/s
+
+running (1m45.0s), 099/100 VUs, 327 complete and 0 interrupted iterations
+steady   [  35% ] 099/100 VUs  1m45.0s/5m0s  5.00 iters/s
+
+running (1m46.0s), 100/100 VUs, 330 complete and 0 interrupted iterations
+steady   [  35% ] 100/100 VUs  1m46.0s/5m0s  5.00 iters/s
+
+running (1m47.0s), 099/100 VUs, 334 complete and 0 interrupted iterations
+steady   [  36% ] 099/100 VUs  1m47.0s/5m0s  5.00 iters/s
+
+running (1m48.0s), 099/100 VUs, 338 complete and 0 interrupted iterations
+steady   [  36% ] 099/100 VUs  1m48.0s/5m0s  5.00 iters/s
+
+running (1m49.0s), 100/100 VUs, 341 complete and 0 interrupted iterations
+steady   [  36% ] 100/100 VUs  1m49.0s/5m0s  5.00 iters/s
+
+running (1m50.0s), 100/100 VUs, 344 complete and 0 interrupted iterations
+steady   [  37% ] 100/100 VUs  1m50.0s/5m0s  5.00 iters/s
+
+running (1m51.0s), 100/100 VUs, 347 complete and 0 interrupted iterations
+steady   [  37% ] 100/100 VUs  1m51.0s/5m0s  5.00 iters/s
+
+running (1m52.0s), 099/100 VUs, 351 complete and 0 interrupted iterations
+steady   [  37% ] 099/100 VUs  1m52.0s/5m0s  5.00 iters/s
+
+running (1m53.0s), 099/100 VUs, 355 complete and 0 interrupted iterations
+steady   [  38% ] 099/100 VUs  1m53.0s/5m0s  5.00 iters/s
+
+running (1m54.0s), 099/100 VUs, 357 complete and 0 interrupted iterations
+steady   [  38% ] 099/100 VUs  1m54.0s/5m0s  5.00 iters/s
+
+running (1m55.0s), 099/100 VUs, 361 complete and 0 interrupted iterations
+steady   [  38% ] 099/100 VUs  1m55.0s/5m0s  5.00 iters/s
+
+running (1m56.0s), 099/100 VUs, 364 complete and 0 interrupted iterations
+steady   [  39% ] 099/100 VUs  1m56.0s/5m0s  5.00 iters/s
+
+running (1m57.0s), 099/100 VUs, 367 complete and 0 interrupted iterations
+steady   [  39% ] 099/100 VUs  1m57.0s/5m0s  5.00 iters/s
+
+running (1m58.0s), 099/100 VUs, 371 complete and 0 interrupted iterations
+steady   [  39% ] 099/100 VUs  1m58.0s/5m0s  5.00 iters/s
+
+running (1m59.0s), 099/100 VUs, 376 complete and 0 interrupted iterations
+steady   [  40% ] 099/100 VUs  1m59.0s/5m0s  5.00 iters/s
+
+running (2m00.0s), 098/100 VUs, 379 complete and 0 interrupted iterations
+steady   [  40% ] 098/100 VUs  2m00.0s/5m0s  5.00 iters/s
+
+running (2m01.0s), 100/100 VUs, 381 complete and 0 interrupted iterations
+steady   [  40% ] 100/100 VUs  2m01.0s/5m0s  5.00 iters/s
+
+running (2m02.0s), 098/100 VUs, 386 complete and 0 interrupted iterations
+steady   [  41% ] 098/100 VUs  2m02.0s/5m0s  5.00 iters/s
+
+running (2m03.0s), 098/100 VUs, 389 complete and 0 interrupted iterations
+steady   [  41% ] 098/100 VUs  2m03.0s/5m0s  5.00 iters/s
+
+running (2m04.0s), 100/100 VUs, 390 complete and 0 interrupted iterations
+steady   [  41% ] 100/100 VUs  2m04.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:25Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=231&strategy=lazy\": request timeout"
+
+running (2m05.0s), 099/100 VUs, 392 complete and 0 interrupted iterations
+steady   [  42% ] 099/100 VUs  2m05.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:25Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=416&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=710&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=780&strategy=lazy\": request timeout"
+
+running (2m06.0s), 099/100 VUs, 396 complete and 0 interrupted iterations
+steady   [  42% ] 099/100 VUs  2m06.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=848&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=23&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=370&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=632&strategy=lazy\": request timeout"
+
+running (2m07.0s), 099/100 VUs, 400 complete and 0 interrupted iterations
+steady   [  42% ] 099/100 VUs  2m07.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=27&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=935&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=825&strategy=lazy\": request timeout"
+
+running (2m08.0s), 099/100 VUs, 403 complete and 0 interrupted iterations
+steady   [  43% ] 099/100 VUs  2m08.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=332&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=125&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=594&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=598&strategy=lazy\": request timeout"
+
+running (2m09.0s), 099/100 VUs, 407 complete and 0 interrupted iterations
+steady   [  43% ] 099/100 VUs  2m09.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=494&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=906&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=304&strategy=lazy\": request timeout"
+
+running (2m10.0s), 100/100 VUs, 410 complete and 0 interrupted iterations
+steady   [  43% ] 100/100 VUs  2m10.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=478&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=984&strategy=lazy\": request timeout"
+
+running (2m11.0s), 099/100 VUs, 412 complete and 0 interrupted iterations
+steady   [  44% ] 099/100 VUs  2m11.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=815&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=913&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=726&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=209&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=389&strategy=lazy\": request timeout"
+
+running (2m12.0s), 099/100 VUs, 417 complete and 0 interrupted iterations
+steady   [  44% ] 099/100 VUs  2m12.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=713&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=879&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=316&strategy=lazy\": request timeout"
+
+running (2m13.0s), 100/100 VUs, 420 complete and 0 interrupted iterations
+steady   [  44% ] 100/100 VUs  2m13.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=488&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=566&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=250&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=921&strategy=lazy\": request timeout"
+
+running (2m14.0s), 099/100 VUs, 424 complete and 0 interrupted iterations
+steady   [  45% ] 099/100 VUs  2m14.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=825&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=985&strategy=lazy\": request timeout"
+
+running (2m15.0s), 099/100 VUs, 426 complete and 0 interrupted iterations
+steady   [  45% ] 099/100 VUs  2m15.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=653&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=764&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=124&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=620&strategy=lazy\": request timeout"
+
+running (2m16.0s), 099/100 VUs, 430 complete and 0 interrupted iterations
+steady   [  45% ] 099/100 VUs  2m16.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=69&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=244&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=457&strategy=lazy\": request timeout"
+
+running (2m17.0s), 099/100 VUs, 433 complete and 0 interrupted iterations
+steady   [  46% ] 099/100 VUs  2m17.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=84&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=171&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=991&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=224&strategy=lazy\": request timeout"
+
+running (2m18.0s), 100/100 VUs, 437 complete and 0 interrupted iterations
+steady   [  46% ] 100/100 VUs  2m18.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=402&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=710&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=967&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=740&strategy=lazy\": request timeout"
+
+running (2m19.0s), 099/100 VUs, 441 complete and 0 interrupted iterations
+steady   [  46% ] 099/100 VUs  2m19.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=33&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=555&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=158&strategy=lazy\": request timeout"
+
+running (2m20.0s), 099/100 VUs, 444 complete and 0 interrupted iterations
+steady   [  47% ] 099/100 VUs  2m20.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=759&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=629&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=164&strategy=lazy\": request timeout"
+
+running (2m21.0s), 099/100 VUs, 447 complete and 0 interrupted iterations
+steady   [  47% ] 099/100 VUs  2m21.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=443&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=624&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=71&strategy=lazy\": request timeout"
+
+running (2m22.0s), 100/100 VUs, 450 complete and 0 interrupted iterations
+steady   [  47% ] 100/100 VUs  2m22.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=429&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=743&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=436&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=911&strategy=lazy\": request timeout"
+
+running (2m23.0s), 099/100 VUs, 454 complete and 0 interrupted iterations
+steady   [  48% ] 099/100 VUs  2m23.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=515&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=338&strategy=lazy\": request timeout"
+
+running (2m24.0s), 100/100 VUs, 456 complete and 0 interrupted iterations
+steady   [  48% ] 100/100 VUs  2m24.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=849&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=358&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=522&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=746&strategy=lazy\": request timeout"
+
+running (2m25.0s), 099/100 VUs, 460 complete and 0 interrupted iterations
+steady   [  48% ] 099/100 VUs  2m25.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=14&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=519&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=265&strategy=lazy\": request timeout"
+
+running (2m26.0s), 099/100 VUs, 463 complete and 0 interrupted iterations
+steady   [  49% ] 099/100 VUs  2m26.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=738&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=908&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=170&strategy=lazy\": request timeout"
+
+running (2m27.0s), 100/100 VUs, 466 complete and 0 interrupted iterations
+steady   [  49% ] 100/100 VUs  2m27.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=668&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=944&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=886&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=226&strategy=lazy\": request timeout"
+
+running (2m28.0s), 099/100 VUs, 470 complete and 0 interrupted iterations
+steady   [  49% ] 099/100 VUs  2m28.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=220&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=841&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=2&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=561&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=212&strategy=lazy\": request timeout"
+
+running (2m29.0s), 099/100 VUs, 475 complete and 0 interrupted iterations
+steady   [  50% ] 099/100 VUs  2m29.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=732&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=863&strategy=lazy\": request timeout"
+
+running (2m30.0s), 099/100 VUs, 477 complete and 0 interrupted iterations
+steady   [  50% ] 099/100 VUs  2m30.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=985&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=339&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=931&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=389&strategy=lazy\": request timeout"
+
+running (2m31.0s), 099/100 VUs, 481 complete and 0 interrupted iterations
+steady   [  50% ] 099/100 VUs  2m31.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=1000&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=577&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=89&strategy=lazy\": request timeout"
+
+running (2m32.0s), 099/100 VUs, 484 complete and 0 interrupted iterations
+steady   [  51% ] 099/100 VUs  2m32.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=686&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=37&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=172&strategy=lazy\": request timeout"
+
+running (2m33.0s), 099/100 VUs, 487 complete and 0 interrupted iterations
+steady   [  51% ] 099/100 VUs  2m33.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=150&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=219&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=913&strategy=lazy\": request timeout"
+
+running (2m34.0s), 100/100 VUs, 490 complete and 0 interrupted iterations
+steady   [  51% ] 100/100 VUs  2m34.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:55Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=162&strategy=lazy\": request timeout"
+
+running (2m35.0s), 100/100 VUs, 491 complete and 0 interrupted iterations
+steady   [  52% ] 100/100 VUs  2m35.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:55Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=972&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=625&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=219&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=289&strategy=lazy\": request timeout"
+
+running (2m36.0s), 099/100 VUs, 495 complete and 0 interrupted iterations
+steady   [  52% ] 099/100 VUs  2m36.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=697&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=763&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=636&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=466&strategy=lazy\": request timeout"
+
+running (2m37.0s), 099/100 VUs, 499 complete and 0 interrupted iterations
+steady   [  52% ] 099/100 VUs  2m37.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=295&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=559&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=959&strategy=lazy\": request timeout"
+
+running (2m38.0s), 099/100 VUs, 502 complete and 0 interrupted iterations
+steady   [  53% ] 099/100 VUs  2m38.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=290&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=162&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=936&strategy=lazy\": request timeout"
+time="2026-05-21T02:28:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=940&strategy=lazy\": request timeout"
+
+running (2m39.0s), 099/100 VUs, 506 complete and 0 interrupted iterations
+steady   [  53% ] 099/100 VUs  2m39.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:28:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=553&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=168&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=481&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=893&strategy=lazy\": request timeout"
+
+running (2m40.0s), 099/100 VUs, 510 complete and 0 interrupted iterations
+steady   [  53% ] 099/100 VUs  2m40.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:01Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=714&strategy=lazy\": request timeout"
+
+running (2m41.0s), 099/100 VUs, 511 complete and 0 interrupted iterations
+steady   [  54% ] 099/100 VUs  2m41.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:01Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=446&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=204&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=76&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=691&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=248&strategy=lazy\": request timeout"
+
+running (2m42.0s), 099/100 VUs, 516 complete and 0 interrupted iterations
+steady   [  54% ] 099/100 VUs  2m42.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=789&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=511&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=71&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=391&strategy=lazy\": request timeout"
+
+running (2m43.0s), 100/100 VUs, 520 complete and 0 interrupted iterations
+steady   [  54% ] 100/100 VUs  2m43.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=6&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=289&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=798&strategy=lazy\": request timeout"
+
+running (2m44.0s), 099/100 VUs, 523 complete and 0 interrupted iterations
+steady   [  55% ] 099/100 VUs  2m44.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=944&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=843&strategy=lazy\": request timeout"
+
+running (2m45.0s), 100/100 VUs, 525 complete and 0 interrupted iterations
+steady   [  55% ] 100/100 VUs  2m45.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=613&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=967&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=864&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=538&strategy=lazy\": request timeout"
+
+running (2m46.0s), 099/100 VUs, 529 complete and 0 interrupted iterations
+steady   [  55% ] 099/100 VUs  2m46.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=389&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=460&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=377&strategy=lazy\": request timeout"
+
+running (2m47.0s), 099/100 VUs, 532 complete and 0 interrupted iterations
+steady   [  56% ] 099/100 VUs  2m47.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=920&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=160&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=845&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=494&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=841&strategy=lazy\": request timeout"
+
+running (2m48.0s), 099/100 VUs, 537 complete and 0 interrupted iterations
+steady   [  56% ] 099/100 VUs  2m48.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=608&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=121&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=523&strategy=lazy\": request timeout"
+
+running (2m49.0s), 099/100 VUs, 540 complete and 0 interrupted iterations
+steady   [  56% ] 099/100 VUs  2m49.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=87&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=311&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=603&strategy=lazy\": request timeout"
+
+running (2m50.0s), 100/100 VUs, 543 complete and 0 interrupted iterations
+steady   [  57% ] 100/100 VUs  2m50.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=503&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=790&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=370&strategy=lazy\": request timeout"
+
+running (2m51.0s), 099/100 VUs, 546 complete and 0 interrupted iterations
+steady   [  57% ] 099/100 VUs  2m51.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=543&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=604&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=272&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=750&strategy=lazy\": request timeout"
+
+running (2m52.0s), 099/100 VUs, 550 complete and 0 interrupted iterations
+steady   [  57% ] 099/100 VUs  2m52.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=642&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=850&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=883&strategy=lazy\": request timeout"
+
+running (2m53.0s), 099/100 VUs, 553 complete and 0 interrupted iterations
+steady   [  58% ] 099/100 VUs  2m53.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=557&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=992&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=505&strategy=lazy\": request timeout"
+
+running (2m54.0s), 100/100 VUs, 556 complete and 0 interrupted iterations
+steady   [  58% ] 100/100 VUs  2m54.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=494&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=726&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=478&strategy=lazy\": request timeout"
+
+running (2m55.0s), 099/100 VUs, 559 complete and 0 interrupted iterations
+steady   [  58% ] 099/100 VUs  2m55.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=932&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=900&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=673&strategy=lazy\": request timeout"
+
+running (2m56.0s), 099/100 VUs, 562 complete and 0 interrupted iterations
+steady   [  59% ] 099/100 VUs  2m56.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=806&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=986&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=113&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=963&strategy=lazy\": request timeout"
+
+running (2m57.0s), 100/100 VUs, 566 complete and 0 interrupted iterations
+steady   [  59% ] 100/100 VUs  2m57.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=704&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=908&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=902&strategy=lazy\": request timeout"
+
+running (2m58.0s), 099/100 VUs, 569 complete and 0 interrupted iterations
+steady   [  59% ] 099/100 VUs  2m58.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=346&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=446&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=187&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=758&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=593&strategy=lazy\": request timeout"
+
+running (2m59.0s), 099/100 VUs, 574 complete and 0 interrupted iterations
+steady   [  60% ] 099/100 VUs  2m59.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=851&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=200&strategy=lazy\": request timeout"
+
+running (3m00.0s), 100/100 VUs, 576 complete and 0 interrupted iterations
+steady   [  60% ] 100/100 VUs  3m00.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=498&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=239&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=642&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=318&strategy=lazy\": request timeout"
+
+running (3m01.0s), 100/100 VUs, 580 complete and 0 interrupted iterations
+steady   [  60% ] 100/100 VUs  3m01.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=621&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=633&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=874&strategy=lazy\": request timeout"
+
+running (3m02.0s), 099/100 VUs, 583 complete and 0 interrupted iterations
+steady   [  61% ] 099/100 VUs  3m02.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=372&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=675&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=605&strategy=lazy\": request timeout"
+
+running (3m03.0s), 100/100 VUs, 587 complete and 0 interrupted iterations
+steady   [  61% ] 100/100 VUs  3m03.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=278&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=413&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=974&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=755&strategy=lazy\": request timeout"
+
+running (3m04.0s), 099/100 VUs, 591 complete and 0 interrupted iterations
+steady   [  61% ] 099/100 VUs  3m04.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:25Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=975&strategy=lazy\": request timeout"
+
+running (3m05.0s), 100/100 VUs, 592 complete and 0 interrupted iterations
+steady   [  62% ] 100/100 VUs  3m05.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=834&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=418&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=976&strategy=lazy\": request timeout"
+
+running (3m06.0s), 100/100 VUs, 595 complete and 0 interrupted iterations
+steady   [  62% ] 100/100 VUs  3m06.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=932&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=947&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=861&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=549&strategy=lazy\": request timeout"
+
+running (3m07.0s), 099/100 VUs, 599 complete and 0 interrupted iterations
+steady   [  62% ] 099/100 VUs  3m07.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=324&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=178&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=54&strategy=lazy\": request timeout"
+
+running (3m08.0s), 099/100 VUs, 602 complete and 0 interrupted iterations
+steady   [  63% ] 099/100 VUs  3m08.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=712&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=12&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=707&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=515&strategy=lazy\": request timeout"
+
+running (3m09.0s), 099/100 VUs, 606 complete and 0 interrupted iterations
+steady   [  63% ] 099/100 VUs  3m09.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=165&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=270&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=244&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=795&strategy=lazy\": request timeout"
+
+running (3m10.0s), 099/100 VUs, 610 complete and 0 interrupted iterations
+steady   [  63% ] 099/100 VUs  3m10.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=746&strategy=lazy\": request timeout"
+
+running (3m11.0s), 100/100 VUs, 611 complete and 0 interrupted iterations
+steady   [  64% ] 100/100 VUs  3m11.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=867&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=470&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=159&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=402&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=280&strategy=lazy\": request timeout"
+
+running (3m12.0s), 098/100 VUs, 617 complete and 0 interrupted iterations
+steady   [  64% ] 098/100 VUs  3m12.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=405&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=874&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=702&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=876&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=976&strategy=lazy\": request timeout"
+
+running (3m13.0s), 098/100 VUs, 622 complete and 0 interrupted iterations
+steady   [  64% ] 098/100 VUs  3m13.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=75&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=759&strategy=lazy\": request timeout"
+
+running (3m14.0s), 099/100 VUs, 624 complete and 0 interrupted iterations
+steady   [  65% ] 099/100 VUs  3m14.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=864&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=225&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=141&strategy=lazy\": request timeout"
+
+running (3m15.0s), 099/100 VUs, 627 complete and 0 interrupted iterations
+steady   [  65% ] 099/100 VUs  3m15.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=732&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=434&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=800&strategy=lazy\": request timeout"
+
+running (3m16.0s), 099/100 VUs, 630 complete and 0 interrupted iterations
+steady   [  65% ] 099/100 VUs  3m16.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=487&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=733&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=265&strategy=lazy\": request timeout"
+
+running (3m17.0s), 099/100 VUs, 633 complete and 0 interrupted iterations
+steady   [  66% ] 099/100 VUs  3m17.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=779&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=736&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=598&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=316&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=422&strategy=lazy\": request timeout"
+
+running (3m18.0s), 099/100 VUs, 638 complete and 0 interrupted iterations
+steady   [  66% ] 099/100 VUs  3m18.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=549&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=958&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=517&strategy=lazy\": request timeout"
+
+running (3m19.0s), 099/100 VUs, 641 complete and 0 interrupted iterations
+steady   [  66% ] 099/100 VUs  3m19.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=191&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=120&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=735&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=484&strategy=lazy\": request timeout"
+
+running (3m20.0s), 099/100 VUs, 645 complete and 0 interrupted iterations
+steady   [  67% ] 099/100 VUs  3m20.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=213&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=699&strategy=lazy\": request timeout"
+
+running (3m21.0s), 099/100 VUs, 647 complete and 0 interrupted iterations
+steady   [  67% ] 099/100 VUs  3m21.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=182&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=501&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=375&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=553&strategy=lazy\": request timeout"
+
+running (3m22.0s), 099/100 VUs, 651 complete and 0 interrupted iterations
+steady   [  67% ] 099/100 VUs  3m22.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=614&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=366&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=192&strategy=lazy\": request timeout"
+
+running (3m23.0s), 100/100 VUs, 654 complete and 0 interrupted iterations
+steady   [  68% ] 100/100 VUs  3m23.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=915&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=811&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=508&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=737&strategy=lazy\": request timeout"
+
+running (3m24.0s), 100/100 VUs, 658 complete and 0 interrupted iterations
+steady   [  68% ] 100/100 VUs  3m24.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=755&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=520&strategy=lazy\": request timeout"
+
+running (3m25.0s), 100/100 VUs, 660 complete and 0 interrupted iterations
+steady   [  68% ] 100/100 VUs  3m25.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=664&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=338&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=753&strategy=lazy\": request timeout"
+
+running (3m26.0s), 100/100 VUs, 663 complete and 0 interrupted iterations
+steady   [  69% ] 100/100 VUs  3m26.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=958&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=686&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=33&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=423&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=541&strategy=lazy\": request timeout"
+
+running (3m27.0s), 099/100 VUs, 668 complete and 0 interrupted iterations
+steady   [  69% ] 099/100 VUs  3m27.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=419&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=565&strategy=lazy\": request timeout"
+
+running (3m28.0s), 099/100 VUs, 670 complete and 0 interrupted iterations
+steady   [  69% ] 099/100 VUs  3m28.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=935&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=447&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=389&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=397&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=376&strategy=lazy\": request timeout"
+
+running (3m29.0s), 099/100 VUs, 675 complete and 0 interrupted iterations
+steady   [  70% ] 099/100 VUs  3m29.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=61&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=721&strategy=lazy\": request timeout"
+
+running (3m30.0s), 100/100 VUs, 677 complete and 0 interrupted iterations
+steady   [  70% ] 100/100 VUs  3m30.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=901&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=650&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=401&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=277&strategy=lazy\": request timeout"
+
+running (3m31.0s), 099/100 VUs, 681 complete and 0 interrupted iterations
+steady   [  70% ] 099/100 VUs  3m31.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=262&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=68&strategy=lazy\": request timeout"
+
+running (3m32.0s), 099/100 VUs, 683 complete and 0 interrupted iterations
+steady   [  71% ] 099/100 VUs  3m32.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=981&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=503&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=316&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=517&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=227&strategy=lazy\": request timeout"
+
+running (3m33.0s), 099/100 VUs, 688 complete and 0 interrupted iterations
+steady   [  71% ] 099/100 VUs  3m33.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=412&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=373&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=770&strategy=lazy\": request timeout"
+
+running (3m34.0s), 100/100 VUs, 691 complete and 0 interrupted iterations
+steady   [  71% ] 100/100 VUs  3m34.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=644&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:55Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=227&strategy=lazy\": request timeout"
+
+running (3m35.0s), 099/100 VUs, 693 complete and 0 interrupted iterations
+steady   [  72% ] 099/100 VUs  3m35.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=351&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=174&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=61&strategy=lazy\": request timeout"
+
+running (3m36.0s), 099/100 VUs, 696 complete and 0 interrupted iterations
+steady   [  72% ] 099/100 VUs  3m36.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=735&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=651&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=407&strategy=lazy\": request timeout"
+
+running (3m37.0s), 099/100 VUs, 699 complete and 0 interrupted iterations
+steady   [  72% ] 099/100 VUs  3m37.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=666&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=830&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=607&strategy=lazy\": request timeout"
+
+running (3m38.0s), 100/100 VUs, 702 complete and 0 interrupted iterations
+steady   [  73% ] 100/100 VUs  3m38.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=843&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=781&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=622&strategy=lazy\": request timeout"
+time="2026-05-21T02:29:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=852&strategy=lazy\": request timeout"
+
+running (3m39.0s), 100/100 VUs, 706 complete and 0 interrupted iterations
+steady   [  73% ] 100/100 VUs  3m39.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:29:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=383&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=49&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=286&strategy=lazy\": request timeout"
+
+running (3m40.0s), 099/100 VUs, 709 complete and 0 interrupted iterations
+steady   [  73% ] 099/100 VUs  3m40.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=396&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:01Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=240&strategy=lazy\": request timeout"
+
+running (3m41.0s), 100/100 VUs, 711 complete and 0 interrupted iterations
+steady   [  74% ] 100/100 VUs  3m41.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=893&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=486&strategy=lazy\": request timeout"
+
+running (3m42.0s), 099/100 VUs, 715 complete and 0 interrupted iterations
+steady   [  74% ] 099/100 VUs  3m42.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=434&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=843&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=868&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=893&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=586&strategy=lazy\": request timeout"
+
+running (3m43.0s), 099/100 VUs, 720 complete and 0 interrupted iterations
+steady   [  74% ] 099/100 VUs  3m43.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=804&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=447&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=901&strategy=lazy\": request timeout"
+
+running (3m44.0s), 099/100 VUs, 723 complete and 0 interrupted iterations
+steady   [  75% ] 099/100 VUs  3m44.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=458&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=216&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=766&strategy=lazy\": request timeout"
+
+running (3m45.0s), 100/100 VUs, 726 complete and 0 interrupted iterations
+steady   [  75% ] 100/100 VUs  3m45.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=332&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=180&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=750&strategy=lazy\": request timeout"
+
+running (3m46.0s), 100/100 VUs, 729 complete and 0 interrupted iterations
+steady   [  75% ] 100/100 VUs  3m46.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=479&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=614&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=194&strategy=lazy\": request timeout"
+
+running (3m47.0s), 100/100 VUs, 732 complete and 0 interrupted iterations
+steady   [  76% ] 100/100 VUs  3m47.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=924&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=250&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=336&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=51&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=144&strategy=lazy\": request timeout"
+
+running (3m48.0s), 099/100 VUs, 737 complete and 0 interrupted iterations
+steady   [  76% ] 099/100 VUs  3m48.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=657&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=530&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=257&strategy=lazy\": request timeout"
+
+running (3m49.0s), 100/100 VUs, 740 complete and 0 interrupted iterations
+steady   [  76% ] 100/100 VUs  3m49.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=823&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=852&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=214&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=156&strategy=lazy\": request timeout"
+
+running (3m50.0s), 099/100 VUs, 744 complete and 0 interrupted iterations
+steady   [  77% ] 099/100 VUs  3m50.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=413&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=647&strategy=lazy\": request timeout"
+
+running (3m51.0s), 100/100 VUs, 746 complete and 0 interrupted iterations
+steady   [  77% ] 100/100 VUs  3m51.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=768&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=930&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=574&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=894&strategy=lazy\": request timeout"
+
+running (3m52.0s), 099/100 VUs, 750 complete and 0 interrupted iterations
+steady   [  77% ] 099/100 VUs  3m52.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=768&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=767&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=542&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=333&strategy=lazy\": request timeout"
+
+running (3m53.0s), 099/100 VUs, 754 complete and 0 interrupted iterations
+steady   [  78% ] 099/100 VUs  3m53.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=952&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=540&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=279&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=88&strategy=lazy\": request timeout"
+
+running (3m54.0s), 099/100 VUs, 758 complete and 0 interrupted iterations
+steady   [  78% ] 099/100 VUs  3m54.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=900&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=32&strategy=lazy\": request timeout"
+
+running (3m55.0s), 099/100 VUs, 760 complete and 0 interrupted iterations
+steady   [  78% ] 099/100 VUs  3m55.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=850&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=752&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=226&strategy=lazy\": request timeout"
+
+running (3m56.0s), 100/100 VUs, 763 complete and 0 interrupted iterations
+steady   [  79% ] 100/100 VUs  3m56.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=605&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=268&strategy=lazy\": request timeout"
+
+running (3m57.0s), 099/100 VUs, 767 complete and 0 interrupted iterations
+steady   [  79% ] 099/100 VUs  3m57.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=105&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=960&strategy=lazy\": request timeout"
+
+running (3m58.0s), 099/100 VUs, 770 complete and 0 interrupted iterations
+steady   [  79% ] 099/100 VUs  3m58.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=178&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=329&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=636&strategy=lazy\": request timeout"
+
+running (3m59.0s), 099/100 VUs, 774 complete and 0 interrupted iterations
+steady   [  80% ] 099/100 VUs  3m59.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=481&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=162&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=503&strategy=lazy\": request timeout"
+
+running (4m00.0s), 100/100 VUs, 777 complete and 0 interrupted iterations
+steady   [  80% ] 100/100 VUs  4m00.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=812&strategy=lazy\": request timeout"
+
+running (4m01.0s), 099/100 VUs, 780 complete and 0 interrupted iterations
+steady   [  80% ] 099/100 VUs  4m01.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=46&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=310&strategy=lazy\": request timeout"
+
+running (4m02.0s), 100/100 VUs, 783 complete and 0 interrupted iterations
+steady   [  81% ] 100/100 VUs  4m02.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=686&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=977&strategy=lazy\": request timeout"
+
+running (4m03.0s), 099/100 VUs, 787 complete and 0 interrupted iterations
+steady   [  81% ] 099/100 VUs  4m03.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=677&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=609&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=713&strategy=lazy\": request timeout"
+
+running (4m04.0s), 100/100 VUs, 791 complete and 0 interrupted iterations
+steady   [  81% ] 100/100 VUs  4m04.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:25Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=686&strategy=lazy\": request timeout"
+
+running (4m05.0s), 099/100 VUs, 793 complete and 0 interrupted iterations
+steady   [  82% ] 099/100 VUs  4m05.0s/5m0s  5.00 iters/s
+
+running (4m06.0s), 099/100 VUs, 797 complete and 0 interrupted iterations
+steady   [  82% ] 099/100 VUs  4m06.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=116&strategy=lazy\": request timeout"
+
+running (4m07.0s), 098/100 VUs, 800 complete and 0 interrupted iterations
+steady   [  82% ] 098/100 VUs  4m07.0s/5m0s  5.00 iters/s
+
+running (4m08.0s), 099/100 VUs, 804 complete and 0 interrupted iterations
+steady   [  83% ] 099/100 VUs  4m08.0s/5m0s  5.00 iters/s
+
+running (4m09.0s), 099/100 VUs, 807 complete and 0 interrupted iterations
+steady   [  83% ] 099/100 VUs  4m09.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=732&strategy=lazy\": request timeout"
+
+running (4m10.0s), 099/100 VUs, 810 complete and 0 interrupted iterations
+steady   [  83% ] 099/100 VUs  4m10.0s/5m0s  5.00 iters/s
+
+running (4m11.0s), 100/100 VUs, 814 complete and 0 interrupted iterations
+steady   [  84% ] 100/100 VUs  4m11.0s/5m0s  5.00 iters/s
+
+running (4m12.0s), 100/100 VUs, 817 complete and 0 interrupted iterations
+steady   [  84% ] 100/100 VUs  4m12.0s/5m0s  5.00 iters/s
+
+running (4m13.0s), 097/100 VUs, 823 complete and 0 interrupted iterations
+steady   [  84% ] 097/100 VUs  4m13.0s/5m0s  5.00 iters/s
+
+running (4m14.0s), 100/100 VUs, 824 complete and 0 interrupted iterations
+steady   [  85% ] 100/100 VUs  4m14.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=431&strategy=lazy\": request timeout"
+
+running (4m15.0s), 099/100 VUs, 827 complete and 0 interrupted iterations
+steady   [  85% ] 099/100 VUs  4m15.0s/5m0s  5.00 iters/s
+
+running (4m16.0s), 099/100 VUs, 830 complete and 0 interrupted iterations
+steady   [  85% ] 099/100 VUs  4m16.0s/5m0s  5.00 iters/s
+
+running (4m17.0s), 100/100 VUs, 834 complete and 0 interrupted iterations
+steady   [  86% ] 100/100 VUs  4m17.0s/5m0s  5.00 iters/s
+
+running (4m18.0s), 100/100 VUs, 837 complete and 0 interrupted iterations
+steady   [  86% ] 100/100 VUs  4m18.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=152&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=643&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=727&strategy=lazy\": request timeout"
+
+running (4m19.0s), 098/100 VUs, 841 complete and 0 interrupted iterations
+steady   [  86% ] 098/100 VUs  4m19.0s/5m0s  5.00 iters/s
+
+running (4m20.0s), 100/100 VUs, 844 complete and 0 interrupted iterations
+steady   [  87% ] 100/100 VUs  4m20.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=669&strategy=lazy\": request timeout"
+
+running (4m21.0s), 099/100 VUs, 847 complete and 0 interrupted iterations
+steady   [  87% ] 099/100 VUs  4m21.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=861&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=466&strategy=lazy\": request timeout"
+
+running (4m22.0s), 099/100 VUs, 850 complete and 0 interrupted iterations
+steady   [  87% ] 099/100 VUs  4m22.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=220&strategy=lazy\": request timeout"
+
+running (4m23.0s), 099/100 VUs, 854 complete and 0 interrupted iterations
+steady   [  88% ] 099/100 VUs  4m23.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=679&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=478&strategy=lazy\": request timeout"
+
+running (4m24.0s), 099/100 VUs, 857 complete and 0 interrupted iterations
+steady   [  88% ] 099/100 VUs  4m24.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=18&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=113&strategy=lazy\": request timeout"
+
+running (4m25.0s), 099/100 VUs, 859 complete and 0 interrupted iterations
+steady   [  88% ] 099/100 VUs  4m25.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=371&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=942&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=415&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=552&strategy=lazy\": request timeout"
+
+running (4m26.0s), 099/100 VUs, 863 complete and 0 interrupted iterations
+steady   [  89% ] 099/100 VUs  4m26.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=753&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=582&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=45&strategy=lazy\": request timeout"
+
+running (4m27.0s), 099/100 VUs, 866 complete and 0 interrupted iterations
+steady   [  89% ] 099/100 VUs  4m27.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=332&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=562&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=381&strategy=lazy\": request timeout"
+
+running (4m28.0s), 099/100 VUs, 869 complete and 0 interrupted iterations
+steady   [  89% ] 099/100 VUs  4m28.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=523&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=512&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=119&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=873&strategy=lazy\": request timeout"
+
+running (4m29.0s), 099/100 VUs, 873 complete and 0 interrupted iterations
+steady   [  90% ] 099/100 VUs  4m29.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=575&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=668&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=645&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=765&strategy=lazy\": request timeout"
+
+running (4m30.0s), 100/100 VUs, 877 complete and 0 interrupted iterations
+steady   [  90% ] 100/100 VUs  4m30.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=489&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=969&strategy=lazy\": request timeout"
+
+running (4m31.0s), 099/100 VUs, 879 complete and 0 interrupted iterations
+steady   [  90% ] 099/100 VUs  4m31.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:51Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=447&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=779&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=673&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:52Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=112&strategy=lazy\": request timeout"
+
+running (4m32.0s), 099/100 VUs, 883 complete and 0 interrupted iterations
+steady   [  91% ] 099/100 VUs  4m32.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=868&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=481&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=396&strategy=lazy\": request timeout"
+
+running (4m33.0s), 099/100 VUs, 886 complete and 0 interrupted iterations
+steady   [  91% ] 099/100 VUs  4m33.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:53Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=312&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=292&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=904&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=415&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:54Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=589&strategy=lazy\": request timeout"
+
+running (4m34.0s), 099/100 VUs, 891 complete and 0 interrupted iterations
+steady   [  91% ] 099/100 VUs  4m34.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:55Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=103&strategy=lazy\": request timeout"
+
+running (4m35.0s), 100/100 VUs, 892 complete and 0 interrupted iterations
+steady   [  92% ] 100/100 VUs  4m35.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:55Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=849&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=538&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=646&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=834&strategy=lazy\": request timeout"
+
+running (4m36.0s), 099/100 VUs, 896 complete and 0 interrupted iterations
+steady   [  92% ] 099/100 VUs  4m36.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:56Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=240&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=478&strategy=lazy\": request timeout"
+
+running (4m37.0s), 099/100 VUs, 898 complete and 0 interrupted iterations
+steady   [  92% ] 099/100 VUs  4m37.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:57Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=855&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=71&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=72&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=962&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=416&strategy=lazy\": request timeout"
+
+running (4m38.0s), 099/100 VUs, 903 complete and 0 interrupted iterations
+steady   [  93% ] 099/100 VUs  4m38.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:58Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=689&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=470&strategy=lazy\": request timeout"
+time="2026-05-21T02:30:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=107&strategy=lazy\": request timeout"
+
+running (4m39.0s), 099/100 VUs, 906 complete and 0 interrupted iterations
+steady   [  93% ] 099/100 VUs  4m39.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:30:59Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=639&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=340&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=233&strategy=lazy\": request timeout"
+
+running (4m40.0s), 099/100 VUs, 909 complete and 0 interrupted iterations
+steady   [  93% ] 099/100 VUs  4m40.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:00Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=178&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:01Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=143&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:01Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=376&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:01Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=347&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:01Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=406&strategy=lazy\": request timeout"
+
+running (4m41.0s), 099/100 VUs, 914 complete and 0 interrupted iterations
+steady   [  94% ] 099/100 VUs  4m41.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=625&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=179&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:02Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=975&strategy=lazy\": request timeout"
+
+running (4m42.0s), 099/100 VUs, 917 complete and 0 interrupted iterations
+steady   [  94% ] 099/100 VUs  4m42.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=6&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=99&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=874&strategy=lazy\": request timeout"
+
+running (4m43.0s), 099/100 VUs, 920 complete and 0 interrupted iterations
+steady   [  94% ] 099/100 VUs  4m43.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:03Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=309&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=231&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=296&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:04Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=54&strategy=lazy\": request timeout"
+
+running (4m44.0s), 100/100 VUs, 924 complete and 0 interrupted iterations
+steady   [  95% ] 100/100 VUs  4m44.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=672&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=456&strategy=lazy\": request timeout"
+
+running (4m45.0s), 099/100 VUs, 926 complete and 0 interrupted iterations
+steady   [  95% ] 099/100 VUs  4m45.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:05Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=38&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=520&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=540&strategy=lazy\": request timeout"
+
+running (4m46.0s), 099/100 VUs, 929 complete and 0 interrupted iterations
+steady   [  95% ] 099/100 VUs  4m46.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:06Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=601&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=600&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=610&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=639&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:07Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=177&strategy=lazy\": request timeout"
+
+running (4m47.0s), 099/100 VUs, 934 complete and 0 interrupted iterations
+steady   [  96% ] 099/100 VUs  4m47.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=986&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=684&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:08Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=601&strategy=lazy\": request timeout"
+
+running (4m48.0s), 099/100 VUs, 937 complete and 0 interrupted iterations
+steady   [  96% ] 099/100 VUs  4m48.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=639&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=361&strategy=lazy\": request timeout"
+
+running (4m49.0s), 100/100 VUs, 939 complete and 0 interrupted iterations
+steady   [  96% ] 100/100 VUs  4m49.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:09Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=290&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=250&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=663&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=299&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:10Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=552&strategy=lazy\": request timeout"
+
+running (4m50.0s), 099/100 VUs, 944 complete and 0 interrupted iterations
+steady   [  97% ] 099/100 VUs  4m50.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=617&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=587&strategy=lazy\": request timeout"
+
+running (4m51.0s), 100/100 VUs, 946 complete and 0 interrupted iterations
+steady   [  97% ] 100/100 VUs  4m51.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:11Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=979&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=908&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=679&strategy=lazy\": request timeout"
+
+running (4m52.0s), 099/100 VUs, 949 complete and 0 interrupted iterations
+steady   [  97% ] 099/100 VUs  4m52.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:12Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=725&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=577&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=615&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=620&strategy=lazy\": request timeout"
+
+running (4m53.0s), 099/100 VUs, 953 complete and 0 interrupted iterations
+steady   [  98% ] 099/100 VUs  4m53.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:13Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=152&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=822&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=619&strategy=lazy\": request timeout"
+
+running (4m54.0s), 099/100 VUs, 956 complete and 0 interrupted iterations
+steady   [  98% ] 099/100 VUs  4m54.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:14Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=688&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=479&strategy=lazy\": request timeout"
+
+running (4m55.0s), 100/100 VUs, 958 complete and 0 interrupted iterations
+steady   [  98% ] 100/100 VUs  4m55.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:15Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=132&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=250&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=436&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=722&strategy=lazy\": request timeout"
+
+running (4m56.0s), 099/100 VUs, 962 complete and 0 interrupted iterations
+steady   [  99% ] 099/100 VUs  4m56.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:16Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=390&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=926&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=341&strategy=lazy\": request timeout"
+
+running (4m57.0s), 100/100 VUs, 965 complete and 0 interrupted iterations
+steady   [  99% ] 100/100 VUs  4m57.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:17Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=88&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=408&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=941&strategy=lazy\": request timeout"
+
+running (4m58.0s), 100/100 VUs, 968 complete and 0 interrupted iterations
+steady   [  99% ] 100/100 VUs  4m58.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:18Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=177&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=751&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=138&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=298&strategy=lazy\": request timeout"
+
+running (4m59.0s), 099/100 VUs, 972 complete and 0 interrupted iterations
+steady   [ 100% ] 099/100 VUs  4m59.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:19Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=765&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=180&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=206&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=945&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:20Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=809&strategy=lazy\": request timeout"
+
+running (5m00.0s), 099/100 VUs, 977 complete and 0 interrupted iterations
+steady   [ 100% ] 099/100 VUs  5m00.0s/5m0s  5.00 iters/s
+time="2026-05-21T02:31:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=396&strategy=lazy\": request timeout"
+
+running (5m01.0s), 099/100 VUs, 978 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:21Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=942&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=396&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=580&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=656&strategy=lazy\": request timeout"
+
+running (5m02.0s), 095/100 VUs, 982 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:22Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=39&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=478&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=579&strategy=lazy\": request timeout"
+
+running (5m03.0s), 092/100 VUs, 985 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:23Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=454&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=668&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=785&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=522&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=390&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:24Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=410&strategy=lazy\": request timeout"
+
+running (5m04.0s), 087/100 VUs, 990 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:25Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=431&strategy=lazy\": request timeout"
+
+running (5m05.0s), 085/100 VUs, 992 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=719&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=24&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=375&strategy=lazy\": request timeout"
+
+running (5m06.0s), 082/100 VUs, 995 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:26Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=270&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=150&strategy=lazy\": request timeout"
+
+running (5m07.0s), 080/100 VUs, 997 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:27Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=232&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=904&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=923&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=813&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=800&strategy=lazy\": request timeout"
+
+running (5m08.0s), 075/100 VUs, 1002 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:28Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=463&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=597&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=92&strategy=lazy\": request timeout"
+
+running (5m09.0s), 072/100 VUs, 1005 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:29Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=692&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=137&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=194&strategy=lazy\": request timeout"
+
+running (5m10.0s), 069/100 VUs, 1008 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:30Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=212&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=769&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=427&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=855&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=506&strategy=lazy\": request timeout"
+
+running (5m11.0s), 064/100 VUs, 1013 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:31Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=309&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=770&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=548&strategy=lazy\": request timeout"
+
+running (5m12.0s), 061/100 VUs, 1016 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:32Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=327&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=801&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=397&strategy=lazy\": request timeout"
+
+running (5m13.0s), 058/100 VUs, 1019 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:33Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=661&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=641&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=725&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=65&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:34Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=783&strategy=lazy\": request timeout"
+
+running (5m14.0s), 053/100 VUs, 1024 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=280&strategy=lazy\": request timeout"
+
+running (5m15.0s), 052/100 VUs, 1025 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:35Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=594&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=92&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=255&strategy=lazy\": request timeout"
+
+running (5m16.0s), 049/100 VUs, 1028 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:36Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=626&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=679&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=875&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=166&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=773&strategy=lazy\": request timeout"
+
+running (5m17.0s), 044/100 VUs, 1033 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:37Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=22&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=190&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=516&strategy=lazy\": request timeout"
+
+running (5m18.0s), 041/100 VUs, 1036 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:38Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=489&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=54&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:39Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=149&strategy=lazy\": request timeout"
+
+running (5m19.0s), 038/100 VUs, 1039 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=414&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=122&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=818&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=135&strategy=lazy\": request timeout"
+
+running (5m20.0s), 034/100 VUs, 1043 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:40Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=336&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=899&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:41Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=675&strategy=lazy\": request timeout"
+
+running (5m21.0s), 031/100 VUs, 1046 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=772&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=735&strategy=lazy\": request timeout"
+
+running (5m22.0s), 029/100 VUs, 1048 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:42Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=556&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=76&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=413&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=181&strategy=lazy\": request timeout"
+
+running (5m23.0s), 025/100 VUs, 1052 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:43Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=923&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=990&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=496&strategy=lazy\": request timeout"
+
+running (5m24.0s), 022/100 VUs, 1055 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:44Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=98&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=991&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:45Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=624&strategy=lazy\": request timeout"
+
+running (5m25.0s), 018/100 VUs, 1059 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=662&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=239&strategy=lazy\": request timeout"
+
+running (5m26.0s), 016/100 VUs, 1061 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:46Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=788&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=300&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=529&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:47Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=475&strategy=lazy\": request timeout"
+
+running (5m27.0s), 012/100 VUs, 1065 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=318&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=645&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:48Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=808&strategy=lazy\": request timeout"
+
+running (5m28.0s), 008/100 VUs, 1069 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=854&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:49Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=341&strategy=lazy\": request timeout"
+
+running (5m29.0s), 005/100 VUs, 1072 complete and 0 interrupted iterations
+steady ↓ [ 100% ] 100/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=16&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=703&strategy=lazy\": request timeout"
+time="2026-05-21T02:31:50Z" level=warning msg="Request Failed" error="Get \"http://host.docker.internal:8080/api/orders?userId=635&strategy=lazy\": request timeout"
+
+
+  █ THRESHOLDS
+
+    http_req_duration
+    ✗ 'p(95)<5000' p(95)=29.99s
+
+    http_req_failed
+    ✗ 'rate<0.05' rate=56.91%
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 2154   6.529091/s
+    checks_succeeded...: 23.39% 504 out of 2154
+    checks_failed......: 76.60% 1650 out of 2154
+
+
+    HTTP
+    http_req_duration..............: avg=24.97s min=2.45s med=29.98s max=30.01s p(90)=29.99s p(95)=29.99s
+      { expected_response:true }...: avg=18.33s min=2.45s med=18.42s max=29.99s p(90)=29.61s p(95)=29.79s
+    http_req_failed................: 56.91% 613 out of 1077
+    http_reqs......................: 1077   3.264546/s
+
+    EXECUTION
+    dropped_iterations.............: 424    1.285206/s
+    iteration_duration.............: avg=24.97s min=2.45s med=30s    max=30.01s p(90)=30s    p(95)=30s
+    iterations.....................: 1077   3.264546/s
+    vus............................: 5      min=5           max=100
+    vus_max........................: 100    min=20          max=100
+
+    NETWORK
+    data_received..................: 76 MB  231 kB/s
+    data_sent......................: 125 kB 378 B/s
+
+
+
+
+running (5m29.9s), 000/100 VUs, 1077 complete and 0 interrupted iterations
+steady ✓ [ 100% ] 000/100 VUs  5m0s  5.00 iters/s
+time="2026-05-21T02:31:51Z" level=error msg="thresholds on metrics 'http_req_duration, http_req_failed' have been crossed"

@@ -4,11 +4,12 @@ Phase 3는 주문 목록 화면의 상품 썸네일 요구사항을 기준으로
 
 ## 현재 상태
 
-Phase 3는 준비 중이다.
+Phase 3는 완료된 상태다.
 
-- API는 `GET /api/orders?userId=&strategy=`를 사용한다.
-- 비교 전략은 `lazy`, `fetch-join`, `batch-size`, `entity-graph`다.
-- 핵심 evidence는 요청당 SQL 수, `pg_stat_statements`, k6, Grafana, 대표 EXPLAIN이다.
+- Lazy naive N+1 재현 완료
+- Fetch Join, BatchSize, EntityGraph 전략 비교 완료
+- SQL count, `pg_stat_statements`, k6, Grafana, EXPLAIN evidence 저장 완료
+- Phase 4 transaction isolation handoff 기록 완료
 
 ## 문서
 

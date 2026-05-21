@@ -1,0 +1,11 @@
+Phase 3 lazy representative query: order_item by order_id
+                                                              QUERY PLAN
+--------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using idx_order_item_order_id on order_item  (cost=0.42..11.45 rows=2 width=79) (actual time=0.053..0.061 rows=2 loops=1)
+   Index Cond: (order_id = 100)
+   Buffers: shared hit=6 read=2
+ Planning:
+   Buffers: shared hit=90 read=4
+ Planning Time: 0.897 ms
+ Execution Time: 0.162 ms
+(7 rows)
