@@ -141,12 +141,13 @@ rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition
 
 Phase 3 orders strategy 증빙은 같은 wrapper에 `STRATEGY` 환경변수를 함께 넘긴다.
 
-Phase 3 closeout evidence의 `baseline` preset은 `rate=1`, 30초 timeout을 사용한다. threshold 실패 구간도 Grafana window로 남겨야 하면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`을 함께 사용한다.
+Phase 3 rerun evidence는 `phase3-orders-baseline` preset을 사용한다. 저장된 Phase 3 evidence는 preset 분리 이전에 수집되어 Grafana label에는 historical `preset=baseline`이 남아 있다. threshold 실패 구간도 Grafana window로 남겨야 하면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`을 함께 사용한다.
 
 ```bash
 STRATEGY=lazy rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-lazy \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-lazy.png
@@ -154,6 +155,7 @@ STRATEGY=lazy rtk npm run evidence:capture -- \
 STRATEGY=fetch-join rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-fetch-join \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-fetch-join.png
@@ -161,6 +163,7 @@ STRATEGY=fetch-join rtk npm run evidence:capture -- \
 STRATEGY=batch-size rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-batch-size \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-batch-size.png
@@ -168,6 +171,7 @@ STRATEGY=batch-size rtk npm run evidence:capture -- \
 STRATEGY=entity-graph rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-entity-graph \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-entity-graph.png
@@ -251,7 +255,7 @@ Useful options:
 | `--url <url>` | Start from a custom Grafana dashboard URL. Explicit variable options still override matching `var-*` parameters. |
 | `--output <path>` | Override the final PNG path. |
 | `--parts-dir <path>` | Override the temporary part capture directory. |
-| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-07`. |
+| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-04`, `phase-07`. |
 | `--scenario <name>` | Set `var-scenario`. |
 | `--preset <name>` | Set `var-preset`. |
 | `--pool <name>` | Set `var-pool`. |

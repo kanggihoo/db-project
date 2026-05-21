@@ -397,7 +397,7 @@ addRowWithPanels(panels, 'Table Access', (rowY, targetPanels) => {
   y = rowY + 24;
 });
 
-for (const title of ['Phase 1 Baseline Focus', 'Phase 2 Index Focus', 'Phase 3 N+1 Focus', 'Phase 7 Pagination Focus']) {
+for (const title of ['Phase 1 Baseline Focus', 'Phase 2 Index Focus', 'Phase 3 N+1 Focus', 'Phase 4 Transaction Focus', 'Phase 7 Pagination Focus']) {
   addRowWithPanels(panels, title, (rowY, targetPanels) => {
     targetPanels.push(
       timeSeries(`${title} Latency`, `histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 'p95', 0, rowY),

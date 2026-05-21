@@ -13,6 +13,7 @@ k6/
 └── presets/
     ├── smoke.json
     ├── baseline.json
+    ├── phase3-orders-baseline.json
     ├── stress-100.json
     ├── stress-200.json
     ├── points-page0.json
@@ -60,7 +61,7 @@ PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 Phase 3 orders runs can set `STRATEGY=lazy|fetch-join|batch-size|entity-graph`.
 The value is sent to `GET /api/orders` as the `strategy` query parameter.
 Keep strategy evidence separate by using matching `--condition` and `--output` names, for example `pool10-lazy` and `orders-pool10-lazy.png`.
-For Phase 3 closeout evidence, the `baseline` preset uses `rate=1`, `preAllocatedVUs=20`, `maxVUs=100`, and a 30 second request timeout so Lazy can be compared with the optimized strategies under the same load.
+For Phase 3 reruns, use `phase3-orders-baseline`. The stored Phase 3 evidence was captured before this preset split and therefore still has the historical Grafana label `preset=baseline`.
 
 ## Scenarios
 
@@ -76,6 +77,7 @@ For Phase 3 closeout evidence, the `baseline` preset uses `rate=1`, `preAllocate
 |---|---:|---|---|
 | `smoke` | 5 rps | 1m | API 정상 확인 |
 | `baseline` | 50 rps | 5m | 기본 기준선 |
+| `phase3-orders-baseline` | 1 rps | 5m | Phase 3 strategy 비교 재실행 |
 | `stress-100` | 100 rps | 5m | 부하 증가 |
 | `stress-200` | 200 rps | 5m | 한계 확인 |
 | `points-page0` | 50 rps | 5m | 얕은 페이지 |
