@@ -129,7 +129,7 @@ npm run k6:evidence -- --phase phase-02 --scenario products --condition pool10-p
 
 기본값은 `preset=baseline`, `pool=pool10`, `mode=prometheus`다. 위 명령은 `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`와 같은 디렉토리의 `run-window.json`을 자동으로 만든다.
 
-`run.sh`는 기본적으로 k6 log와 같은 디렉토리에 `run-window.json`을 저장한다. 파일에는 host-side `startedAt`, `endedAt`, `grafanaFrom`, `grafanaTo`가 들어간다. 기본 padding은 시작 전 10초, 종료 후 20초이며 `K6_WINDOW_START_PADDING_MS`, `K6_WINDOW_END_PADDING_MS`로 조정할 수 있다. `K6_RUN_WINDOW_FILE=0`을 지정하면 window 파일 생성을 끈다. k6 실행이 실패하면 실패한 실행 구간을 evidence로 쓰지 않도록 `run-window.json`을 만들지 않는다.
+`run.sh`는 기본적으로 k6 log와 같은 디렉토리에 `run-window.json`을 저장한다. 파일에는 host-side `startedAt`, `endedAt`, `grafanaFrom`, `grafanaTo`, `exitStatus`가 들어간다. 기본 padding은 시작 전 10초, 종료 후 20초이며 `K6_WINDOW_START_PADDING_MS`, `K6_WINDOW_END_PADDING_MS`로 조정할 수 있다. `K6_RUN_WINDOW_FILE=0`을 지정하면 window 파일 생성을 끈다. k6 실행이 실패하면 실패한 실행 구간을 evidence로 쓰지 않도록 기본적으로 `run-window.json`을 만들지 않는다. Phase 3처럼 threshold 실패 자체가 관찰 대상이면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`로 실패 실행 구간도 저장할 수 있다.
 
 k6 실행 직후 같은 `run-window.json`으로 Grafana를 캡처하고 stitch까지 끝내려면 같은 wrapper의 capture alias를 쓴다.
 
@@ -140,6 +140,8 @@ rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition
 위 명령은 `npm run k6:evidence -- --capture ...`와 같은 흐름이다. 순서대로 `k6/run.sh`를 실행하고, 성공하면 `scripts/capture-grafana-dashboard.mjs --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json`을 호출한다. 기본 PNG는 `docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png`에 저장된다. 파일명을 직접 정하려면 `--output <path>`를 넘긴다.
 
 Phase 3 orders strategy 증빙은 같은 wrapper에 `STRATEGY` 환경변수를 함께 넘긴다.
+
+Phase 3 closeout evidence의 `baseline` preset은 `rate=1`, 30초 timeout을 사용한다. threshold 실패 구간도 Grafana window로 남겨야 하면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`을 함께 사용한다.
 
 ```bash
 STRATEGY=lazy rtk npm run evidence:capture -- \

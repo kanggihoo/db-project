@@ -2,12 +2,16 @@ import http from 'k6/http';
 import { check } from 'k6';
 
 const preset = JSON.parse(open(__ENV.PRESET || 'presets/baseline.json'));
-
 const BASE_URL = preset.baseUrl || 'http://host.docker.internal:8080';
 const USER_START = Number(preset.userStart || 1);
 const USER_END = Number(preset.userEnd || USER_START);
 const TIMEOUT = preset.timeout || '5s';
 const STRATEGY = __ENV.STRATEGY || 'lazy';
+const DEFAULT_THRESHOLDS = {
+    http_req_failed: ['rate<0.05'],
+    http_req_duration: ['p(95)<5000'],
+};
+const THRESHOLDS = preset.thresholds === undefined ? DEFAULT_THRESHOLDS : preset.thresholds;
 
 const commonTags = {
     phase: __ENV.PHASE || 'phase-01',
@@ -34,10 +38,7 @@ export const options = {
             maxVUs: Number(preset.maxVUs || 300),
         },
     },
-    thresholds: {
-        http_req_failed: ['rate<0.05'],
-        http_req_duration: ['p(95)<5000'],
-    },
+    thresholds: THRESHOLDS,
 };
 
 function randomBetween(start, end) {

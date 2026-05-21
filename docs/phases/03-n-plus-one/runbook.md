@@ -33,6 +33,14 @@ Lazy, Fetch Join, and EntityGraph evidence must run without the `phase3-batch` p
 
 ## Strategy evidence capture
 
+Before comparing loading strategies, prepare the basic FK lookup indexes. Phase 3 compares loading strategy behavior, not missing FK-index behavior.
+
+```bash
+rtk docker compose exec -T postgres psql -U app -d ecommerce < scripts/phase-03/00-prepare-fk-indexes.sql
+```
+
+After creating indexes, run `VACUUM ANALYZE` through `scripts/phase-03/00-reset-statistics.sql` before each strategy measurement.
+
 For each strategy, reset statistics, run k6, then capture `pg_stat_statements`. Use the default server profile for `lazy`, `fetch-join`, and `entity-graph`; restart the server with `phase3-batch` only for `batch-size`.
 
 ```bash

@@ -1,0 +1,9 @@
+ calls  | mean_ms | total_ms |  rows  |                                                                                                            query
+--------+---------+----------+--------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 209807 |    0.03 |  6579.85 | 419614 | select i1_0.product_id,i1_0.id,i1_0.image_url,i1_0.is_main,i1_0.sort_order from product_image i1_0 where i1_0.product_id=$1 order by i1_0.is_main desc,i1_0.sort_order,i1_0.id
+    301 |   14.06 |  4231.07 | 210554 | select o1_0.id,o1_0.address_id,o1_0.created_at,o1_0.discount_price,o1_0.final_price,oi1_0.order_id,oi1_0.id,oi1_0.option_info,oi1_0.product_name,ps1_0.id,ps1_0.extra_price,p1_0.id,p1_0.base_price,p1_0.category_id,p1_0.cr
+      1 |  188.31 |   188.31 |      0 | VACUUM ANALYZE order_item
+      1 |  144.05 |   144.05 |      0 | VACUUM ANALYZE product_image
+      1 |  127.12 |   127.12 |      0 | VACUUM ANALYZE orders
+      1 |   86.25 |    86.25 |      0 | VACUUM ANALYZE product_sku
+(6 rows)

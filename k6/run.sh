@@ -12,6 +12,7 @@ STRATEGY="${STRATEGY:-lazy}"
 K6_TAIL_ONLY="${K6_TAIL_ONLY:-0}"
 K6_TAIL_LINES="${K6_TAIL_LINES:-120}"
 K6_RUN_WINDOW_FILE="${K6_RUN_WINDOW_FILE:-auto}"
+K6_WRITE_RUN_WINDOW_ON_FAILURE="${K6_WRITE_RUN_WINDOW_ON_FAILURE:-0}"
 K6_WINDOW_START_PADDING_MS="${K6_WINDOW_START_PADDING_MS:-10000}"
 K6_WINDOW_END_PADDING_MS="${K6_WINDOW_END_PADDING_MS:-20000}"
 
@@ -59,6 +60,11 @@ fi
 
 if ! [[ "$K6_WINDOW_END_PADDING_MS" =~ ^[0-9]+$ ]]; then
   echo "Invalid K6_WINDOW_END_PADDING_MS: $K6_WINDOW_END_PADDING_MS" >&2
+  exit 1
+fi
+
+if [[ "$K6_WRITE_RUN_WINDOW_ON_FAILURE" != "0" && "$K6_WRITE_RUN_WINDOW_ON_FAILURE" != "1" ]]; then
+  echo "Invalid K6_WRITE_RUN_WINDOW_ON_FAILURE: $K6_WRITE_RUN_WINDOW_ON_FAILURE" >&2
   exit 1
 fi
 
@@ -128,13 +134,14 @@ fi
 ENDED_AT="$(node -e "console.log(Date.now())")"
 set -e
 
-if [[ "$STATUS" -eq 0 && "$K6_RUN_WINDOW_FILE" != "0" ]]; then
+if [[ "$K6_RUN_WINDOW_FILE" != "0" && ( "$STATUS" -eq 0 || "$K6_WRITE_RUN_WINDOW_ON_FAILURE" == "1" ) ]]; then
   K6_RUN_WINDOW_FILE="$K6_RUN_WINDOW_FILE" \
   PHASE="$PHASE" \
   SCENARIO="$SCENARIO" \
   PRESET="$PRESET" \
   POOL="$POOL" \
   MODE="$MODE" \
+  STATUS="$STATUS" \
   STARTED_AT="$STARTED_AT" \
   ENDED_AT="$ENDED_AT" \
   START_PADDING_MS="$K6_WINDOW_START_PADDING_MS" \
@@ -154,6 +161,7 @@ if [[ "$STATUS" -eq 0 && "$K6_RUN_WINDOW_FILE" != "0" ]]; then
       preset: process.env.PRESET,
       pool: process.env.POOL,
       mode: process.env.MODE,
+      exitStatus: Number(process.env.STATUS),
       startedAt,
       endedAt,
       grafanaFrom: startedAt - startPaddingMs,
