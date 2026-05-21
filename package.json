@@ -1,0 +1,15 @@
+{
+  "name": "db-project",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "k6:evidence": "node scripts/run-k6-evidence.mjs",
+    "evidence:capture": "node scripts/run-k6-evidence.mjs --capture",
+    "grafana:capture": "node scripts/capture-grafana-dashboard.mjs",
+    "grafana:capture:parts": "node scripts/capture-grafana-dashboard.mjs --no-stitch",
+    "test:grafana-capture": "node --test scripts/grafana-capture-utils.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

@@ -1,0 +1,64 @@
+ Container postgres Running 
+ Container postgres_exporter Running 
+ Container prometheus Running 
+ Container postgres Waiting 
+ Container postgres Healthy 
+ Container db-project-k6-run-8f7f6af54bb3 Creating 
+ Container db-project-k6-run-8f7f6af54bb3 Created 
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: /scripts/products-test.js
+        output: Prometheus remote write (http://prometheus:9090/api/v1/write)
+
+     scenarios: (100.00%) 1 scenario, 300 max VUs, 5m30s max duration (incl. graceful stop):
+              * steady: 50.00 iterations/s for 5m0s (maxVUs: 100-300, gracefulStop: 30s)
+
+
+running (0m01.0s), 003/100 VUs, 46 complete and 0 interrupted iterations
+steady   [   0% ] 003/100 VUs  0m01.0s/5m0s  50.00 iters/s
+
+running (0m02.0s), 001/100 VUs, 98 complete and 0 interrupted iterations
+steady   [   1% ] 001/100 VUs  0m02.0s/5m0s  50.00 iters/s
+
+running (0m03.0s), 001/100 VUs, 148 complete and 0 interrupted iterations
+steady   [   1% ] 001/100 VUs  0m03.0s/5m0s  50.00 iters/s
+
+running (0m04.0s), 001/100 VUs, 198 complete and 0 interrupted iterations
+steady   [   1% ] 001/100 VUs  0m04.0s/5m0s  50.00 iters/s
+
+running (0m05.0s), 002/100 VUs, 247 complete and 0 interrupted iterations
+steady   [   2% ] 002/100 VUs  0m05.0s/5m0s  50.00 iters/s
+
+running (0m06.0s), 001/100 VUs, 298 complete and 0 interrupted iterations
+steady   [   2% ] 001/100 VUs  0m06.0s/5m0s  50.00 iters/s
+
+running (0m07.0s), 001/100 VUs, 348 complete and 0 interrupted iterations
+steady   [   2% ] 001/100 VUs  0m07.0s/5m0s  50.00 iters/s
+
+running (0m08.0s), 001/100 VUs, 398 complete and 0 interrupted iterations
+steady   [   3% ] 001/100 VUs  0m08.0s/5m0s  50.00 iters/s
+
+running (0m09.0s), 001/100 VUs, 448 complete and 0 interrupted iterations
+steady   [   3% ] 001/100 VUs  0m09.0s/5m0s  50.00 iters/s
+
+running (0m10.0s), 001/100 VUs, 498 complete and 0 interrupted iterations
+steady   [   3% ] 001/100 VUs  0m10.0s/5m0s  50.00 iters/s
+
+running (0m11.0s), 003/100 VUs, 546 complete and 0 interrupted iterations
+steady   [   4% ] 003/100 VUs  0m11.0s/5m0s  50.00 iters/s
+
+running (0m12.0s), 001/100 VUs, 598 complete and 0 interrupted iterations
+steady   [   4% ] 001/100 VUs  0m12.0s/5m0s  50.00 iters/s
+
+running (0m13.0s), 001/100 VUs, 648 complete and 0 interrupted iterations
+steady   [   4% ] 001/100 VUs  0m13.0s/5m0s  50.00 iters/s
+
+running (0m14.0s), 001/100 VUs, 698 complete and 0 interrupted iterations
+steady   [   5% ] 001/100 VUs  0m14.0s/5m0s  50.00 iters/s

@@ -6,6 +6,19 @@
 
 ```text
 scripts/
+├── capture-grafana-dashboard.mjs
+├── generate-db-lab-dashboard.mjs
+├── grafana-capture-utils.mjs
+├── phase-02/
+│   ├── 00-clean-product-indexes.sql
+│   ├── 01-main-pre-index-explain.sql
+│   ├── 02-create-main-index.sql
+│   ├── 03-main-post-index-explain.sql
+│   ├── 04-product-pg-stat-statements.sql
+│   ├── 10-single-status-index.sql
+│   ├── 20-composite-order-index.sql
+│   ├── 30-covering-index.sql
+│   └── 40-partial-index.sql
 ├── seed.sh
 └── server.sh
 ```
@@ -63,6 +76,222 @@ Spring Boot API 서버를 HikariCP pool preset으로 실행한다.
 - Hikari pool 값은 서버 재시작 후 적용된다.
 - pool 비교 실험은 같은 데이터, 같은 k6 preset, 같은 DB 통계 초기화 조건에서 반복한다.
 - 서버 실행 중 다른 pool preset으로 바꾸려면 기존 서버를 종료하고 다시 실행한다.
+
+## k6/run.sh
+
+k6 부하 테스트 시나리오를 실행한다.
+
+```bash
+./k6/run.sh orders baseline local
+./k6/run.sh products baseline local
+./k6/run.sh points baseline prometheus
+```
+
+사용 형식:
+
+```bash
+./k6/run.sh <orders|products|points> [preset] [local|prometheus]
+```
+
+기본값:
+
+| 값 | 기본값 | 설명 |
+|---|---|---|
+| `preset` | `baseline` | `k6/presets/<preset>.json` |
+| `mode` | `local` | 로컬 `k6` 또는 Docker `grafana/k6` 실행 |
+| `PHASE` | `phase-01` | k6 스크립트에 전달되는 phase 이름 |
+| `POOL` | `pool10` | k6 스크립트에 전달되는 pool 이름 |
+| `K6_TAIL_ONLY` | `0` | `1`이면 실행 중 출력은 숨기고 종료 후 tail만 출력 |
+| `K6_TAIL_LINES` | `120` | `K6_TAIL_ONLY=1`일 때 보여줄 마지막 로그 줄 수 |
+
+로그 출력:
+
+- 전체 k6 stdout/stderr는 기본적으로 `k6/results/<scenario>-<preset>-<mode>.log`에 저장된다.
+- 기본 실행은 콘솔에 k6 출력을 실시간으로 보여주면서 같은 내용을 로그 파일에도 저장한다.
+- `K6_TAIL_ONLY=1`이면 콘솔에는 전체 로그를 직접 출력하지 않고 마지막 `K6_TAIL_LINES`줄만 출력한다.
+- 실행 종료 코드는 원래 k6 또는 Docker 실행 결과를 그대로 반환한다.
+- `K6_TAIL_ONLY=1`은 AI 에이전트가 실행할 때 전체 k6 진행 로그가 context에 들어가는 것을 줄이기 위한 옵션이다.
+
+로그 위치나 tail 줄 수를 바꾸려면 환경변수를 사용한다.
+
+```bash
+K6_RESULTS_DIR=docs/evidence/phase-02/products ./k6/run.sh products baseline local
+K6_LOG_FILE=/tmp/products-baseline.log ./k6/run.sh products baseline local
+K6_TAIL_ONLY=1 K6_TAIL_LINES=40 ./k6/run.sh products baseline local
+K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt ./k6/run.sh products baseline prometheus
+```
+
+Evidence용으로는 긴 환경변수 조합 대신 npm wrapper를 쓴다.
+
+```powershell
+npm run k6:evidence -- --phase phase-02 --scenario products --condition pool10-post-index
+```
+
+기본값은 `preset=baseline`, `pool=pool10`, `mode=prometheus`다. 위 명령은 `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`와 같은 디렉토리의 `run-window.json`을 자동으로 만든다.
+
+`run.sh`는 기본적으로 k6 log와 같은 디렉토리에 `run-window.json`을 저장한다. 파일에는 host-side `startedAt`, `endedAt`, `grafanaFrom`, `grafanaTo`, `exitStatus`가 들어간다. 기본 padding은 시작 전 10초, 종료 후 20초이며 `K6_WINDOW_START_PADDING_MS`, `K6_WINDOW_END_PADDING_MS`로 조정할 수 있다. `K6_RUN_WINDOW_FILE=0`을 지정하면 window 파일 생성을 끈다. k6 실행이 실패하면 실패한 실행 구간을 evidence로 쓰지 않도록 기본적으로 `run-window.json`을 만들지 않는다. Phase 3처럼 threshold 실패 자체가 관찰 대상이면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`로 실패 실행 구간도 저장할 수 있다.
+
+k6 실행 직후 같은 `run-window.json`으로 Grafana를 캡처하고 stitch까지 끝내려면 같은 wrapper의 capture alias를 쓴다.
+
+```powershell
+rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition pool10-post-index --table product
+```
+
+위 명령은 `npm run k6:evidence -- --capture ...`와 같은 흐름이다. 순서대로 `k6/run.sh`를 실행하고, 성공하면 `scripts/capture-grafana-dashboard.mjs --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json`을 호출한다. 기본 PNG는 `docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png`에 저장된다. 파일명을 직접 정하려면 `--output <path>`를 넘긴다.
+
+Phase 3 orders strategy 증빙은 같은 wrapper에 `STRATEGY` 환경변수를 함께 넘긴다.
+
+Phase 3 closeout evidence의 `baseline` preset은 `rate=1`, 30초 timeout을 사용한다. threshold 실패 구간도 Grafana window로 남겨야 하면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`을 함께 사용한다.
+
+```bash
+STRATEGY=lazy rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-lazy \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-lazy.png
+
+STRATEGY=fetch-join rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-fetch-join \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-fetch-join.png
+
+STRATEGY=batch-size rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-batch-size \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-batch-size.png
+
+STRATEGY=entity-graph rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --condition pool10-entity-graph \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-entity-graph.png
+```
+
+`evidence:capture`는 현재 환경변수를 `k6/run.sh`까지 전달한다. 따라서 `STRATEGY=...`는 API strategy를 제어하고, `--condition`과 `--output`은 evidence 디렉토리와 Grafana screenshot 이름을 제어한다.
+
+`local` 모드는 로컬에 `k6` 명령이 있으면 그것을 사용하고, 없으면 `grafana/k6` Docker 이미지를 사용한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
+
+Windows Git Bash에서 `prometheus` 모드를 실행할 때 `/scripts/*.js` 같은 Docker 컨테이너 내부 경로가 `C:/Program Files/Git/...` 형태로 바뀌지 않도록 `run.sh`가 `MSYS_NO_PATHCONV=1`을 설정한다. 사용자가 별도로 설정할 필요는 없다.
+
+## scripts/generate-db-lab-dashboard.mjs
+
+Grafana provisioning용 dashboard JSON을 생성한다.
+
+```powershell
+rtk node scripts/generate-db-lab-dashboard.mjs
+```
+
+출력 파일:
+
+```text
+docker/grafana/dashboards/db-lab-overview.json
+```
+
+언제 실행하는가:
+
+- Grafana dashboard 패널, row, PromQL, variable 구성을 바꿨을 때
+- `docker/grafana/dashboards/db-lab-overview.json`을 코드 정의에서 다시 생성할 때
+
+주의 사항:
+
+- k6 실행이나 Playwright 캡처 중에 자동으로 호출되지는 않는다.
+- dashboard JSON을 다시 만든 뒤 Grafana 컨테이너가 이미 떠 있다면 dashboard reload 또는 컨테이너 재시작이 필요할 수 있다.
+
+## scripts/capture-grafana-dashboard.mjs
+
+Captures the provisioned Grafana dashboard with Playwright and stitches the dashboard body into one long PNG.
+
+Setup once:
+
+```powershell
+rtk npm install
+rtk python -c "import PIL; print('ok')"
+rtk docker compose up -d --force-recreate grafana
+```
+
+`docker-compose.yml` enables Grafana anonymous Viewer access, so this script opens dashboard URLs directly without login cookies.
+
+Default capture:
+
+```powershell
+rtk npm run grafana:capture
+```
+
+The default output path is built from dashboard variables:
+
+```text
+docs/evidence/<phase>/grafana-screenshots/<scenario>-<preset>-<pool>.png
+```
+
+Examples:
+
+```powershell
+rtk npm run grafana:capture -- --phase phase-02 --scenario products --preset baseline --pool pool10
+rtk npm run grafana:capture -- --phase phase-03 --scenario orders --preset baseline --pool pool10
+```
+
+The script also updates the dashboard URL variables. For example, `--phase phase-03` opens the dashboard with `var-phase=phase-03`, collapses all phase focus rows, expands only `Phase 3 N+1 Focus`, resets the internal Grafana scroll container to the top, captures clipped container images, then runs the Python stitch step.
+
+Related module:
+
+- `scripts/grafana-capture-utils.mjs` is imported by `capture-grafana-dashboard.mjs`.
+- It is used during capture to build the Grafana URL, convert `run-window.json` into fixed `from/to` values, choose the phase focus row, and calculate scroll offsets.
+- It is not a standalone command. Do not run it directly.
+
+Useful options:
+
+| Option | Purpose |
+|---|---|
+| `--url <url>` | Start from a custom Grafana dashboard URL. Explicit variable options still override matching `var-*` parameters. |
+| `--output <path>` | Override the final PNG path. |
+| `--parts-dir <path>` | Override the temporary part capture directory. |
+| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-07`. |
+| `--scenario <name>` | Set `var-scenario`. |
+| `--preset <name>` | Set `var-preset`. |
+| `--pool <name>` | Set `var-pool`. |
+| `--uri <pattern>` | Set `var-uri`. |
+| `--table <pattern>` | Set `var-table`. |
+| `--from <time>` | Set Grafana `from`, usually epoch milliseconds for evidence captures. |
+| `--to <time>` | Set Grafana `to`, usually epoch milliseconds for evidence captures. |
+| `--refresh <value>` | Set Grafana refresh. Pass an empty value from automation to disable refresh for fixed evidence windows. |
+| `--window-file <path>` | Read `grafanaFrom` and `grafanaTo` from a k6 `run-window.json` file and disable refresh. If omitted, the latest matching file under `docs/evidence/<phase>/<scenario>/` is used when present. Explicit `--from`, `--to`, or `--refresh` still override the file. |
+| `--no-stitch` | Save only part captures and `capture-meta.json`. |
+| `--no-align-phase-rows` | Keep the dashboard's current phase row state. |
+
+Generated intermediate files are written under `docs/evidence/grafana-internal-scroll-captures/` and are ignored by git.
+
+필요하면 k6 실행과 Playwright 캡처를 두 명령으로 분리할 수도 있다.
+
+```powershell
+npm run k6:evidence -- --phase phase-02 --scenario products --condition pool10-post-index
+rtk npm run grafana:capture -- --phase phase-02 --scenario products --preset baseline --pool pool10 --table product --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json --output docs/evidence/phase-02/grafana-screenshots/products-post-index.png
+```
+
+이 경우에도 `--window-file`을 명시해서 방금 만든 k6 실행 구간을 사용해야 한다. `--window-file`을 생략하면 같은 phase/scenario/preset/pool의 최신 파일을 다시 찾으므로, 여러 condition을 반복 측정할 때 다른 실행 구간을 캡처할 수 있다.
+
+## scripts/phase-02/
+
+Phase 2 인덱스 실험용 SQL 스크립트다. 운영 migration이 아니라 Learning Phase evidence를 반복 생성하기 위한 도구다.
+
+주요 스크립트:
+
+| Script | Purpose |
+|---|---|
+| `00-clean-product-indexes.sql` | product 실험 인덱스 정리 |
+| `01-main-pre-index-explain.sql` | 메인 상품 검색 pre-index 실행계획 |
+| `02-create-main-index.sql` | `idx_product_category_status` 생성 |
+| `03-main-post-index-explain.sql` | 메인 상품 검색 post-index 실행계획 |
+| `04-product-pg-stat-statements.sql` | product query snapshot |
+| `10-single-status-index.sql` | 단일 status 인덱스 선택도 실험 |
+| `20-composite-order-index.sql` | 복합 인덱스 순서 실험 |
+| `30-covering-index.sql` | 커버링 인덱스 실험 |
+| `40-partial-index.sql` | soft delete 부분 인덱스 실험 |
 
 ## Typical Flow
 
