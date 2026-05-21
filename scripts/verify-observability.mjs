@@ -68,9 +68,36 @@ function verifyDashboard() {
     assert(rows.includes(title), `dashboard must include row ${title}`);
   }
   const dashboardText = JSON.stringify(dashboard);
-  for (const expected of ['$phase', '$scenario', '$preset', '$pool', 'k6_http_reqs_total', 'k6_http_req_duration_seconds', 'hikaricp_connections_pending', 'pg_stat_user_tables_seq_scan']) {
+  for (const expected of [
+    '$phase',
+    '$scenario',
+    '$preset',
+    '$pool',
+    'k6_http_reqs_total',
+    'k6_http_req_duration_seconds',
+    'k6_iteration_duration_seconds',
+    'k6_checks_rate',
+    'expected_response',
+    'hikaricp_connections_timeout_total',
+    'process_cpu_usage',
+    'jvm_memory_used_bytes',
+    'jvm_gc_pause_seconds_sum',
+    'pg_stat_database_numbackends',
+    'pg_settings_max_connections',
+    'hikaricp_connections_pending',
+    'pg_stat_user_tables_seq_scan',
+  ]) {
     assert(dashboardText.includes(expected), `dashboard must include ${expected}`);
   }
+  const targetsWithoutFallback = dashboard.panels.flatMap((panel) =>
+    (panel.targets || [])
+      .filter((target) => target.expr && !target.expr.includes('or vector(0)'))
+      .map((target) => `${panel.title}: ${target.expr}`),
+  );
+  assert(
+    targetsWithoutFallback.length === 0,
+    `dashboard targets must use no-data fallback: ${targetsWithoutFallback.slice(0, 3).join(', ')}`,
+  );
 }
 
 function verifySpringHistograms() {

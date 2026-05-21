@@ -45,6 +45,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "unit": "s",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -63,7 +64,7 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
+        "w": 6,
         "x": 0,
         "y": 1
       },
@@ -91,7 +92,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "range": true,
           "refId": "A"
         }
@@ -110,6 +111,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "unit": "s",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -128,8 +130,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 4,
+        "w": 6,
+        "x": 6,
         "y": 1
       },
       "id": 3,
@@ -156,7 +158,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))",
+          "expr": "(histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "range": true,
           "refId": "B"
         }
@@ -175,6 +177,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "unit": "reqps",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -193,8 +196,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 8,
+        "w": 6,
+        "x": 12,
         "y": 1
       },
       "id": 4,
@@ -221,12 +224,12 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "avg(k6_http_req_failed_rate{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"})",
+          "expr": "(sum(rate(k6_http_reqs_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))) or vector(0)",
           "range": true,
           "refId": "C"
         }
       ],
-      "title": "Error Rate",
+      "title": "Actual RPS",
       "type": "stat"
     },
     {
@@ -240,6 +243,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "unit": "percent",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -258,8 +262,8 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 12,
+        "w": 6,
+        "x": 18,
         "y": 1
       },
       "id": 5,
@@ -286,12 +290,12 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(k6_http_reqs_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))",
+          "expr": "(avg(k6_http_req_failed_rate{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}) * 100) or vector(0)",
           "range": true,
           "refId": "D"
         }
       ],
-      "title": "Actual RPS",
+      "title": "Error Rate",
       "type": "stat"
     },
     {
@@ -305,6 +309,7 @@
             "mode": "thresholds"
           },
           "mappings": [],
+          "unit": "percent",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -323,9 +328,9 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 16,
-        "y": 1
+        "w": 6,
+        "x": 0,
+        "y": 5
       },
       "id": 6,
       "options": {
@@ -351,12 +356,12 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__range]))",
+          "expr": "(avg(k6_checks_rate{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}) * 100) or vector(0)",
           "range": true,
           "refId": "E"
         }
       ],
-      "title": "Dropped Iterations",
+      "title": "Checks Success",
       "type": "stat"
     },
     {
@@ -388,9 +393,9 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 20,
-        "y": 1
+        "w": 6,
+        "x": 6,
+        "y": 5
       },
       "id": 7,
       "options": {
@@ -416,9 +421,140 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "max_over_time(hikaricp_connections_pending[$__range])",
+          "expr": "(sum(increase(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__range]))) or vector(0)",
           "range": true,
           "refId": "F"
+        }
+      ],
+      "title": "Dropped Iterations",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 5
+      },
+      "id": 8,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(pg_stat_database_numbackends) / max(pg_settings_max_connections) * 100) or vector(0)",
+          "range": true,
+          "refId": "G"
+        }
+      ],
+      "title": "PG Connections Used",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 5
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(max(max_over_time(hikaricp_connections_pending[$__range]))) or vector(0)",
+          "range": true,
+          "refId": "H"
         }
       ],
       "title": "Hikari Pending Max",
@@ -430,9 +566,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 5
+        "y": 9
       },
-      "id": 8,
+      "id": 10,
       "panels": [],
       "title": "k6 Load",
       "type": "row"
@@ -494,205 +630,79 @@
             ]
           }
         },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 6
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "sum(rate(k6_http_reqs_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))",
-          "legendFormat": "rps",
-          "range": true,
-          "refId": "G"
-        }
-      ],
-      "title": "Actual RPS",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "rps"
             },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
+            "properties": [
               {
-                "color": "green",
-                "value": null
+                "id": "unit",
+                "value": "reqps"
               },
               {
-                "color": "red",
-                "value": 80
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error_rps"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "p95_latency"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
               }
             ]
           }
-        },
-        "overrides": []
+        ]
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 6
-      },
-      "id": 10,
-      "options": {
-        "legend": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))",
-          "legendFormat": "p95",
-          "range": true,
-          "refId": "H"
-        }
-      ],
-      "title": "k6 Latency p95",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 10,
+        "w": 24,
         "x": 0,
-        "y": 14
+        "y": 10
       },
       "id": 11,
       "options": {
@@ -705,6 +715,414 @@
           "showLegend": true
         },
         "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(k6_vus{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"})) or vector(0)",
+          "legendFormat": "vus",
+          "range": true,
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(k6_http_reqs_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "rps",
+          "range": true,
+          "refId": "J"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(k6_http_reqs_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\", expected_response=\"false\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "error_rps",
+          "range": true,
+          "refId": "K"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
+          "legendFormat": "p95_latency",
+          "range": true,
+          "refId": "L"
+        }
+      ],
+      "title": "Performance Overview",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "success_rps"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "error_rps"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(k6_http_reqs_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\", expected_response=\"true\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "success_rps",
+          "range": true,
+          "refId": "M"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(k6_http_reqs_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\", expected_response=\"false\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "error_rps",
+          "range": true,
+          "refId": "N"
+        }
+      ],
+      "title": "HTTP Request Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*_p95"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
+          "legendFormat": "http_p95",
+          "range": true,
+          "refId": "O"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_iteration_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
+          "legendFormat": "iteration_p95",
+          "range": true,
+          "refId": "P"
+        }
+      ],
+      "title": "Latency and Iteration p95",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 28
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
           "mode": "single",
           "sort": "none"
         }
@@ -716,13 +1134,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "avg(k6_http_req_failed_rate{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"})",
-          "legendFormat": "failed",
+          "expr": "(avg by (check) (k6_checks_rate{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}) * 100) or vector(0)",
+          "legendFormat": "{{check}}",
           "range": true,
-          "refId": "I"
+          "refId": "Q"
         }
       ],
-      "title": "Error Rate",
+      "title": "Checks Success Rate",
       "type": "timeseries"
     },
     {
@@ -788,9 +1206,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 14
+        "y": 28
       },
-      "id": 12,
+      "id": 15,
       "options": {
         "legend": {
           "calcs": [
@@ -812,10 +1230,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))",
+          "expr": "(sum(rate(k6_dropped_iterations_total{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "dropped",
           "range": true,
-          "refId": "J"
+          "refId": "R"
         }
       ],
       "title": "Dropped Iterations",
@@ -827,9 +1245,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 36
       },
-      "id": 13,
+      "id": 16,
       "panels": [],
       "title": "Spring API",
       "type": "row"
@@ -895,11 +1313,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 24,
         "x": 0,
-        "y": 23
+        "y": 37
       },
-      "id": 14,
+      "id": 17,
       "options": {
         "legend": {
           "calcs": [
@@ -921,10 +1339,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (uri) (rate(http_server_requests_seconds_count{uri=~\"$uri\"}[$__rate_interval]))",
+          "expr": "(sum by (uri) (rate(http_server_requests_seconds_count{uri=~\"$uri\", uri!=\"/actuator/prometheus\", uri!=\"/**\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{uri}}",
           "range": true,
-          "refId": "K"
+          "refId": "S"
         }
       ],
       "title": "HTTP Request Rate by URI",
@@ -992,10 +1410,10 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 12,
-        "y": 23
+        "x": 0,
+        "y": 45
       },
-      "id": 15,
+      "id": 18,
       "options": {
         "legend": {
           "calcs": [
@@ -1017,10 +1435,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~\"$uri\"}[$__rate_interval])))",
+          "expr": "(histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~\"$uri\", uri!=\"/actuator/prometheus\", uri!=\"/**\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "{{uri}}",
           "range": true,
-          "refId": "L"
+          "refId": "T"
         }
       ],
       "title": "HTTP p95 by URI",
@@ -1088,10 +1506,10 @@
       "gridPos": {
         "h": 8,
         "w": 12,
-        "x": 0,
-        "y": 31
+        "x": 12,
+        "y": 45
       },
-      "id": 16,
+      "id": 19,
       "options": {
         "legend": {
           "calcs": [
@@ -1113,14 +1531,27 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (status) (rate(http_server_requests_seconds_count{status!~\"2..\"}[$__rate_interval]))",
+          "expr": "(sum by (status) (rate(http_server_requests_seconds_count{status!~\"2..\", uri!=\"/actuator/prometheus\", uri!=\"/**\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{status}}",
           "range": true,
-          "refId": "M"
+          "refId": "U"
         }
       ],
       "title": "HTTP Errors by Status",
       "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 53
+      },
+      "id": 20,
+      "panels": [],
+      "title": "Spring Runtime",
+      "type": "row"
     },
     {
       "datasource": {
@@ -1131,13 +1562,6 @@
         "defaults": {
           "color": {
             "mode": "thresholds"
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
-            },
-            "inspect": false
           },
           "mappings": [],
           "thresholds": {
@@ -1157,23 +1581,201 @@
         "overrides": []
       },
       "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 54
+      },
+      "id": 21,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(increase(hikaricp_connections_timeout_total[$__range]))) or vector(0)",
+          "range": true,
+          "refId": "V"
+        }
+      ],
+      "title": "Hikari Timeout Count",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 54
+      },
+      "id": 22,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(jvm_memory_used_bytes{area=\"heap\"}) * 100 / sum(jvm_memory_max_bytes{area=\"heap\"})) or vector(0)",
+          "range": true,
+          "refId": "W"
+        }
+      ],
+      "title": "Heap Used",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 31
+        "y": 54
       },
-      "id": 17,
+      "id": 23,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
+        "legend": {
+          "calcs": [
+            "lastNotNull"
           ],
-          "show": false
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "showHeader": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -1182,13 +1784,123 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sort_desc(histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~\"$uri\"}[$__rate_interval]))))",
+          "expr": "(process_cpu_usage * 100) or vector(0)",
+          "legendFormat": "process_cpu",
           "range": true,
-          "refId": "N"
+          "refId": "X"
         }
       ],
-      "title": "Slowest URI",
-      "type": "table"
+      "title": "Process CPU Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": ".*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "s"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 58
+      },
+      "id": 24,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(rate(jvm_gc_pause_seconds_sum[$__rate_interval]))) or vector(0)",
+          "legendFormat": "gc_pause",
+          "range": true,
+          "refId": "Y"
+        }
+      ],
+      "title": "GC Pause Time",
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -1196,9 +1908,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 39
+        "y": 66
       },
-      "id": 18,
+      "id": 25,
       "panels": [],
       "title": "Hikari Pool",
       "type": "row"
@@ -1266,9 +1978,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 40
+        "y": 67
       },
-      "id": 19,
+      "id": 26,
       "options": {
         "legend": {
           "calcs": [
@@ -1290,10 +2002,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "hikaricp_connections_active",
+          "expr": "(hikaricp_connections_active) or vector(0)",
           "legendFormat": "active",
           "range": true,
-          "refId": "O"
+          "refId": "Z"
         }
       ],
       "title": "Active Connections",
@@ -1362,9 +2074,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 40
+        "y": 67
       },
-      "id": 20,
+      "id": 27,
       "options": {
         "legend": {
           "calcs": [
@@ -1386,10 +2098,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "hikaricp_connections_max",
+          "expr": "(hikaricp_connections_max) or vector(0)",
           "legendFormat": "max",
           "range": true,
-          "refId": "P"
+          "refId": "["
         }
       ],
       "title": "Max Connections",
@@ -1458,9 +2170,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 48
+        "y": 75
       },
-      "id": 21,
+      "id": 28,
       "options": {
         "legend": {
           "calcs": [
@@ -1482,10 +2194,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "hikaricp_connections_pending",
+          "expr": "(hikaricp_connections_pending) or vector(0)",
           "legendFormat": "pending",
           "range": true,
-          "refId": "Q"
+          "refId": "\\"
         }
       ],
       "title": "Pending Threads",
@@ -1554,9 +2266,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 48
+        "y": 75
       },
-      "id": 22,
+      "id": 29,
       "options": {
         "legend": {
           "calcs": [
@@ -1578,10 +2290,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(hikaricp_connections_acquire_seconds_sum[$__rate_interval]) / rate(hikaricp_connections_acquire_seconds_count[$__rate_interval])",
+          "expr": "(rate(hikaricp_connections_acquire_seconds_sum[$__rate_interval]) / rate(hikaricp_connections_acquire_seconds_count[$__rate_interval])) or vector(0)",
           "legendFormat": "avg acquire",
           "range": true,
-          "refId": "R"
+          "refId": "]"
         }
       ],
       "title": "Acquire Time",
@@ -1593,9 +2305,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 56
+        "y": 83
       },
-      "id": 23,
+      "id": 30,
       "panels": [],
       "title": "PostgreSQL Activity",
       "type": "row"
@@ -1663,9 +2375,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 57
+        "y": 84
       },
-      "id": 24,
+      "id": 31,
       "options": {
         "legend": {
           "calcs": [
@@ -1687,10 +2399,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(pg_stat_activity_count{state=\"active\"})",
+          "expr": "(sum(pg_stat_activity_count{state=\"active\"})) or vector(0)",
           "legendFormat": "active",
           "range": true,
-          "refId": "S"
+          "refId": "^"
         }
       ],
       "title": "Active Sessions",
@@ -1759,9 +2471,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 57
+        "y": 84
       },
-      "id": 25,
+      "id": 32,
       "options": {
         "legend": {
           "calcs": [
@@ -1783,10 +2495,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (mode) (pg_locks_count)",
+          "expr": "(sum by (mode) (pg_locks_count)) or vector(0)",
           "legendFormat": "{{mode}}",
           "range": true,
-          "refId": "T"
+          "refId": "_"
         }
       ],
       "title": "Locks",
@@ -1855,9 +2567,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 65
+        "y": 92
       },
-      "id": 26,
+      "id": 33,
       "options": {
         "legend": {
           "calcs": [
@@ -1879,10 +2591,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(pg_stat_database_xact_commit[$__rate_interval])",
+          "expr": "(rate(pg_stat_database_xact_commit[$__rate_interval])) or vector(0)",
           "legendFormat": "commit",
           "range": true,
-          "refId": "U"
+          "refId": "`"
         }
       ],
       "title": "Commit Rate",
@@ -1951,9 +2663,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 65
+        "y": 92
       },
-      "id": 27,
+      "id": 34,
       "options": {
         "legend": {
           "calcs": [
@@ -1975,10 +2687,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(pg_stat_database_xact_rollback[$__rate_interval])",
+          "expr": "(rate(pg_stat_database_xact_rollback[$__rate_interval])) or vector(0)",
           "legendFormat": "rollback",
           "range": true,
-          "refId": "V"
+          "refId": "a"
         }
       ],
       "title": "Rollback Rate",
@@ -1990,9 +2702,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 73
+        "y": 100
       },
-      "id": 28,
+      "id": 35,
       "panels": [],
       "title": "Table Access",
       "type": "row"
@@ -2058,11 +2770,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 24,
         "x": 0,
-        "y": 74
+        "y": 101
       },
-      "id": 29,
+      "id": 36,
       "options": {
         "legend": {
           "calcs": [
@@ -2084,10 +2796,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "W"
+          "refId": "b"
         }
       ],
       "title": "Seq Scan by Table",
@@ -2154,11 +2866,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 74
+        "w": 24,
+        "x": 0,
+        "y": 109
       },
-      "id": 30,
+      "id": 37,
       "options": {
         "legend": {
           "calcs": [
@@ -2180,10 +2892,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (relname) (rate(pg_stat_user_tables_idx_scan{relname=~\"$table\"}[$__rate_interval]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_idx_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "X"
+          "refId": "c"
         }
       ],
       "title": "Index Scan by Table",
@@ -2197,14 +2909,39 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
           "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "inspect": false
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -2227,20 +2964,22 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 82
+        "y": 117
       },
-      "id": 31,
+      "id": 38,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
+        "legend": {
+          "calcs": [
+            "lastNotNull"
           ],
-          "show": false
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "showHeader": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -2249,13 +2988,14 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(10, increase(pg_stat_user_tables_seq_tup_read[$__range]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_tup_read{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "Y"
+          "refId": "d"
         }
       ],
-      "title": "Seq Tuples Read Top N",
-      "type": "table"
+      "title": "Seq Tuples Read Rate by Table",
+      "type": "timeseries"
     },
     {
       "datasource": {
@@ -2265,14 +3005,39 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
           "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "auto"
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "inspect": false
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
           },
           "mappings": [],
           "thresholds": {
@@ -2295,20 +3060,22 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 82
+        "y": 117
       },
-      "id": 32,
+      "id": 39,
       "options": {
-        "cellHeight": "sm",
-        "footer": {
-          "countRows": false,
-          "fields": "",
-          "reducer": [
-            "sum"
+        "legend": {
+          "calcs": [
+            "lastNotNull"
           ],
-          "show": false
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "showHeader": true
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -2317,13 +3084,14 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(10, increase(pg_stat_user_tables_idx_tup_fetch[$__range]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_idx_tup_fetch{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
+          "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "Z"
+          "refId": "e"
         }
       ],
-      "title": "Index Tuples Fetch Top N",
-      "type": "table"
+      "title": "Index Tuples Fetch Rate by Table",
+      "type": "timeseries"
     },
     {
       "collapsed": false,
@@ -2331,9 +3099,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 90
+        "y": 125
       },
-      "id": 33,
+      "id": 40,
       "panels": [],
       "title": "Phase 1 Baseline Focus",
       "type": "row"
@@ -2401,9 +3169,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 91
+        "y": 126
       },
-      "id": 34,
+      "id": 41,
       "options": {
         "legend": {
           "calcs": [
@@ -2425,10 +3193,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "["
+          "refId": "f"
         }
       ],
       "title": "Phase 1 Baseline Focus Latency",
@@ -2497,9 +3265,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 91
+        "y": 126
       },
-      "id": 35,
+      "id": 42,
       "options": {
         "legend": {
           "calcs": [
@@ -2521,10 +3289,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "\\"
+          "refId": "g"
         }
       ],
       "title": "Phase 1 Baseline Focus Table Scan",
@@ -2536,9 +3304,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 99
+        "y": 134
       },
-      "id": 36,
+      "id": 43,
       "panels": [],
       "title": "Phase 2 Index Focus",
       "type": "row"
@@ -2606,9 +3374,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 100
+        "y": 135
       },
-      "id": 37,
+      "id": 44,
       "options": {
         "legend": {
           "calcs": [
@@ -2630,10 +3398,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "]"
+          "refId": "h"
         }
       ],
       "title": "Phase 2 Index Focus Latency",
@@ -2702,9 +3470,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 100
+        "y": 135
       },
-      "id": 38,
+      "id": 45,
       "options": {
         "legend": {
           "calcs": [
@@ -2726,10 +3494,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "^"
+          "refId": "i"
         }
       ],
       "title": "Phase 2 Index Focus Table Scan",
@@ -2741,9 +3509,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 108
+        "y": 143
       },
-      "id": 39,
+      "id": 46,
       "panels": [],
       "title": "Phase 3 N+1 Focus",
       "type": "row"
@@ -2811,9 +3579,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 109
+        "y": 144
       },
-      "id": 40,
+      "id": 47,
       "options": {
         "legend": {
           "calcs": [
@@ -2835,10 +3603,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "_"
+          "refId": "j"
         }
       ],
       "title": "Phase 3 N+1 Focus Latency",
@@ -2907,9 +3675,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 109
+        "y": 144
       },
-      "id": 41,
+      "id": 48,
       "options": {
         "legend": {
           "calcs": [
@@ -2931,10 +3699,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "`"
+          "refId": "k"
         }
       ],
       "title": "Phase 3 N+1 Focus Table Scan",
@@ -2946,9 +3714,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 117
+        "y": 152
       },
-      "id": 42,
+      "id": 49,
       "panels": [],
       "title": "Phase 7 Pagination Focus",
       "type": "row"
@@ -3016,9 +3784,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 118
+        "y": 153
       },
-      "id": 43,
+      "id": 50,
       "options": {
         "legend": {
           "calcs": [
@@ -3040,10 +3808,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))",
+          "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "a"
+          "refId": "l"
         }
       ],
       "title": "Phase 7 Pagination Focus Latency",
@@ -3112,9 +3880,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 118
+        "y": 153
       },
-      "id": 44,
+      "id": 51,
       "options": {
         "legend": {
           "calcs": [
@@ -3136,10 +3904,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))",
+          "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "b"
+          "refId": "m"
         }
       ],
       "title": "Phase 7 Pagination Focus Table Scan",

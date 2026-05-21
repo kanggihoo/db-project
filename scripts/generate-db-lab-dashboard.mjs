@@ -11,6 +11,8 @@ const datasource = {
 };
 
 const k6Filter = 'phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"';
+const apiUriFilter = 'uri=~"$uri", uri!="/actuator/prometheus", uri!="/**"';
+const zeroWhenNoData = (expr) => (expr.includes('or vector(0)') ? expr : `(${expr}) or vector(0)`);
 
 let nextPanelId = 1;
 let nextRefCode = 'A'.charCodeAt(0);
@@ -26,7 +28,7 @@ function target(expr, legendFormat = undefined) {
   return {
     datasource,
     editorMode: 'code',
-    expr,
+    expr: zeroWhenNoData(expr),
     legendFormat,
     range: true,
     refId: nextRefId(),
@@ -50,13 +52,14 @@ function row(title) {
   };
 }
 
-function stat(title, expr, x, yPos, w = 4) {
+function stat(title, expr, x, yPos, w = 4, unit = undefined) {
   return {
     datasource,
     fieldConfig: {
       defaults: {
         color: { mode: 'thresholds' },
         mappings: [],
+        ...(unit ? { unit } : {}),
         thresholds: {
           mode: 'absolute',
           steps: [
@@ -90,6 +93,10 @@ function stat(title, expr, x, yPos, w = 4) {
 }
 
 function timeSeries(title, expr, legendFormat, x, yPos, w = 12, h = 8) {
+  return timeSeriesMulti(title, [target(expr, legendFormat)], x, yPos, w, h);
+}
+
+function timeSeriesMulti(title, targets, x, yPos, w = 12, h = 8, overrides = [], tooltipMode = 'single') {
   return {
     datasource,
     fieldConfig: {
@@ -125,7 +132,7 @@ function timeSeries(title, expr, legendFormat, x, yPos, w = 12, h = 8) {
           ],
         },
       },
-      overrides: [],
+      overrides,
     },
     gridPos: { h, w, x, y: yPos },
     id: nextPanelId++,
@@ -137,11 +144,11 @@ function timeSeries(title, expr, legendFormat, x, yPos, w = 12, h = 8) {
         showLegend: true,
       },
       tooltip: {
-        mode: 'single',
+        mode: tooltipMode,
         sort: 'none',
       },
     },
-    targets: [target(expr, legendFormat)],
+    targets,
     title,
     type: 'timeseries',
   };
@@ -197,34 +204,167 @@ const panels = [];
 
 addRowWithPanels(panels, 'Run Summary', (rowY, targetPanels) => {
   targetPanels.push(
-    stat('k6 p95', `histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 0, rowY),
-    stat('k6 p99', `histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 4, rowY),
-    stat('Error Rate', `avg(k6_http_req_failed_rate{${k6Filter}})`, 8, rowY),
-    stat('Actual RPS', `sum(rate(k6_http_reqs_total{${k6Filter}}[$__rate_interval]))`, 12, rowY),
-    stat('Dropped Iterations', `sum(increase(k6_dropped_iterations_total{${k6Filter}}[$__range]))`, 16, rowY),
-    stat('Hikari Pending Max', 'max_over_time(hikaricp_connections_pending[$__range])', 20, rowY),
+    stat('k6 p95', `histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 0, rowY, 6, 's'),
+    stat('k6 p99', `histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 6, rowY, 6, 's'),
+    stat('Actual RPS', `sum(rate(k6_http_reqs_total{${k6Filter}}[$__rate_interval]))`, 12, rowY, 6, 'reqps'),
+    stat('Error Rate', `avg(k6_http_req_failed_rate{${k6Filter}}) * 100`, 18, rowY, 6, 'percent'),
+    stat('Checks Success', `avg(k6_checks_rate{${k6Filter}}) * 100`, 0, rowY + 4, 6, 'percent'),
+    stat('Dropped Iterations', zeroWhenNoData(`sum(increase(k6_dropped_iterations_total{${k6Filter}}[$__range]))`), 6, rowY + 4, 6),
+    stat('PG Connections Used', 'sum(pg_stat_database_numbackends) / max(pg_settings_max_connections) * 100', 12, rowY + 4, 6, 'percent'),
+    stat('Hikari Pending Max', 'max(max_over_time(hikaricp_connections_pending[$__range]))', 18, rowY + 4, 6),
   );
-  y = rowY + 4;
+  y = rowY + 8;
 });
 
 addRowWithPanels(panels, 'k6 Load', (rowY, targetPanels) => {
   targetPanels.push(
-    timeSeries('Actual RPS', `sum(rate(k6_http_reqs_total{${k6Filter}}[$__rate_interval]))`, 'rps', 0, rowY),
-    timeSeries('k6 Latency p95', `histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 'p95', 12, rowY),
-    timeSeries('Error Rate', `avg(k6_http_req_failed_rate{${k6Filter}})`, 'failed', 0, rowY + 8),
-    timeSeries('Dropped Iterations', `sum(rate(k6_dropped_iterations_total{${k6Filter}}[$__rate_interval]))`, 'dropped', 12, rowY + 8),
+    timeSeriesMulti(
+      'Performance Overview',
+      [
+        target(`sum(k6_vus{${k6Filter}})`, 'vus'),
+        target(`sum(rate(k6_http_reqs_total{${k6Filter}}[$__rate_interval]))`, 'rps'),
+        target(zeroWhenNoData(`sum(rate(k6_http_reqs_total{${k6Filter}, expected_response="false"}[$__rate_interval]))`), 'error_rps'),
+        target(`histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 'p95_latency'),
+      ],
+      0,
+      rowY,
+      24,
+      10,
+      [
+        {
+          matcher: { id: 'byName', options: 'rps' },
+          properties: [
+            { id: 'unit', value: 'reqps' },
+            { id: 'custom.axisPlacement', value: 'right' },
+            { id: 'color', value: { fixedColor: 'yellow', mode: 'fixed' } },
+          ],
+        },
+        {
+          matcher: { id: 'byName', options: 'error_rps' },
+          properties: [
+            { id: 'unit', value: 'reqps' },
+            { id: 'custom.axisPlacement', value: 'right' },
+            { id: 'color', value: { fixedColor: 'red', mode: 'fixed' } },
+          ],
+        },
+        {
+          matcher: { id: 'byName', options: 'p95_latency' },
+          properties: [
+            { id: 'unit', value: 's' },
+            { id: 'color', value: { fixedColor: 'blue', mode: 'fixed' } },
+          ],
+        },
+      ],
+      'multi',
+    ),
+    timeSeriesMulti(
+      'HTTP Request Rate',
+      [
+        target(`sum(rate(k6_http_reqs_total{${k6Filter}, expected_response="true"}[$__rate_interval]))`, 'success_rps'),
+        target(zeroWhenNoData(`sum(rate(k6_http_reqs_total{${k6Filter}, expected_response="false"}[$__rate_interval]))`), 'error_rps'),
+      ],
+      0,
+      rowY + 10,
+      12,
+      8,
+      [
+        {
+          matcher: { id: 'byName', options: 'success_rps' },
+          properties: [
+            { id: 'unit', value: 'reqps' },
+            { id: 'color', value: { fixedColor: 'green', mode: 'fixed' } },
+          ],
+        },
+        {
+          matcher: { id: 'byName', options: 'error_rps' },
+          properties: [
+            { id: 'unit', value: 'reqps' },
+            { id: 'color', value: { fixedColor: 'red', mode: 'fixed' } },
+          ],
+        },
+      ],
+      'multi',
+    ),
+    timeSeriesMulti(
+      'Latency and Iteration p95',
+      [
+        target(`histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{${k6Filter}}[$__rate_interval])))`, 'http_p95'),
+        target(`histogram_quantile(0.95, sum(rate(k6_iteration_duration_seconds{${k6Filter}}[$__rate_interval])))`, 'iteration_p95'),
+      ],
+      12,
+      rowY + 10,
+      12,
+      8,
+      [
+        {
+          matcher: { id: 'byRegexp', options: '.*_p95' },
+          properties: [{ id: 'unit', value: 's' }],
+        },
+      ],
+      'multi',
+    ),
+    timeSeriesMulti(
+      'Checks Success Rate',
+      [target(`avg by (check) (k6_checks_rate{${k6Filter}}) * 100`, '{{check}}')],
+      0,
+      rowY + 18,
+      12,
+      8,
+      [
+        {
+          matcher: { id: 'byRegexp', options: '.*' },
+          properties: [{ id: 'unit', value: 'percent' }],
+        },
+      ],
+    ),
+    timeSeries('Dropped Iterations', zeroWhenNoData(`sum(rate(k6_dropped_iterations_total{${k6Filter}}[$__rate_interval]))`), 'dropped', 12, rowY + 18, 12, 8),
   );
-  y = rowY + 16;
+  y = rowY + 26;
 });
 
 addRowWithPanels(panels, 'Spring API', (rowY, targetPanels) => {
   targetPanels.push(
-    timeSeries('HTTP Request Rate by URI', 'sum by (uri) (rate(http_server_requests_seconds_count{uri=~"$uri"}[$__rate_interval]))', '{{uri}}', 0, rowY),
-    timeSeries('HTTP p95 by URI', 'histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~"$uri"}[$__rate_interval])))', '{{uri}}', 12, rowY),
-    timeSeries('HTTP Errors by Status', 'sum by (status) (rate(http_server_requests_seconds_count{status!~"2.."}[$__rate_interval]))', '{{status}}', 0, rowY + 8),
-    table('Slowest URI', 'sort_desc(histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~"$uri"}[$__rate_interval]))))', 12, rowY + 8),
+    timeSeries('HTTP Request Rate by URI', `sum by (uri) (rate(http_server_requests_seconds_count{${apiUriFilter}}[$__rate_interval]))`, '{{uri}}', 0, rowY, 24),
+    timeSeries('HTTP p95 by URI', `histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{${apiUriFilter}}[$__rate_interval])))`, '{{uri}}', 0, rowY + 8, 12),
+    timeSeries('HTTP Errors by Status', 'sum by (status) (rate(http_server_requests_seconds_count{status!~"2..", uri!="/actuator/prometheus", uri!="/**"}[$__rate_interval]))', '{{status}}', 12, rowY + 8, 12),
   );
   y = rowY + 16;
+});
+
+addRowWithPanels(panels, 'Spring Runtime', (rowY, targetPanels) => {
+  targetPanels.push(
+    stat('Hikari Timeout Count', zeroWhenNoData('sum(increase(hikaricp_connections_timeout_total[$__range]))'), 0, rowY, 6),
+    stat('Heap Used', 'sum(jvm_memory_used_bytes{area="heap"}) * 100 / sum(jvm_memory_max_bytes{area="heap"})', 6, rowY, 6, 'percent'),
+    timeSeriesMulti(
+      'Process CPU Usage',
+      [target('process_cpu_usage * 100', 'process_cpu')],
+      12,
+      rowY,
+      12,
+      8,
+      [
+        {
+          matcher: { id: 'byRegexp', options: '.*' },
+          properties: [{ id: 'unit', value: 'percent' }],
+        },
+      ],
+    ),
+    timeSeriesMulti(
+      'GC Pause Time',
+      [target('sum(rate(jvm_gc_pause_seconds_sum[$__rate_interval]))', 'gc_pause')],
+      0,
+      rowY + 4,
+      12,
+      8,
+      [
+        {
+          matcher: { id: 'byRegexp', options: '.*' },
+          properties: [{ id: 'unit', value: 's' }],
+        },
+      ],
+    ),
+  );
+  y = rowY + 12;
 });
 
 addRowWithPanels(panels, 'Hikari Pool', (rowY, targetPanels) => {
@@ -249,12 +389,12 @@ addRowWithPanels(panels, 'PostgreSQL Activity', (rowY, targetPanels) => {
 
 addRowWithPanels(panels, 'Table Access', (rowY, targetPanels) => {
   targetPanels.push(
-    timeSeries('Seq Scan by Table', 'sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 0, rowY),
-    timeSeries('Index Scan by Table', 'sum by (relname) (rate(pg_stat_user_tables_idx_scan{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 12, rowY),
-    table('Seq Tuples Read Top N', 'topk(10, increase(pg_stat_user_tables_seq_tup_read[$__range]))', 0, rowY + 8),
-    table('Index Tuples Fetch Top N', 'topk(10, increase(pg_stat_user_tables_idx_tup_fetch[$__range]))', 12, rowY + 8),
+    timeSeries('Seq Scan by Table', 'sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 0, rowY, 24),
+    timeSeries('Index Scan by Table', 'sum by (relname) (rate(pg_stat_user_tables_idx_scan{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 0, rowY + 8, 24),
+    timeSeries('Seq Tuples Read Rate by Table', 'sum by (relname) (rate(pg_stat_user_tables_seq_tup_read{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 0, rowY + 16),
+    timeSeries('Index Tuples Fetch Rate by Table', 'sum by (relname) (rate(pg_stat_user_tables_idx_tup_fetch{relname=~"$table"}[$__rate_interval]))', '{{relname}}', 12, rowY + 16),
   );
-  y = rowY + 16;
+  y = rowY + 24;
 });
 
 for (const title of ['Phase 1 Baseline Focus', 'Phase 2 Index Focus', 'Phase 3 N+1 Focus', 'Phase 7 Pagination Focus']) {

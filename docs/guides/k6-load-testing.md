@@ -57,6 +57,11 @@ PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 
 `scenario`와 `preset`은 `k6/run.sh` 인자에서 결정한다. `phase`와 `pool`은 환경변수로 전달한다. `userId`, `categoryId`, `page` 같은 요청별 값은 label로 남기지 않는다.
 
+Phase 3 orders runs can set `STRATEGY=lazy|fetch-join|batch-size|entity-graph`.
+The value is sent to `GET /api/orders` as the `strategy` query parameter.
+Keep strategy evidence separate by using matching `--condition` and `--output` names, for example `pool10-lazy` and `orders-pool10-lazy.png`.
+For Phase 3 closeout evidence, the `baseline` preset uses `rate=1`, `preAllocatedVUs=20`, `maxVUs=100`, and a 30 second request timeout so Lazy can be compared with the optimized strategies under the same load.
+
 ## Scenarios
 
 | scenario | Target API | Purpose |

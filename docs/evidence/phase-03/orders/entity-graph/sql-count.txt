@@ -1,0 +1,5 @@
+Phase 3 selected order-list shape
+ order_count | order_item_count | distinct_sku_count | distinct_product_count
+-------------+------------------+--------------------+------------------------
+         381 |              762 |                761 |                    760
+(1 row)
