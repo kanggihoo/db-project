@@ -4,15 +4,16 @@
 
 ```text
 1. Phase 4 코드와 SQL helper 준비
-2. READ COMMITTED / REPEATABLE READ 읽기 이상 현상 재현
-3. SERIALIZABLE 동시 갱신 실패 재현
-4. k6, pg_stat_statements, Grafana evidence 저장
+2. Dirty Read 방지 확인
+3. READ COMMITTED / REPEATABLE READ 읽기 이상 현상 재현
+4. Lost Update 동시 갱신 충돌 재현
+5. SQL transcript, integration test output, server log evidence 저장
 5. report.md 작성
 ```
 
 ## 준비
 
-Phase 4는 Phase 3의 orders loading strategy 설정을 사용하지 않는다. 공통 k6 `baseline` preset은 50 rps 기준선이고, Phase 4 실험에는 별도 scenario/preset을 추가해서 사용한다.
+Phase 4는 Phase 3의 orders loading strategy 설정을 사용하지 않는다. 이 Phase의 핵심은 대량 부하가 아니라 트랜잭션 실행 순서이므로, 두 connection 또는 두 thread를 사용해 순서를 고정한 재현 테스트를 우선한다. k6는 반복 부하 지표가 필요할 때만 선택적으로 사용한다.
 
 ```bash
 docker compose up -d
@@ -23,22 +24,24 @@ docker compose up -d
 
 ```text
 docs/evidence/phase-04/
-├── isolation-read-anomalies/
-├── serializable-conflicts/
-└── grafana-screenshots/
+├── dirty-read/
+├── non-repeatable-read/
+├── phantom-read/
+├── lost-update/
+└── optional-load/
 ```
 
 ## 예정된 반복 순서
 
-각 실험은 같은 데이터 상태에서 실행한다.
+각 실험은 필요한 row만 known state로 되돌린 뒤 실행한다. 전체 DB를 매번 초기화하지 않는다.
 
 ```text
-1. DB 통계 초기화
-2. 격리 수준별 SQL 또는 API 실행
-3. pg_stat_statements 저장
-4. k6 summary 저장
-5. Grafana screenshot 저장
+1. 대상 Product 또는 Product SKU row를 known state로 reset
+2. 격리 수준별 SQL 또는 integration test 실행
+3. transaction transcript 또는 test output 저장
+4. concurrent update failure가 있으면 server log excerpt 저장
+5. 필요 시 pg_stat_statements snapshot 저장
 6. report.md에 결과 반영
 ```
 
-구체적인 명령은 Phase 4 구현 계획에서 SQL helper와 k6 scenario를 추가한 뒤 확정한다.
+구체적인 명령은 Phase 4 구현 계획에서 SQL helper와 thread 기반 integration test를 추가한 뒤 확정한다.

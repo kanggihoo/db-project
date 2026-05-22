@@ -1,6 +1,6 @@
 # Phase 4. 트랜잭션 격리 수준
 
-Phase 4는 동시에 여러 트랜잭션이 같은 상품/재고 데이터를 읽거나 변경할 때 PostgreSQL 격리 수준에 따라 어떤 읽기 이상 현상과 실패 비용이 나타나는지 확인하는 Learning Phase다.
+Phase 4는 동시에 여러 트랜잭션이 같은 Product/Product SKU 데이터를 읽거나 변경할 때 PostgreSQL 격리 수준에 따라 어떤 읽기 이상 현상과 동시 갱신 충돌 결과가 나타나는지 확인하는 Learning Phase다.
 
 ## 현재 상태
 
@@ -8,8 +8,9 @@ Phase 4는 준비 중이다.
 
 - Phase 3 N+1 로딩 전략 실험은 종료됐다.
 - Phase 4는 조회 로딩 전략이 아니라 트랜잭션 격리 수준과 정합성 관찰을 다룬다.
-- 비관적 락/낙관적 락 전략 비교는 Phase 11 범위로 분리한다.
-- Phase 4 시작 전 공통 k6 `baseline` preset은 50 rps 기준선으로 복원했고, Phase 3 재실행용 preset은 `phase3-orders-baseline`으로 분리했다.
+- Dirty Read, Non-Repeatable Read, Phantom Read, Lost Update를 PostgreSQL 격리 수준별로 재현한다.
+- 비관적 락/낙관적 락/Atomic UPDATE 전략 비교는 Phase 11 범위로 분리한다.
+- Phase 4 시작 전 공통 k6 `baseline` preset은 50 rps 기준선으로 복원했고, Phase 3 재실행용 preset은 `phase3-orders-baseline`으로 분리했다. Phase 4의 기본 evidence는 k6가 아니라 실행 순서를 고정한 SQL transcript 또는 integration test output이다.
 
 ## 문서
 
