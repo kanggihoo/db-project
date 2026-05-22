@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -148,6 +149,51 @@ class TransactionIsolationTest {
         }
     }
 
+    @Test
+    @DisplayName("READ COMMITTED can lose update with naive read-modify-write")
+    void readCommittedCanLoseUpdateWithNaiveReadModifyWrite() throws SQLException {
+        try (Connection txA = openTransaction(Connection.TRANSACTION_READ_COMMITTED);
+             Connection txB = openTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
+
+            int stockReadByA = selectStockQuantity(txA, SKU_ID);
+            int stockReadByB = selectStockQuantity(txB, SKU_ID);
+
+            updateStockQuantity(txA, SKU_ID, stockReadByA - 1);
+            txA.commit();
+
+            updateStockQuantity(txB, SKU_ID, stockReadByB - 1);
+            txB.commit();
+        }
+
+        try (Connection connection = dataSource.getConnection()) {
+            assertThat(selectStockQuantity(connection, SKU_ID)).isEqualTo(9);
+        }
+    }
+
+    @Test
+    @DisplayName("PostgreSQL REPEATABLE READ prevents Lost Update with concurrent update failure")
+    void repeatableReadPreventsLostUpdateWithConcurrentUpdateFailure() throws SQLException {
+        try (Connection txA = openTransaction(Connection.TRANSACTION_REPEATABLE_READ);
+             Connection txB = openTransaction(Connection.TRANSACTION_REPEATABLE_READ)) {
+
+            int stockReadByA = selectStockQuantity(txA, SKU_ID);
+            int stockReadByB = selectStockQuantity(txB, SKU_ID);
+
+            updateStockQuantity(txA, SKU_ID, stockReadByA - 1);
+            txA.commit();
+
+            assertThatThrownBy(() -> updateStockQuantity(txB, SKU_ID, stockReadByB - 1))
+                    .isInstanceOf(SQLException.class)
+                    .satisfies(error -> assertThat(((SQLException) error).getSQLState()).isEqualTo("40001"));
+
+            txB.rollback();
+        }
+
+        try (Connection connection = dataSource.getConnection()) {
+            assertThat(selectStockQuantity(connection, SKU_ID)).isEqualTo(9);
+        }
+    }
+
     private Connection openTransaction(int isolationLevel) throws SQLException {
         Connection connection = dataSource.getConnection();
         try {
@@ -235,6 +281,15 @@ class TransactionIsolationTest {
                 "UPDATE product SET base_price = ?, updated_at = NOW() WHERE id = ?")) {
             statement.setInt(1, basePrice);
             statement.setLong(2, productId);
+            assertThat(statement.executeUpdate()).isEqualTo(1);
+        }
+    }
+
+    private void updateStockQuantity(Connection connection, long skuId, int stockQuantity) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "UPDATE product_sku SET stock_quantity = ? WHERE id = ?")) {
+            statement.setInt(1, stockQuantity);
+            statement.setLong(2, skuId);
             assertThat(statement.executeUpdate()).isEqualTo(1);
         }
     }
