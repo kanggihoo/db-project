@@ -110,6 +110,44 @@ class TransactionIsolationTest {
         }
     }
 
+    @Test
+    @DisplayName("READ COMMITTED allows Phantom Read")
+    void readCommittedAllowsPhantomRead() throws SQLException {
+        try (Connection txA = openTransaction(Connection.TRANSACTION_READ_COMMITTED);
+             Connection txB = openTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
+
+            int firstCount = countOnSaleProducts(txA, CATEGORY_ID);
+
+            insertPhantomProduct(txB);
+            txB.commit();
+
+            int secondCount = countOnSaleProducts(txA, CATEGORY_ID);
+            txA.commit();
+
+            assertThat(firstCount).isEqualTo(1);
+            assertThat(secondCount).isEqualTo(2);
+        }
+    }
+
+    @Test
+    @DisplayName("PostgreSQL REPEATABLE READ prevents Phantom Read")
+    void repeatableReadPreventsPhantomReadInPostgresql() throws SQLException {
+        try (Connection txA = openTransaction(Connection.TRANSACTION_REPEATABLE_READ);
+             Connection txB = openTransaction(Connection.TRANSACTION_READ_COMMITTED)) {
+
+            int firstCount = countOnSaleProducts(txA, CATEGORY_ID);
+
+            insertPhantomProduct(txB);
+            txB.commit();
+
+            int secondCount = countOnSaleProducts(txA, CATEGORY_ID);
+            txA.commit();
+
+            assertThat(firstCount).isEqualTo(1);
+            assertThat(secondCount).isEqualTo(1);
+        }
+    }
+
     private Connection openTransaction(int isolationLevel) throws SQLException {
         Connection connection = dataSource.getConnection();
         try {
@@ -197,6 +235,17 @@ class TransactionIsolationTest {
                 "UPDATE product SET base_price = ?, updated_at = NOW() WHERE id = ?")) {
             statement.setInt(1, basePrice);
             statement.setLong(2, productId);
+            assertThat(statement.executeUpdate()).isEqualTo(1);
+        }
+    }
+
+    private void insertPhantomProduct(Connection connection) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement("""
+                INSERT INTO product (id, category_id, name, description, base_price, status, is_deleted, created_at, updated_at)
+                VALUES (?, ?, 'Phase4 Phantom Product', 'Phase4 phantom fixture', 20000, 'ON_SALE', false, NOW(), NOW())
+                """)) {
+            statement.setLong(1, PHANTOM_PRODUCT_ID);
+            statement.setLong(2, CATEGORY_ID);
             assertThat(statement.executeUpdate()).isEqualTo(1);
         }
     }
