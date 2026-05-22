@@ -43,6 +43,8 @@ k6/
 - 시나리오별 `pg_stat_statements_reset()`와 `VACUUM ANALYZE`를 실행한 뒤
 - Phase별 기준선 또는 Before/After를 측정할 때
 
+k6는 부하, 처리량, latency evidence가 필요한 Phase에 사용한다. Phase 4 transaction isolation처럼 두 transaction의 실행 순서를 고정해 DB 격리 현상을 재현하는 경우에는 primary evidence가 아니며, [Testcontainers Integration Testing Guide](./testcontainers-integration-testing.md)의 focused integration test 방식을 우선한다.
+
 Grafana 증빙을 남길 때는 Measurement Condition을 label로 남긴다.
 
 ```bash

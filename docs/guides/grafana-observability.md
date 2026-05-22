@@ -8,6 +8,8 @@
 
 상세 요구사항은 [DB Lab Grafana Dashboard Spec](../superpowers/specs/db-lab-grafana-dashboard-spec.md)을 기준으로 한다. 이 결정의 배경은 [ADR 0005](../adr/0005-use-one-observability-dashboard-for-comparable-phase-evidence.md)에 기록한다.
 
+Grafana는 k6 또는 long-running application run의 time-series를 확인할 때 사용한다. Phase 4 transaction isolation처럼 Testcontainers에서 두 JDBC connection의 실행 순서를 고정하는 테스트는 Grafana가 primary evidence가 아니다. 이 경우 integration test output과 phase report를 우선하고, runtime pressure를 추가로 보고 싶을 때만 Grafana를 선택 evidence로 사용한다.
+
 ## Measurement Conditions
 
 k6 지표는 비교 가능한 Phase Evidence를 위해 낮은 cardinality label만 사용한다.
