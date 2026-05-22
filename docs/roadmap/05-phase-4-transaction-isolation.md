@@ -133,11 +133,11 @@ public void naiveAdjustStock(Long skuId, int quantity) {
 
 ### 완료 조건
 
-- [ ] READ COMMITTED와 REPEATABLE READ에서 Non-Repeatable Read 차이를 재현했다.
-- [ ] PostgreSQL REPEATABLE READ의 Phantom Read 방지 특성을 확인했다.
-- [ ] PostgreSQL에서 Dirty Read가 발생하지 않음을 확인했다.
-- [ ] REPEATABLE READ 이상에서 Lost Update가 조용히 발생하지 않고 concurrent update failure로 방지됨을 확인했다.
-- [ ] 격리 수준별 결과를 SQL transcript 또는 integration test evidence로 기록했다.
-- [ ] 락 전략 비교는 Phase 11 범위로 분리해 문서상 경계를 명확히 했다.
+- [x] READ COMMITTED와 REPEATABLE READ에서 Non-Repeatable Read 차이를 재현했다.
+- [x] PostgreSQL REPEATABLE READ의 Phantom Read 방지 특성을 확인했다.
+- [x] PostgreSQL에서 Dirty Read가 발생하지 않음을 확인했다.
+- [x] REPEATABLE READ 이상에서 Lost Update가 조용히 발생하지 않고 concurrent update failure로 방지됨을 확인했다.
+- [x] 격리 수준별 결과를 integration test evidence로 기록했다.
+- [x] 락 전략 비교는 Phase 11 범위로 분리해 문서상 경계를 명확히 했다.
 
 ---

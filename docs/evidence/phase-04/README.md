@@ -12,12 +12,17 @@ Phase 4 evidence는 트랜잭션 격리 수준별 읽기 이상 현상과 동시
 | Lost Update | [lost-update/](./lost-update/) | 격리 수준별 naive read-modify-write 동시 갱신 결과 확인 |
 | Optional Load | [optional-load/](./optional-load/) | 필요 시 k6, SQL, Grafana evidence |
 
-## Expected Files Per Scenario
+## Required Files Per Scenario
 
 | File | Purpose |
 |---|---|
-| `transaction-transcript.txt` | 격리 수준별 SQL 실행 순서와 조회 결과 |
 | `integration-test-output.txt` | 두 thread 또는 두 connection 기반 재현 테스트 결과 |
+
+## Optional Files Per Scenario
+
+| File | Purpose |
+|---|---|
+| `transaction-transcript.txt` | 필요 시 격리 수준별 SQL 실행 순서와 조회 결과 |
 | `server-log.txt` | concurrent update failure, serialization failure, rollback 원인 로그 |
 | `pg-stat-statements.txt` | 선택 evidence. query shape별 calls, mean time, total time |
 | `k6-summary.txt` | 선택 evidence. k6 stdout/stderr summary |
