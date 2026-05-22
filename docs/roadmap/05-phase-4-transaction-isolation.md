@@ -94,23 +94,23 @@ public void naiveAdjustStock(Long skuId, int quantity) {
 
 // 테스트: 두 thread가 같은 Product SKU를 읽고 stale value 기반으로 갱신
 // → READ COMMITTED에서는 쿼리 형태에 따라 lost update가 가능함
-// → PostgreSQL REPEATABLE READ 이상에서는 "could not serialize access due to concurrent update"로 실패할 수 있음
+// → PostgreSQL REPEATABLE READ에서는 "could not serialize access due to concurrent update"로 실패할 수 있음
 // → 실패 재시도나 Atomic UPDATE 전략 비교는 Phase 11 범위
 ```
 
-### 격리 수준별 비교표 (직접 측정)
+### 격리 수준별 비교표 (측정 및 문서 비교)
 
 | 격리 수준       | Dirty Read | Non-Repeatable Read | Phantom Read | Lost Update / 동시 갱신 충돌 |
 | --------------- | ---------- | ------------------- | ------------ | ---------------------------- |
 | READ COMMITTED  | 방지       | 발생                | 발생         | naive read-modify-write에서 발생 가능 |
 | REPEATABLE READ | 방지       | 방지                | 방지 (PG)    | concurrent update failure로 방지 |
-| SERIALIZABLE    | 방지       | 방지                | 방지         | serialization failure로 방지 |
+| SERIALIZABLE    | 미측정     | 미측정              | 미측정       | 이번 Phase 4 구현 테스트 범위 밖의 문서 비교 대상 |
 
 ### Evidence로 확인하는 것
 
 - SQL transcript: 두 세션의 실행 순서와 조회 결과
 - Integration test: 두 thread 또는 두 connection으로 순서를 고정한 재현 테스트
-- server log excerpt: concurrent update failure 또는 serialization failure 원인 로그
+- server log excerpt: 필요 시 concurrent update failure 원인 로그
 - `pg_stat_statements`: 필요 시 격리 수준별 실행 window를 분리해 query snapshot 저장
 - k6/Grafana: 대량 부하 지표가 필요할 때만 선택적으로 사용
 
@@ -124,7 +124,7 @@ public void naiveAdjustStock(Long skuId, int quantity) {
 ### 측정 지표 (회고용)
 
 - 격리 수준별 재현 결과: 발생, 방지, 실패
-- concurrent update failure 또는 serialization failure 발생 여부
+- concurrent update failure 발생 여부
 - 선택 지표: thread test 반복 실행 시 성공/실패 건수
 
 ### 남은 문제 → Phase 5로
@@ -136,7 +136,7 @@ public void naiveAdjustStock(Long skuId, int quantity) {
 - [x] READ COMMITTED와 REPEATABLE READ에서 Non-Repeatable Read 차이를 재현했다.
 - [x] PostgreSQL REPEATABLE READ의 Phantom Read 방지 특성을 확인했다.
 - [x] PostgreSQL에서 Dirty Read가 발생하지 않음을 확인했다.
-- [x] REPEATABLE READ 이상에서 Lost Update가 조용히 발생하지 않고 concurrent update failure로 방지됨을 확인했다.
+- [x] REPEATABLE READ에서 Lost Update가 조용히 발생하지 않고 concurrent update failure로 방지됨을 확인했다.
 - [x] 격리 수준별 결과를 integration test evidence로 기록했다.
 - [x] 락 전략 비교는 Phase 11 범위로 분리해 문서상 경계를 명확히 했다.
 
