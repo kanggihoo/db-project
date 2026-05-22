@@ -112,9 +112,14 @@ class TransactionIsolationTest {
 
     private Connection openTransaction(int isolationLevel) throws SQLException {
         Connection connection = dataSource.getConnection();
-        connection.setTransactionIsolation(isolationLevel);
-        connection.setAutoCommit(false);
-        return connection;
+        try {
+            connection.setTransactionIsolation(isolationLevel);
+            connection.setAutoCommit(false);
+            return connection;
+        } catch (SQLException exception) {
+            connection.close();
+            throw exception;
+        }
     }
 
     private void deletePhantomProduct(Connection connection) throws SQLException {
