@@ -1,0 +1,20 @@
+Scenario: Phantom Read
+Tests:
+- TransactionIsolationTest.readCommittedAllowsPhantomRead
+- TransactionIsolationTest.repeatableReadPreventsPhantomReadInPostgresql
+Database: PostgreSQL Testcontainers using src/test/resources/init.sql
+Fixture: category id=900001, product id=900001 status=ON_SALE
+
+READ COMMITTED:
+1. txA counts ON_SALE products in category 900001: 1.
+2. txB inserts product 900002 with status=ON_SALE and commits.
+3. txA counts again: 2.
+Expected: Phantom Read occurs.
+
+REPEATABLE READ:
+1. txA counts ON_SALE products in category 900001: 1.
+2. txB inserts product 900002 with status=ON_SALE and commits.
+3. txA counts again: 1 from its snapshot.
+Expected: PostgreSQL REPEATABLE READ prevents Phantom Read.
+
+Result: PASS - TransactionIsolationTest completed successfully in Gradle.

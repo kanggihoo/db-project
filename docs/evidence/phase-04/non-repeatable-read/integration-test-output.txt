@@ -1,0 +1,20 @@
+Scenario: Non-Repeatable Read
+Tests:
+- TransactionIsolationTest.readCommittedAllowsNonRepeatableRead
+- TransactionIsolationTest.repeatableReadPreventsNonRepeatableRead
+Database: PostgreSQL Testcontainers using src/test/resources/init.sql
+Fixture: product id=900001 base_price=10000
+
+READ COMMITTED:
+1. txA reads base_price=10000.
+2. txB updates base_price=15000 and commits.
+3. txA reads base_price=15000.
+Expected: Non-Repeatable Read occurs.
+
+REPEATABLE READ:
+1. txA reads base_price=10000.
+2. txB updates base_price=15000 and commits.
+3. txA reads base_price=10000 from its snapshot.
+Expected: Non-Repeatable Read is prevented.
+
+Result: PASS - TransactionIsolationTest completed successfully in Gradle.
