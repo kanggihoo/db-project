@@ -28,6 +28,7 @@
 
 - [Environment](./guides/environment.md)
 - [Scripts](./guides/scripts.md)
+- [Project Format Standard](./guides/project-format-standard.md)
 - [Seed Data](./guides/seed-data.md)
 - [Spring Profiles](./guides/spring-profiles.md)
 - [k6 Load Testing](./guides/k6-load-testing.md)
