@@ -3,6 +3,7 @@ export const PHASE_FOCUS_ROWS = {
   'phase-02': 'Phase 2 Index Focus',
   'phase-03': 'Phase 3 N+1 Focus',
   'phase-04': 'Phase 4 Transaction Focus',
+  'phase-06': 'Phase 6 Aggregation Focus',
   'phase-07': 'Phase 7 Pagination Focus',
 };
 

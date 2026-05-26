@@ -255,7 +255,7 @@ Useful options:
 | `--url <url>` | Start from a custom Grafana dashboard URL. Explicit variable options still override matching `var-*` parameters. |
 | `--output <path>` | Override the final PNG path. |
 | `--parts-dir <path>` | Override the temporary part capture directory. |
-| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-04`, `phase-07`. |
+| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-04`, `phase-06`, `phase-07`. |
 | `--scenario <name>` | Set `var-scenario`. |
 | `--preset <name>` | Set `var-preset`. |
 | `--pool <name>` | Set `var-pool`. |
