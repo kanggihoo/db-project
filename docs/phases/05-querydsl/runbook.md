@@ -1,8 +1,8 @@
 # Phase 5 Runbook
 
-Run commands from `ecommerce/` unless noted otherwise.
+별도 언급이 없으면 명령은 `ecommerce/`에서 실행한다.
 
-## Focused Test Commands
+## Focused Test 명령
 
 ```bash
 rtk gradlew test --tests "*ProductSearchStrategyTest"
@@ -10,18 +10,18 @@ rtk gradlew test --tests "*OrderBulkUpdateTest"
 rtk gradlew compileJava
 ```
 
-## Evidence Capture Commands
+## Evidence Capture 명령
 
-Use focused test output and representative SQL snapshots under `docs/evidence/phase-05/`.
+Focused test 출력과 대표 SQL snapshot을 `docs/evidence/phase-05/` 아래에 저장한다.
 
 ```bash
 rtk gradlew test --tests "*ProductSearchStrategyTest" --info > ../docs/evidence/phase-05/product-search/strategy-test-output.txt
 rtk gradlew test --tests "*OrderBulkUpdateTest" --info > ../docs/evidence/phase-05/bulk-update/persistence-context-test-output.txt
 ```
 
-If SQL snapshots need to be refreshed, enable Hibernate SQL logging for the focused test run and save only the representative SQL shape.
+SQL snapshot을 갱신해야 한다면 focused test 실행 시 Hibernate SQL logging을 켜고 대표 SQL shape만 저장한다.
 
-## Expected Evidence Files
+## 예상 Evidence 파일
 
 - `docs/evidence/phase-05/README.md`
 - `docs/evidence/phase-05/product-search/measurement-condition.md`
@@ -35,9 +35,9 @@ If SQL snapshots need to be refreshed, enable Hibernate SQL logging for the focu
 - `docs/evidence/phase-05/bulk-update/persistence-context-test-output.txt`
 - `docs/evidence/phase-05/bulk-update/summary.md`
 
-## Closeout Checks
+## Closeout 확인
 
-From the repository root:
+repository root에서 실행한다.
 
 ```powershell
 rtk powershell -NoProfile -Command "$paths = @('docs/evidence/phase-05/README.md','docs/evidence/phase-05/product-search/measurement-condition.md','docs/evidence/phase-05/product-search/baseline-sql.txt','docs/evidence/phase-05/product-search/querydsl-sql.txt','docs/evidence/phase-05/product-search/strategy-test-output.txt','docs/evidence/phase-05/product-search/summary.md','docs/evidence/phase-05/bulk-update/measurement-condition.md','docs/evidence/phase-05/bulk-update/loop-update-sql-count.txt','docs/evidence/phase-05/bulk-update/bulk-update-sql-count.txt','docs/evidence/phase-05/bulk-update/persistence-context-test-output.txt','docs/evidence/phase-05/bulk-update/summary.md'); $paths | ForEach-Object { [pscustomobject]@{ Path = $_; Exists = Test-Path $_ } }"

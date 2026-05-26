@@ -1,23 +1,23 @@
-# Phase 5 Report
+# Phase 5 결과 보고서
 
-## Status
+## 상태
 
-Completed.
+완료.
 
-Phase 5 keeps the existing product search API and adds an explicit strategy comparison for learning evidence:
+Phase 5는 기존 상품 검색 API를 유지하면서 학습 증거 비교를 위한 명시적 strategy를 추가했다.
 
-- `strategy=baseline`: Spring Data JPA entity query, then `ProductResponse.from(product)`
+- `strategy=baseline`: Spring Data JPA 엔티티 조회 후 `ProductResponse.from(product)` 변환
 - `strategy=querydsl`: QueryDSL DTO projection
-- omitted `strategy`: defaults to `querydsl`
+- `strategy` 생략: `querydsl` 기본 사용
 
-## Product Search
+## 상품 검색
 
-Focused integration evidence shows that baseline and QueryDSL return equivalent `ProductResponse` values under shared `categoryId=200` and `status=ON_SALE` conditions.
+Focused integration evidence는 baseline과 QueryDSL이 공유 `categoryId=200`, `status=ON_SALE` 조건에서 같은 `ProductResponse` 값을 반환함을 보여준다.
 
-| Strategy | Mapping path | SQL shape | SQL count evidence |
+| 전략 | Mapping path | SQL shape | SQL count evidence |
 |---|---|---|---:|
-| `baseline` | Product entity -> `ProductResponse.from(product)` | Product entity columns selected, including fields not needed by response | 1 |
-| `querydsl` | QueryDSL projection -> `ProductResponse` | `ProductResponse` fields projected: `id`, `category_id`, `name`, `base_price`, `status` | 1 |
+| `baseline` | Product 엔티티 -> `ProductResponse.from(product)` | 응답에 필요하지 않은 필드를 포함해 Product 엔티티 컬럼 조회 | 1 |
+| `querydsl` | QueryDSL projection -> `ProductResponse` | `ProductResponse` 필드인 `id`, `category_id`, `name`, `base_price`, `status`만 projection | 1 |
 
 Evidence:
 
@@ -26,15 +26,15 @@ Evidence:
 - [strategy-test-output.txt](../../evidence/phase-05/product-search/strategy-test-output.txt)
 - [summary.md](../../evidence/phase-05/product-search/summary.md)
 
-The QueryDSL test also verifies that null optional predicates are omitted.
+QueryDSL test는 optional predicate가 null일 때 생략되는지도 검증한다.
 
 ## Bulk Update
 
-Focused integration evidence compares managed entity dirty checking with JPQL bulk update under the same fixture.
+Focused integration evidence는 같은 fixture에서 managed entity dirty checking과 JPQL bulk update를 비교한다.
 
-| Strategy | Rows changed | Hibernate prepareStatementCount | Other evidence |
+| 전략 | 변경 row 수 | Hibernate prepareStatementCount | 추가 증거 |
 |---|---:|---:|---|
-| Row-by-row dirty checking | 3 | 4 | one select + three updates, `entityUpdateCount=3` |
+| Row-by-row dirty checking | 3 | 4 | select 1회 + update 3회, `entityUpdateCount=3` |
 | JPQL bulk update | 3 | 1 | `updatedRows=3` |
 
 Evidence:
@@ -44,19 +44,19 @@ Evidence:
 - [persistence-context-test-output.txt](../../evidence/phase-05/bulk-update/persistence-context-test-output.txt)
 - [summary.md](../../evidence/phase-05/bulk-update/summary.md)
 
-The bulk repository uses `@Modifying(clearAutomatically = true, flushAutomatically = true)` with a method-level transaction boundary. Evidence records the clear/reload behavior after the bulk update: a previously loaded order is reloaded with the updated `PREPARING` state instead of the stale `PENDING` value.
+Bulk repository는 method-level transaction boundary와 함께 `@Modifying(clearAutomatically = true, flushAutomatically = true)`를 사용한다. Evidence는 bulk update 이후 clear/reload 동작을 기록한다. 먼저 로딩된 주문은 stale `PENDING` 값이 아니라 변경된 `PREPARING` 상태로 다시 로딩된다.
 
 ## Evidence Index
 
-All required Phase 5 evidence is organized under [docs/evidence/phase-05/README.md](../../evidence/phase-05/README.md).
+필수 Phase 5 evidence는 [docs/evidence/phase-05/README.md](../../evidence/phase-05/README.md)에 정리되어 있다.
 
-k6/Grafana and `pg_stat_statements` are optional for this phase and were not required for closeout.
+k6/Grafana와 `pg_stat_statements`는 이 phase에서 선택 항목이며 closeout 필수 조건이 아니다.
 
 ## Phase 6 Handoff
 
-Phase 5 optimized and compared a simple product search read path. Phase 6 should move to Product/Review aggregate queries where the likely questions are:
+Phase 5는 단순 상품 검색 read path를 최적화하고 비교했다. Phase 6은 Product/Review 집계 쿼리로 이동한다. 다음 질문을 다룬다.
 
-- `GROUP BY` and `HAVING` behavior for product review summaries
-- expression indexes for aggregate/filter expressions
-- execution plan comparison before and after indexing
-- whether indexes improve aggregate queries as clearly as they improve simple predicates
+- 상품 리뷰 요약에서 `GROUP BY`와 `HAVING` 동작
+- 집계/필터 표현식을 위한 expression index
+- 인덱스 전후 실행 계획 비교
+- 단순 predicate에서 효과적이던 인덱스가 집계 쿼리에서도 같은 수준으로 효과적인지 여부

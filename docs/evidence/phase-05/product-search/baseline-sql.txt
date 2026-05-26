@@ -1,4 +1,4 @@
-Baseline representative SQL
+Baseline 대표 SQL
 
 select
     p1_0.id,

@@ -1,9 +1,9 @@
-JPQL bulk update measurement
+JPQL bulk update 측정
 
 Marker:
 PHASE5_BULK_UPDATE_SQL_COUNT=1
 
 Result:
-- Updated 3 PENDING orders to PREPARING.
-- JPQL bulk update executed as a single prepared statement.
-- A follow-up repository query confirmed 3 PREPARING orders.
+- `PENDING` 주문 3개를 `PREPARING`으로 변경했다.
+- JPQL bulk update는 하나의 prepared statement로 실행되었다.
+- 후속 repository 조회에서 `PREPARING` 주문 3개가 확인되었다.

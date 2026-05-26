@@ -1,4 +1,4 @@
-QueryDSL representative SQL
+QueryDSL 대표 SQL
 
 select
     p1_0.id,

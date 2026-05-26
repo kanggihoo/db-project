@@ -1,36 +1,36 @@
-# Phase 5 Scope
+# Phase 5 범위
 
-Phase 5 validates whether QueryDSL DTO projection improves the product search read path while preserving a comparable baseline path for learning evidence.
+Phase 5는 비교 가능한 baseline 경로를 유지하면서 QueryDSL DTO projection이 상품 검색 read path를 어떻게 바꾸는지 검증한다.
 
-## In Scope
+## 포함 범위
 
 - `GET /api/products`
 - `strategy=baseline|querydsl`
-- omitted `strategy` defaults to `querydsl`
-- optional `categoryId` and `status` request parameters
-- baseline path: Spring Data JPA entity query, then `ProductResponse.from(product)`
-- QueryDSL path: `ProductResponse` DTO projection
-- QueryDSL null predicate omission for optional conditions
-- row-by-row update vs JPQL bulk update comparison
-- evidence stored under [docs/evidence/phase-05](../../evidence/phase-05/README.md)
+- `strategy` 생략 시 `querydsl` 기본 사용
+- optional `categoryId`, `status` request parameter
+- baseline 경로: Spring Data JPA 엔티티 조회 후 `ProductResponse.from(product)` 변환
+- QueryDSL 경로: `ProductResponse` DTO projection
+- optional 조건이 null일 때 QueryDSL predicate 생략
+- 행 단위 update와 JPQL bulk update 비교
+- [docs/evidence/phase-05](../../evidence/phase-05/README.md) 아래 evidence 저장
 
-## Out of Scope
+## 제외 범위
 
-- additional price range or text search filters
-- required k6 or Grafana evidence
-- required `pg_stat_statements` evidence
-- stock, coupon, or order concurrency behavior
-- locks, retry, and idempotency strategies
-- other user-facing product search API changes
+- 추가 가격 범위 또는 텍스트 검색 필터
+- k6 또는 Grafana 필수 증거
+- `pg_stat_statements` 필수 증거
+- 재고, 쿠폰, 주문 동시성 제어
+- lock, retry, idempotency 전략
+- 다른 사용자-facing 상품 검색 API 변경
 
-## Completion Checklist
+## 완료 체크리스트
 
-- [x] `GET /api/products` accepts `strategy=baseline|querydsl`
-- [x] omitted `strategy` defaults to `querydsl`
-- [x] baseline and QueryDSL return equal `ProductResponse` values under shared `categoryId` and `status` conditions
-- [x] QueryDSL null predicates are omitted safely in focused tests
-- [x] baseline SQL shape and QueryDSL SQL shape are captured
-- [x] row-by-row update vs bulk update SQL count evidence is captured
-- [x] bulk update persistence context behavior is verified
-- [x] evidence is organized under `docs/evidence/phase-05/`
-- [x] Phase 6 handoff is recorded in the report
+- [x] `GET /api/products`가 `strategy=baseline|querydsl`을 받는다.
+- [x] `strategy` 생략 시 `querydsl`을 기본값으로 사용한다.
+- [x] baseline과 QueryDSL이 공유 `categoryId`, `status` 조건에서 같은 `ProductResponse` 값을 반환한다.
+- [x] QueryDSL null predicate 생략을 focused test로 검증했다.
+- [x] baseline SQL shape와 QueryDSL SQL shape를 캡처했다.
+- [x] 행 단위 update와 bulk update의 SQL count evidence를 캡처했다.
+- [x] Bulk update persistence context 동작을 검증했다.
+- [x] evidence를 `docs/evidence/phase-05/` 아래에 정리했다.
+- [x] Phase 6 handoff를 report에 기록했다.
