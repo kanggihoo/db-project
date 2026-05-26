@@ -10,10 +10,12 @@ k6/
 ├── orders-test.js
 ├── products-test.js
 ├── points-test.js
+├── review-summary-test.js
 └── presets/
     ├── smoke.json
     ├── baseline.json
     ├── phase3-orders-baseline.json
+    ├── review-summary-baseline.json
     ├── stress-100.json
     ├── stress-200.json
     ├── points-page0.json
@@ -26,6 +28,7 @@ k6/
 | `k6/orders-test.js` | 주문 목록 API 부하 테스트 |
 | `k6/products-test.js` | 상품 검색 API 부하 테스트 |
 | `k6/points-test.js` | 포인트 내역 API 부하 테스트 |
+| `k6/review-summary-test.js` | 상품 리뷰 요약 API 부하 테스트 |
 | `k6/presets/*.json` | rate, duration, VU, page, user/category 범위 설정 |
 
 ## Run
@@ -72,6 +75,7 @@ For Phase 3 reruns, use `phase3-orders-baseline`. The stored Phase 3 evidence wa
 | `orders` | `GET /api/orders?userId=` | N+1, Hikari pool 점유 |
 | `products` | `GET /api/products?categoryId=&status=` | 인덱스 없는 Seq Scan |
 | `points` | `GET /api/points?userId=&page=&size=` | Offset deep page 병목 |
+| `review-summary` | `GET /api/products/review-summary` | Phase 6 aggregation API representative evidence |
 
 ## Presets
 
@@ -80,6 +84,7 @@ For Phase 3 reruns, use `phase3-orders-baseline`. The stored Phase 3 evidence wa
 | `smoke` | 5 rps | 1m | API 정상 확인 |
 | `baseline` | 50 rps | 5m | 기본 기준선 |
 | `phase3-orders-baseline` | 1 rps | 5m | Phase 3 strategy 비교 재실행 |
+| `review-summary-baseline` | 20 rps | 5m | Phase 6 review summary API comparison |
 | `stress-100` | 100 rps | 5m | 부하 증가 |
 | `stress-200` | 200 rps | 5m | 한계 확인 |
 | `points-page0` | 50 rps | 5m | 얕은 페이지 |
@@ -96,6 +101,7 @@ Preset files live in `k6/presets/`.
 ./k6/run.sh products stress-100
 ./k6/run.sh points points-page0
 ./k6/run.sh points points-page500
+./k6/run.sh review-summary review-summary-baseline
 ```
 
 Grafana에서 k6 지표까지 함께 보려면 `prometheus` 모드를 사용한다.
@@ -104,6 +110,7 @@ Grafana에서 k6 지표까지 함께 보려면 `prometheus` 모드를 사용한�
 PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 PHASE=phase-01 POOL=pool10 ./k6/run.sh products stress-100 prometheus
 PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus
+PHASE=phase-06 POOL=pool10 ./k6/run.sh review-summary review-summary-baseline prometheus
 ```
 
 ## Adding a Preset
