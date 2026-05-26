@@ -49,6 +49,47 @@ docs/evidence/phase-06/data-profile/
   index-state-before.txt
 ```
 
+### SQL Script Structure
+
+Phase 6 SQL-only evidence는 번호가 붙은 SQL 파일로 재현한다. 파일은 condition별 `prepare`와 `explain`을 분리한다.
+
+예상 위치:
+
+```text
+scripts/phase-06/
+  00-data-profile.sql
+  10-review-baseline-prepare.sql
+  11-review-baseline-explain.sql
+  12-review-naive-prepare.sql
+  13-review-naive-explain.sql
+  14-review-query-shaped-prepare.sql
+  15-review-query-shaped-explain.sql
+  20-monthly-baseline-prepare.sql
+  21-monthly-baseline-explain.sql
+  22-monthly-naive-prepare.sql
+  23-monthly-naive-explain.sql
+  24-monthly-query-shaped-prepare.sql
+  25-monthly-query-shaped-explain.sql
+```
+
+`prepare` 파일은 해당 condition을 독립적으로 재현할 수 있게 만든다.
+
+- 같은 실험 target의 custom index를 먼저 제거한다.
+- 필요한 index를 생성한다.
+- 대상 테이블에 `VACUUM (ANALYZE)`를 실행해 planner 통계를 갱신한다.
+- `pg_stat_statements_reset()`을 실행해 condition별 누적 통계를 분리한다.
+
+`explain` 파일은 `EXPLAIN (ANALYZE, BUFFERS)` 대상 SQL만 담는다.
+
+실행 예시:
+
+```bash
+docker compose exec postgres psql -U app -d ecommerce -f scripts/phase-06/12-review-naive-prepare.sql
+docker compose exec postgres psql -U app -d ecommerce -f scripts/phase-06/13-review-naive-explain.sql > docs/evidence/phase-06/review-aggregate/naive-index/explain.txt
+```
+
+`VACUUM`은 transaction block 안에서 실행할 수 없으므로 `psql -f`로 독립 실행한다. `pg_stat_statements_reset()`은 docker compose PostgreSQL에 `pg_stat_statements` extension이 활성화되어 있다는 Phase 0 조건을 전제로 한다.
+
 ### 실험 1: Product Review Summary
 
 `Review`는 aggregation optimization target이다. Product별 리뷰 수와 평균 평점을 집계하면서 `GROUP BY`, `HAVING`, `ORDER BY AVG(...)`가 함께 있을 때 인덱스 설계가 실행계획에 어떤 영향을 주는지 확인한다.
@@ -65,7 +106,7 @@ FROM product p
 LEFT JOIN review r ON r.product_id = p.id
 GROUP BY p.id, p.name
 HAVING COUNT(r.id) >= 10
-ORDER BY AVG(r.rating) DESC
+ORDER BY AVG(r.rating) DESC, p.id ASC
 LIMIT 100;
 ```
 
@@ -179,6 +220,21 @@ docs/evidence/phase-06/
   grafana-screenshots/
     review-summary-naive-index.png
     review-summary-query-shaped-index.png
+
+scripts/phase-06/
+  00-data-profile.sql
+  10-review-baseline-prepare.sql
+  11-review-baseline-explain.sql
+  12-review-naive-prepare.sql
+  13-review-naive-explain.sql
+  14-review-query-shaped-prepare.sql
+  15-review-query-shaped-explain.sql
+  20-monthly-baseline-prepare.sql
+  21-monthly-baseline-explain.sql
+  22-monthly-naive-prepare.sql
+  23-monthly-naive-explain.sql
+  24-monthly-query-shaped-prepare.sql
+  25-monthly-query-shaped-explain.sql
 ```
 
 ### 모니터링으로 확인하는 것
@@ -216,6 +272,8 @@ Phase 6은 집계 쿼리 병목을 다룬다. 대량 이력 테이블의 깊은 
 ### 완료 조건
 
 - [ ] `product`, `review`, `orders`, `users` row count와 review/monthly order 분포를 evidence로 기록했다.
+- [ ] Phase 6 SQL-only evidence를 재현할 수 있는 번호 기반 `scripts/phase-06/*.sql` 파일을 작성했다.
+- [ ] condition별 `prepare` SQL에서 custom index 상태, `VACUUM (ANALYZE)`, `pg_stat_statements_reset()` 실행 조건을 분리했다.
 - [ ] Product Review Summary 집계 쿼리를 baseline, naive index, query-shaped index condition에서 비교했다.
 - [ ] Monthly Order Aggregate 쿼리를 baseline, naive index, query-shaped index condition에서 비교했다.
 - [ ] 각 condition의 `EXPLAIN (ANALYZE, BUFFERS)`를 `docs/evidence/phase-06/` 아래에 저장했다.
