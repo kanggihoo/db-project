@@ -6,16 +6,18 @@ import com.dblab.ecommerce.entity.QProduct;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
 public class ProductQueryRepository {
 
     private final JPAQueryFactory queryFactory;
+
+    public ProductQueryRepository(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
+    }
 
     public List<ProductResponse> searchProducts(Long categoryId, Product.Status status) {
         QProduct product = QProduct.product;
