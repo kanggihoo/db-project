@@ -187,6 +187,25 @@ test('buildK6EvidencePaths keeps the existing baseline screenshot name without c
   );
 });
 
+test('buildK6EvidencePaths stores Phase 6 review summary API evidence under the API evidence directory', () => {
+  assert.deepEqual(
+    buildK6EvidencePaths({
+      phase: 'phase-06',
+      scenario: 'review-summary',
+      preset: 'review-summary-baseline',
+      pool: 'pool10',
+      condition: 'naive-index',
+    }),
+    {
+      condition: 'naive-index',
+      evidenceDir: 'docs/evidence/phase-06/review-summary-api/naive-index',
+      logFile: 'docs/evidence/phase-06/review-summary-api/naive-index/k6-summary.txt',
+      runWindowFile: 'docs/evidence/phase-06/review-summary-api/naive-index/run-window.json',
+      output: 'docs/evidence/phase-06/grafana-screenshots/review-summary-naive-index.png',
+    },
+  );
+});
+
 test('buildGrafanaCaptureArgs passes the exact k6 run window to Grafana capture', () => {
   assert.deepEqual(
     buildGrafanaCaptureArgs({
@@ -215,5 +234,20 @@ test('buildGrafanaCaptureArgs passes the exact k6 run window to Grafana capture'
       '--output',
       'docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png',
     ],
+  );
+});
+
+test('buildGrafanaCaptureArgs keeps Phase 6 on common dashboard rows', () => {
+  assert.deepEqual(
+    buildGrafanaCaptureArgs({
+      phase: 'phase-06',
+      scenario: 'review-summary',
+      preset: 'review-summary-baseline',
+      pool: 'pool10',
+      table: 'review',
+      runWindowFile: 'docs/evidence/phase-06/review-summary-api/naive-index/run-window.json',
+      output: 'docs/evidence/phase-06/grafana-screenshots/review-summary-naive-index.png',
+    }).at(-1),
+    '--no-align-phase-rows',
   );
 });

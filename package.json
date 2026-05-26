@@ -7,6 +7,7 @@
     "evidence:capture": "node scripts/run-k6-evidence.mjs --capture",
     "grafana:capture": "node scripts/capture-grafana-dashboard.mjs",
     "grafana:capture:parts": "node scripts/capture-grafana-dashboard.mjs --no-stitch",
+    "phase:sql": "node scripts/run-phase-sql.mjs",
     "test:grafana-capture": "node --test scripts/grafana-capture-utils.test.mjs"
   },
   "devDependencies": {

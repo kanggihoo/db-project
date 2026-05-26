@@ -80,7 +80,10 @@ export function buildEvidencePaths({
   requireValue(pool, '--pool');
 
   const evidenceCondition = condition ?? `${pool}-${preset}`;
-  const evidenceDir = `docs/evidence/${phase}/${scenario}/${evidenceCondition}`;
+  const evidenceScenario = phase === 'phase-06' && scenario === 'review-summary'
+    ? 'review-summary-api'
+    : scenario;
+  const evidenceDir = `docs/evidence/${phase}/${evidenceScenario}/${evidenceCondition}`;
   const outputName = condition
     ? `${scenario}-${evidenceCondition}.png`
     : `${scenario}-${preset}-${pool}.png`;
@@ -122,6 +125,9 @@ export function buildGrafanaCaptureArgs({
   pushOption(args, '--table', table);
   pushOption(args, '--window-file', runWindowFile);
   pushOption(args, '--output', output);
+  if (phase === 'phase-06') {
+    args.push('--no-align-phase-rows');
+  }
   return args;
 }
 

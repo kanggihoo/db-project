@@ -22,3 +22,11 @@
 ## API 해석
 
 k6는 보조 증거다. 실제 후보 인덱스가 API p95/p99에 영향을 주는지 확인한다. k6는 SQL 전용 실행계획 증거를 대체하지 않는다.
+
+## Grafana 캡처
+
+Phase 6은 별도 Grafana focus row를 만들지 않는다. 공통 row를 캡처할 때는 같은 표준 변수명을 사용한다.
+
+```bash
+make grafana-capture PHASE=phase-06 SCENARIO=review-summary CONDITION=naive-index TABLE=review WINDOW_FILE=docs/evidence/phase-06/review-summary-api/naive-index/run-window.json OUTPUT=docs/evidence/phase-06/grafana-screenshots/review-summary-naive-index.png
+```
