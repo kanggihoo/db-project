@@ -18,6 +18,21 @@ public class ProductService {
 
     // 인덱스 없는 상태에서 categoryId + status 필터 → Seq Scan 유발
     public List<ProductResponse> searchProducts(Long categoryId, Product.Status status) {
+        return searchProducts(categoryId, status, ProductSearchStrategy.QUERYDSL);
+    }
+
+    public List<ProductResponse> searchProducts(
+            Long categoryId,
+            Product.Status status,
+            ProductSearchStrategy strategy) {
+        if (strategy == ProductSearchStrategy.BASELINE) {
+            return searchProductsBaseline(categoryId, status);
+        }
+
+        return searchProductsBaseline(categoryId, status);
+    }
+
+    private List<ProductResponse> searchProductsBaseline(Long categoryId, Product.Status status) {
         return productRepository.findByCategoryIdAndStatus(categoryId, status)
                 .stream().map(ProductResponse::from).toList();
     }
