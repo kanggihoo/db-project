@@ -1,0 +1,13 @@
+QueryDSL representative SQL
+
+select
+    p1_0.id,
+    p1_0.category_id,
+    p1_0.name,
+    p1_0.base_price,
+    p1_0.status
+from
+    product p1_0
+where
+    p1_0.category_id=?
+    and p1_0.status=?
