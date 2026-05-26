@@ -44,7 +44,7 @@ Evidence:
 - [persistence-context-test-output.txt](../../evidence/phase-05/bulk-update/persistence-context-test-output.txt)
 - [summary.md](../../evidence/phase-05/bulk-update/summary.md)
 
-The bulk repository uses `@Modifying(clearAutomatically = true, flushAutomatically = true)`. Evidence records that pending changes are flushed before the bulk update and the persistence context is cleared afterward, so a previously loaded order is reloaded with the updated `PREPARING` state.
+The bulk repository uses `@Modifying(clearAutomatically = true, flushAutomatically = true)` with a method-level transaction boundary. Evidence records the clear/reload behavior after the bulk update: a previously loaded order is reloaded with the updated `PREPARING` state instead of the stale `PENDING` value.
 
 ## Evidence Index
 

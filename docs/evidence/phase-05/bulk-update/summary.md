@@ -15,4 +15,4 @@ JPQL bulk update changed the same 3 rows with `prepareStatementCount=1` in this 
 
 ## Persistence Context Behavior
 
-The repository method uses `@Modifying(clearAutomatically = true, flushAutomatically = true)`. Pending changes are flushed before the bulk update, then the persistence context is cleared after the bulk update. A previously loaded order is reloaded from the database and shows `PREPARING` instead of the stale `PENDING` value.
+The repository method uses `@Modifying(clearAutomatically = true, flushAutomatically = true)` with a method-level transaction boundary. The focused persistence-context evidence verifies the clear/reload behavior: a previously loaded order is reloaded from the database after the bulk update and shows `PREPARING` instead of the stale `PENDING` value.
