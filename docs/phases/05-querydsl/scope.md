@@ -16,7 +16,7 @@ Phase 5 validates whether QueryDSL DTO projection improves the product search re
 
 ## Out of Scope
 
-- `minPrice`, `maxPrice`, and `keyword` filters
+- additional price range or text search filters
 - required k6 or Grafana evidence
 - required `pg_stat_statements` evidence
 - stock, coupon, or order concurrency behavior
