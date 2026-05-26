@@ -1,94 +1,121 @@
-# 이커머스 DB 최적화 학습 로드맵
+# E-Commerce DB Optimization Learning Roadmap
+## Phase 5. Query Optimization + QueryDSL
 
-## Phase 5. 쿼리 최적화 + QueryDSL
+> "Fetch only what the screen needs, and write complex dynamic queries in a type-safe way."
 
-> "필요한 것만 정확하게 가져오고, 복잡한 동적 쿼리를 타입 안전하게 작성한다."
+### Current Code And Phase Connection
 
-### 이전 Phase의 문제를 어떻게 해결하는가
+- Phase 3 compared the `Orders -> OrderItems -> ProductSku -> Product -> ProductImages` read path for N+1 and loading strategy. QueryDSL DTO projection remained as Phase 5 work.
+- Phase 4 documented transaction isolation and concurrent update conflicts. Phase 5 is not a data consistency phase; it focuses on read-layer DTO projection and dynamic condition composition.
+- `ecommerce/build.gradle` already has QueryDSL 5.1.0 Jakarta dependencies, so Phase 5 focuses on generated Q-class usage, product search implementation, and evidence.
+- The existing product search API is kept. Phase 5 exposes `strategy=baseline|querydsl` on `GET /api/products` for learning evidence.
+- `baseline` keeps the Spring Data JPA entity query and maps each entity through `ProductResponse.from(product)`.
+- `querydsl` uses QueryDSL DTO projection into `ProductResponse` fields and is the default when `strategy` is omitted.
 
-- Entity 전체 조회 → DTO Projection으로 불필요한 컬럼 제거
-- 문자열 JPQL의 동적 쿼리 한계 → QueryDSL로 타입 안전한 동적 쿼리
-- 단건 루프 업데이트 → 벌크 연산으로 DB 왕복 횟수 감소
+### Optimization Targets
 
-### 실험 1: DTO Projection
+- Entity query followed by DTO mapping -> DTO projection to avoid unneeded selected columns and entity materialization.
+- String-based or derived query limits for dynamic search -> QueryDSL type-safe condition composition.
+- Row-by-row status updates -> JPQL bulk update to reduce prepared statement count.
+
+Atomic update, pessimistic lock, optimistic lock, retry, and idempotency strategies for stock/coupon concurrency remain Phase 11 scope. Phase 5 bulk update evidence is limited to bulk state change and persistence context behavior.
+
+### Experiment 1: DTO Projection
 
 ```java
-// Before: User 엔티티 전체 조회 (불필요한 password, point_balance 등 포함)
-List<User> users = userRepo.findAll();
+// Before: full entity load, including columns not needed by the response
+List<Product> products = productRepository.findByCategoryIdAndStatus(categoryId, status);
+List<ProductResponse> responses = products.stream()
+    .map(ProductResponse::from)
+    .toList();
 
-// After: 필요한 컬럼만
-@Query("SELECT new com.example.dto.UserSummary(u.id, u.name, u.grade) FROM User u")
-List<UserSummary> findAllSummary();
+// After: QueryDSL projection selects only response fields
+QProduct product = QProduct.product;
 
-// QueryDSL로
-List<UserSummary> result = queryFactory
-    .select(Projections.constructor(UserSummary.class,
-        user.id, user.name, user.grade))
-    .from(user)
+List<ProductResponse> responses = queryFactory
+    .select(Projections.constructor(ProductResponse.class,
+        product.id,
+        product.categoryId,
+        product.name,
+        product.basePrice,
+        product.status))
+    .from(product)
+    .where(
+        categoryEq(categoryId),
+        statusEq(status)
+    )
     .fetch();
 ```
 
-### 실험 2: QueryDSL 동적 상품 검색
+### Experiment 2: Product Search Strategy
+
+The implemented comparison uses the existing `GET /api/products` API:
+
+- `GET /api/products?strategy=baseline&categoryId=200&status=ON_SALE`
+- `GET /api/products?strategy=querydsl&categoryId=200&status=ON_SALE`
+- `GET /api/products?categoryId=200&status=ON_SALE` defaults to `querydsl`
+
+Both strategies return equivalent `ProductResponse` values under shared `categoryId` and `status` conditions. QueryDSL also verifies that null predicates are omitted safely.
+
+### Experiment 3: Bulk Update
 
 ```java
-// 검색 조건: 카테고리, 가격 범위, 상태, 키워드 — 모두 선택적
-public List<ProductDto> search(ProductSearchCondition condition) {
-    return queryFactory
-        .select(Projections.constructor(ProductDto.class, ...))
-        .from(product)
-        .where(
-            categoryEq(condition.getCategoryId()),     // null이면 조건 제외
-            priceBetween(condition.getMinPrice(), condition.getMaxPrice()),
-            statusEq(condition.getStatus()),
-            nameContains(condition.getKeyword())
-        )
-        .fetch();
-}
+// Before: row-by-row baseline
+List<Orders> orders = orderRepository.findByStatus(Orders.Status.PENDING);
+orders.forEach(Orders::markPreparing);
+entityManager.flush();
+
+// After: bulk update
+@Modifying(clearAutomatically = true, flushAutomatically = true)
+@Query("UPDATE Orders o SET o.status = :newStatus WHERE o.status = :oldStatus")
+int bulkUpdateStatus(@Param("oldStatus") Orders.Status oldStatus,
+                     @Param("newStatus") Orders.Status newStatus);
 ```
 
-### 실험 3: 벌크 연산
+Bulk update bypasses managed entities, so the repository uses `clearAutomatically = true` and `flushAutomatically = true`. Evidence confirms that a previously loaded order is reloaded from the database after the bulk update.
 
-```java
-// Before: 단건 루프 (주문 상태 일괄 변경)
-// UPDATE 쿼리가 N번 나감
-List<Order> orders = orderRepo.findByStatus(PAID);
-orders.forEach(o -> o.updateStatus(PREPARING));  // dirty checking → N번 UPDATE
+### Required Evidence
 
-// After: 벌크 연산 (1번)
-@Modifying
-@Query("UPDATE Order o SET o.status = :newStatus WHERE o.status = :oldStatus")
-int bulkUpdateStatus(@Param("oldStatus") OrderStatus old,
-                     @Param("newStatus") OrderStatus newStatus);
-```
+Required Phase 5 evidence is stored under `docs/evidence/phase-05/`:
 
-> **주의:** 벌크 연산 후 영속성 컨텍스트 초기화 필요 (`@Modifying(clearAutomatically = true)`)
+- focused integration test output
+- representative baseline and QueryDSL SQL
+- SQL count evidence for product search and bulk update
+- short product-search and bulk-update summaries
 
-### 모니터링으로 확인하는 것
+k6/Grafana and `pg_stat_statements` are optional references for this phase, not required closeout evidence.
 
-- DTO vs Entity 조회 응답 데이터 크기 (bytes) 비교
-- 단건 루프 vs 벌크 연산 실행시간 (1000건 기준)
+### Measured Results
 
-### 이 Phase에서 얻는 인사이트
+- Product search baseline selected Product entity columns and then mapped through `ProductResponse.from(product)`.
+- Product search QueryDSL selected only the fields needed by `ProductResponse`.
+- Both product search strategies used one SQL statement for the shared fixture condition.
+- Row-by-row dirty checking used Hibernate `prepareStatementCount=4` under the fixture: one select plus three updates, with `entityUpdateCount=3`.
+- JPQL bulk update changed the same three rows with Hibernate `prepareStatementCount=1`.
 
-- Entity 조회가 항상 옳은 게 아닌 이유 — 화면에 필요한 데이터만
-- QueryDSL의 타입 안전성이 실무에서 왜 중요한가
-- 벌크 연산과 영속성 컨텍스트의 충돌 — `clearAutomatically`의 의미
+### Insights
 
-### 측정 지표 (회고용)
+- Entity loading is not always the right read model when the response needs only a subset of columns.
+- QueryDSL is useful for type-safe DTO projection and optional predicate composition.
+- Bulk updates reduce SQL count, but they require explicit persistence context handling.
+- Read optimization and concurrency control are separate concerns; stock/coupon concurrency remains Phase 11 scope.
 
-- Entity vs DTO 응답 데이터 크기 차이 (%)
-- 단건 루프 vs 벌크 연산 시간 차이 (1000건 기준 ms)
+### Remaining Question -> Phase 6
 
-### 남은 문제 → Phase 6으로
+> "Simple reads are optimized, but GROUP BY aggregate queries are still slow. Do indexes also affect Product/Review aggregate query performance?"
 
-> "단순 조회는 최적화했는데, GROUP BY 집계 쿼리가 느리다. 인덱스가 집계에도 영향을 미치는가?"
+Phase 6 should continue with Product/Review aggregate queries, `GROUP BY`, `HAVING`, expression indexes, and execution plan comparison.
 
-### 완료 조건
+### Completion Criteria
 
-- [ ] Entity 전체 조회와 DTO Projection의 응답 데이터 크기 또는 실행시간을 비교했다.
-- [ ] QueryDSL 동적 검색 조건이 null 조건을 안전하게 제외하는지 확인했다.
-- [ ] 단건 루프 업데이트와 벌크 업데이트의 실행시간 또는 쿼리 수를 비교했다.
-- [ ] 벌크 연산 후 영속성 컨텍스트 초기화 필요성을 테스트나 문서로 확인했다.
-- [ ] 단순 조회 최적화 이후 남는 집계 쿼리 병목을 Phase 6으로 연결했다.
+- [x] Existing entity query plus `ProductResponse.from(product)` baseline is preserved and compared with QueryDSL DTO projection under the same measurement condition.
+- [x] `GET /api/products` supports `strategy=baseline|querydsl`.
+- [x] Omitted `strategy` defaults to `querydsl`.
+- [x] Baseline and QueryDSL return equal `ProductResponse` values under shared `categoryId` and `status` conditions.
+- [x] QueryDSL omits null predicates safely in focused tests.
+- [x] Row-by-row update and bulk update SQL counts are recorded.
+- [x] Bulk update persistence context behavior is documented and verified.
+- [x] Phase evidence is organized under `docs/evidence/phase-05/`.
+- [x] Product/Review aggregate query follow-up is handed off to Phase 6.
 
 ---

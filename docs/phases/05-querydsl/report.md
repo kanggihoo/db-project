@@ -2,34 +2,61 @@
 
 ## Status
 
-Initial / in progress.
+Completed.
 
-This slice creates the Phase 5 documentation scaffold and product search strategy API contract. QueryDSL repository implementation and measurement evidence are not included yet.
+Phase 5 keeps the existing product search API and adds an explicit strategy comparison for learning evidence:
+
+- `strategy=baseline`: Spring Data JPA entity query, then `ProductResponse.from(product)`
+- `strategy=querydsl`: QueryDSL DTO projection
+- omitted `strategy`: defaults to `querydsl`
 
 ## Product Search
 
-Not measured yet.
+Focused integration evidence shows that baseline and QueryDSL return equivalent `ProductResponse` values under shared `categoryId=200` and `status=ON_SALE` conditions.
 
-Planned comparison:
+| Strategy | Mapping path | SQL shape | SQL count evidence |
+|---|---|---|---:|
+| `baseline` | Product entity -> `ProductResponse.from(product)` | Product entity columns selected, including fields not needed by response | 1 |
+| `querydsl` | QueryDSL projection -> `ProductResponse` | `ProductResponse` fields projected: `id`, `category_id`, `name`, `base_price`, `status` | 1 |
 
-- `strategy=baseline`: Spring Data JPA entity query, then `ProductResponse.from`
-- `strategy=querydsl`: QueryDSL DTO projection through the same `GET /api/products` API
+Evidence:
+
+- [baseline-sql.txt](../../evidence/phase-05/product-search/baseline-sql.txt)
+- [querydsl-sql.txt](../../evidence/phase-05/product-search/querydsl-sql.txt)
+- [strategy-test-output.txt](../../evidence/phase-05/product-search/strategy-test-output.txt)
+- [summary.md](../../evidence/phase-05/product-search/summary.md)
+
+The QueryDSL test also verifies that null optional predicates are omitted.
 
 ## Bulk Update
 
-Not measured yet.
+Focused integration evidence compares managed entity dirty checking with JPQL bulk update under the same fixture.
 
-Planned comparison:
+| Strategy | Rows changed | Hibernate prepareStatementCount | Other evidence |
+|---|---:|---:|---|
+| Row-by-row dirty checking | 3 | 4 | one select + three updates, `entityUpdateCount=3` |
+| JPQL bulk update | 3 | 1 | `updatedRows=3` |
 
-- row-by-row entity update
-- JPQL bulk update
+Evidence:
 
-## Evidence
+- [loop-update-sql-count.txt](../../evidence/phase-05/bulk-update/loop-update-sql-count.txt)
+- [bulk-update-sql-count.txt](../../evidence/phase-05/bulk-update/bulk-update-sql-count.txt)
+- [persistence-context-test-output.txt](../../evidence/phase-05/bulk-update/persistence-context-test-output.txt)
+- [summary.md](../../evidence/phase-05/bulk-update/summary.md)
 
-Evidence will be linked from [docs/evidence/phase-05/README.md](../../evidence/phase-05/README.md).
+The bulk repository uses `@Modifying(clearAutomatically = true, flushAutomatically = true)`. Evidence records that pending changes are flushed before the bulk update and the persistence context is cleared afterward, so a previously loaded order is reloaded with the updated `PREPARING` state.
 
-## Handoff Notes
+## Evidence Index
 
-- `strategy` defaults to `querydsl`.
-- `baseline` remains intentionally available for learning comparison.
-- k6 and Grafana are optional, not required evidence.
+All required Phase 5 evidence is organized under [docs/evidence/phase-05/README.md](../../evidence/phase-05/README.md).
+
+k6/Grafana and `pg_stat_statements` are optional for this phase and were not required for closeout.
+
+## Phase 6 Handoff
+
+Phase 5 optimized and compared a simple product search read path. Phase 6 should move to Product/Review aggregate queries where the likely questions are:
+
+- `GROUP BY` and `HAVING` behavior for product review summaries
+- expression indexes for aggregate/filter expressions
+- execution plan comparison before and after indexing
+- whether indexes improve aggregate queries as clearly as they improve simple predicates

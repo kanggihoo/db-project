@@ -1,6 +1,6 @@
 # Phase 5 Observability
 
-Phase 5 evidence should be small, repeatable, and tied to the comparison being measured.
+Phase 5 evidence is small, repeatable, and tied to the comparison being measured.
 
 ## Required Signals
 
@@ -12,17 +12,33 @@ Phase 5 evidence should be small, repeatable, and tied to the comparison being m
 
 ## Product Search Interpretation
 
-Baseline search is expected to load `Product` entities and convert each entity through `ProductResponse.from`.
+Baseline search loads `Product` entity columns and converts each entity through `ProductResponse.from(product)`.
 
-QueryDSL search is expected to select directly into `ProductResponse` without entity materialization once the repository slice is implemented.
+QueryDSL search projects directly into `ProductResponse` fields:
 
-During this contract slice, both strategies may produce the baseline SQL because the QueryDSL repository is not implemented yet.
+- `id`
+- `categoryId`
+- `name`
+- `basePrice`
+- `status`
+
+Both strategies returned equivalent `ProductResponse` values under the shared fixture conditions and both used one SQL statement. The meaningful Phase 5 difference is SQL shape and mapping path, not k6 throughput.
+
+QueryDSL optional predicates are expected to be omitted when `categoryId` or `status` is null. Focused tests verify this behavior.
 
 ## Bulk Update Interpretation
 
-The row-by-row update comparison should record the statement count and SQL shape for entity updates.
+The row-by-row update comparison records the SQL count and Hibernate entity update count for managed entity dirty checking:
 
-The JPQL bulk update comparison should record the reduced statement count and note persistence context considerations.
+- `prepareStatementCount=4`
+- one select plus three updates under the fixture
+- `entityUpdateCount=3`
+
+The JPQL bulk update comparison records the reduced SQL count:
+
+- `prepareStatementCount=1`
+- `updatedRows=3`
+- `@Modifying(clearAutomatically = true, flushAutomatically = true)` flushes pending changes and clears the persistence context after the bulk update.
 
 ## Optional Signals
 
@@ -31,4 +47,4 @@ The JPQL bulk update comparison should record the reduced statement count and no
 - k6 summaries
 - Grafana screenshots
 
-k6 and Grafana are useful context when available, but they are not required evidence for Phase 5 completion.
+k6, Grafana, and `pg_stat_statements` are useful context when available, but they are not required evidence for Phase 5 completion.

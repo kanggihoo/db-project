@@ -4,23 +4,25 @@ Phase 5 compares the current Product entity search baseline with a QueryDSL DTO 
 
 ## Current Status
 
-Phase 5 is in progress.
+Phase 5 is completed.
 
 - API contract: `GET /api/products`
 - Strategy parameter: `strategy=baseline|querydsl`
 - Default behavior: omitted `strategy` uses `querydsl`
-- This slice only adds the documentation scaffold and API/service contract.
-- QueryDSL repository implementation and measurements are handled in later slices.
-- k6 and Grafana are optional references, not required evidence for Phase 5.
+- `baseline`: Spring Data JPA entity query, then `ProductResponse.from(product)`
+- `querydsl`: QueryDSL DTO projection into `ProductResponse`
+- Product search evidence records representative SQL shape and focused integration test output.
+- Bulk update evidence records SQL count and persistence context behavior.
+- k6 and Grafana are optional references, not required evidence for Phase 5 closeout.
 
 ## Documents
 
 | Document | Purpose |
 |---|---|
-| [scope.md](./scope.md) | Phase 5 scope, exclusions, and completion checklist |
+| [scope.md](./scope.md) | Phase 5 scope, exclusions, and completed criteria |
 | [runbook.md](./runbook.md) | Repeatable commands for focused tests and evidence capture |
 | [observability.md](./observability.md) | SQL, Hibernate statistics, and optional observation notes |
-| [report.md](./report.md) | Initial in-progress report and measurement status |
+| [report.md](./report.md) | Final Phase 5 results and Phase 6 handoff |
 
 ## Source Documents
 
@@ -30,4 +32,4 @@ Phase 5 is in progress.
 
 ## Evidence
 
-- Planned Phase evidence, to be created in slice 003: [docs/evidence/phase-05/README.md](../../evidence/phase-05/README.md)
+- Phase 5 evidence index: [docs/evidence/phase-05/README.md](../../evidence/phase-05/README.md)
