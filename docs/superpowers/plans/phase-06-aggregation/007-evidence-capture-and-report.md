@@ -19,7 +19,17 @@ Capture Phase 6 evidence from the implemented SQL scripts and review summary API
 Run:
 
 ```bash
-rtk proxy powershell -NoProfile -Command "New-Item -ItemType Directory -Force 'docs/evidence/phase-06/data-profile','docs/evidence/phase-06/review-aggregate/baseline','docs/evidence/phase-06/review-aggregate/naive-index','docs/evidence/phase-06/review-aggregate/query-shaped-index','docs/evidence/phase-06/monthly-order-aggregate/baseline','docs/evidence/phase-06/monthly-order-aggregate/naive-index','docs/evidence/phase-06/monthly-order-aggregate/query-shaped-index','docs/evidence/phase-06/review-summary-api/naive-index','docs/evidence/phase-06/review-summary-api/query-shaped-index','docs/evidence/phase-06/grafana-screenshots' | Out-Null"
+rtk proxy mkdir -p \
+  docs/evidence/phase-06/data-profile \
+  docs/evidence/phase-06/review-aggregate/baseline \
+  docs/evidence/phase-06/review-aggregate/naive-index \
+  docs/evidence/phase-06/review-aggregate/query-shaped-index \
+  docs/evidence/phase-06/monthly-order-aggregate/baseline \
+  docs/evidence/phase-06/monthly-order-aggregate/naive-index \
+  docs/evidence/phase-06/monthly-order-aggregate/query-shaped-index \
+  docs/evidence/phase-06/review-summary-api/naive-index \
+  docs/evidence/phase-06/review-summary-api/query-shaped-index \
+  docs/evidence/phase-06/grafana-screenshots
 ```
 
 Expected: command exits 0.
@@ -131,7 +141,7 @@ rtk make grafana-capture PHASE=phase-06 SCENARIO=review-summary CONDITION=naive-
 rtk make grafana-capture PHASE=phase-06 SCENARIO=review-summary CONDITION=query-shaped-index PRESET=review-summary-baseline POOL=pool10 TABLE=review WINDOW_FILE=docs/evidence/phase-06/review-summary-api/query-shaped-index/run-window.json OUTPUT=docs/evidence/phase-06/grafana-screenshots/review-summary-query-shaped-index.png
 ```
 
-Expected: screenshots exist and show the `Phase 6 Aggregation Focus` row for the k6 run windows.
+Expected: screenshots exist and show the common dashboard rows for the fixed k6 run windows. Phase 6 does not use a dedicated Grafana focus row.
 
 - [ ] **Step 12: Update report with measured values**
 
@@ -172,7 +182,7 @@ Add a short bullet list naming the two SQL-only experiments and the Product Revi
 Run:
 
 ```bash
-rtk rg -n "Execution Time|HashAggregate|GroupAggregate|Seq Scan|Index Scan|Bitmap|Sort|http_req_duration|PHASE6_ROW_COUNTS|Phase 6 Aggregation Focus" docs/evidence/phase-06 docs/phases/06-aggregation/report.md
+rtk rg -n "Execution Time|HashAggregate|GroupAggregate|Seq Scan|Index Scan|Bitmap|Sort|http_req_duration|PHASE6_ROW_COUNTS|review-summary-naive-index|review-summary-query-shaped-index" docs/evidence/phase-06 docs/phases/06-aggregation/report.md
 ```
 
 Expected: output includes SQL plan markers, k6 marker, data profile marker, and Grafana screenshot references.
@@ -183,4 +193,3 @@ Expected: output includes SQL plan markers, k6 marker, data profile marker, and 
 git add docs/evidence/phase-06 docs/phases/06-aggregation
 git commit -m "docs(phase6): capture aggregation evidence report"
 ```
-
