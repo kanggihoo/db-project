@@ -402,7 +402,6 @@ for (const title of [
   'Phase 2 Index Focus',
   'Phase 3 N+1 Focus',
   'Phase 4 Transaction Focus',
-  'Phase 6 Aggregation Focus',
   'Phase 7 Pagination Focus',
 ]) {
   addRowWithPanels(panels, title, (rowY, targetPanels) => {

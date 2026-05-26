@@ -58,7 +58,6 @@ test('getPhaseFromUrl reads the selected Grafana phase variable', () => {
 test('getFocusRowTitleForPhase maps phase ids to dashboard focus rows', () => {
   assert.equal(getFocusRowTitleForPhase('phase-03'), 'Phase 3 N+1 Focus');
   assert.equal(getFocusRowTitleForPhase('phase-04'), 'Phase 4 Transaction Focus');
-  assert.equal(getFocusRowTitleForPhase('phase-06'), 'Phase 6 Aggregation Focus');
 });
 
 test('getFocusRowTitleForPhase rejects unsupported phase ids', () => {
