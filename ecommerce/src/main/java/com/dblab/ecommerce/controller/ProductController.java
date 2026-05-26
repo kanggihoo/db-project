@@ -1,6 +1,7 @@
 package com.dblab.ecommerce.controller;
 
 import com.dblab.ecommerce.dto.ProductResponse;
+import com.dblab.ecommerce.dto.ProductReviewSummaryResponse;
 import com.dblab.ecommerce.entity.Product;
 import com.dblab.ecommerce.service.ProductSearchStrategy;
 import com.dblab.ecommerce.service.ProductService;
@@ -28,6 +29,11 @@ public class ProductController {
             @RequestParam(defaultValue = "querydsl") String strategy) {
         ProductSearchStrategy searchStrategy = resolveStrategy(strategy);
         return productService.searchProducts(categoryId, status, searchStrategy);
+    }
+
+    @GetMapping("/review-summary")
+    public List<ProductReviewSummaryResponse> getReviewSummary() {
+        return productService.getReviewSummary();
     }
 
     private ProductSearchStrategy resolveStrategy(String strategy) {

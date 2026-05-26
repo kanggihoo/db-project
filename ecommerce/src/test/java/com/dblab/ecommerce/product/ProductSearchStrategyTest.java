@@ -6,6 +6,7 @@ import com.dblab.ecommerce.dto.ProductResponse;
 import com.dblab.ecommerce.entity.Product;
 import com.dblab.ecommerce.repository.ProductQueryRepository;
 import com.dblab.ecommerce.repository.ProductRepository;
+import com.dblab.ecommerce.repository.ProductReviewSummaryRepository;
 import com.dblab.ecommerce.service.ProductSearchStrategy;
 import com.dblab.ecommerce.service.ProductService;
 import jakarta.persistence.EntityManager;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
         TestcontainersConfiguration.class,
         QuerydslConfig.class,
         ProductQueryRepository.class,
+        ProductReviewSummaryRepository.class,
         ProductService.class
 })
 @Sql("/test-data/product-setup.sql")
@@ -73,7 +75,8 @@ class ProductSearchStrategyTest {
     void twoArgumentOverloadDelegatesToQuerydslRepository() {
         ProductRepository baselineRepository = mock(ProductRepository.class);
         ProductQueryRepository queryRepository = mock(ProductQueryRepository.class);
-        ProductService service = new ProductService(baselineRepository, queryRepository);
+        ProductReviewSummaryRepository reviewSummaryRepository = mock(ProductReviewSummaryRepository.class);
+        ProductService service = new ProductService(baselineRepository, queryRepository, reviewSummaryRepository);
         List<ProductResponse> expected = List.of(
                 new ProductResponse(205L, 200L, "Sold Out Product 0", 10000, Product.Status.SOLD_OUT));
         when(queryRepository.searchProducts(200L, Product.Status.SOLD_OUT)).thenReturn(expected);
@@ -84,6 +87,7 @@ class ProductSearchStrategyTest {
         verify(queryRepository).searchProducts(200L, Product.Status.SOLD_OUT);
         verifyNoMoreInteractions(queryRepository);
         verifyNoInteractions(baselineRepository);
+        verifyNoInteractions(reviewSummaryRepository);
     }
 
     @Test
