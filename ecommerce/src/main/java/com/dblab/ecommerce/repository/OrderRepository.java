@@ -3,6 +3,7 @@ package com.dblab.ecommerce.repository;
 import com.dblab.ecommerce.entity.Orders;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -10,6 +11,8 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
     List<Orders> findByUserId(Long userId);
+
+    List<Orders> findByStatus(Orders.Status status);
 
     @Query("""
             select distinct o
@@ -27,4 +30,9 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "orderItems.productSku.product"
     })
     List<Orders> findGraphByUserId(Long userId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Orders o set o.status = :newStatus where o.status = :oldStatus")
+    int bulkUpdateStatus(@Param("oldStatus") Orders.Status oldStatus,
+                         @Param("newStatus") Orders.Status newStatus);
 }

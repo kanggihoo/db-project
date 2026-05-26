@@ -1,0 +1,11 @@
+Row-by-row dirty checking update measurement under the test fixture/configuration
+
+Marker:
+PHASE5_ROW_BY_ROW_UPDATE_SQL_COUNT=4
+
+Result:
+- Loaded 3 PENDING orders.
+- Called markPreparing() on each managed entity.
+- Flushed the persistence context.
+- Hibernate entityUpdateCount was 3.
+- Hibernate prepareStatementCount was 4 in this test run: one select plus one prepared update execution per order under the fixture/configuration.

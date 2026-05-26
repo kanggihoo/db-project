@@ -1,0 +1,9 @@
+JPQL bulk update measurement
+
+Marker:
+PHASE5_BULK_UPDATE_SQL_COUNT=1
+
+Result:
+- Updated 3 PENDING orders to PREPARING.
+- JPQL bulk update executed as a single prepared statement.
+- A follow-up repository query confirmed 3 PREPARING orders.

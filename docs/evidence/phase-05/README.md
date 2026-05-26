@@ -14,4 +14,10 @@ Phase 5 evidence compares baseline entity-based product search with QueryDSL DTO
 
 ## Bulk Update
 
-Bulk update evidence is added in slice 004.
+| Evidence | Path |
+|---|---|
+| Measurement condition | [bulk-update/measurement-condition.md](./bulk-update/measurement-condition.md) |
+| Row-by-row SQL count | [bulk-update/loop-update-sql-count.txt](./bulk-update/loop-update-sql-count.txt) |
+| Bulk update SQL count | [bulk-update/bulk-update-sql-count.txt](./bulk-update/bulk-update-sql-count.txt) |
+| Test output | [bulk-update/persistence-context-test-output.txt](./bulk-update/persistence-context-test-output.txt) |
+| Summary | [bulk-update/summary.md](./bulk-update/summary.md) |
