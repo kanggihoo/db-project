@@ -1,0 +1,12 @@
+{
+  "phase": "phase-06",
+  "scenario": "review-summary",
+  "preset": "review-summary-baseline",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "exitStatus": 99,
+  "startedAt": 1779843030015,
+  "endedAt": 1779843341000,
+  "grafanaFrom": 1779843020015,
+  "grafanaTo": 1779843361000
+}

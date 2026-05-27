@@ -6,10 +6,7 @@
 
 | 증거 | 경로 | 목적 |
 |---|---|---|
-| 행 수 | [data-profile/row-counts.txt](./data-profile/row-counts.txt) | 대상 테이블 규모 |
-| 리뷰 분포 | [data-profile/review-distribution.txt](./data-profile/review-distribution.txt) | 상품별 리뷰 분포 |
-| 월별 주문 분포 | [data-profile/monthly-order-distribution.txt](./data-profile/monthly-order-distribution.txt) | 월별 주문 분포 |
-| 인덱스 상태 | [data-profile/index-state-before.txt](./data-profile/index-state-before.txt) | 측정 전 인덱스 상태 |
+| 통합 데이터 프로파일 | [data-profile/row-counts.txt](./data-profile/row-counts.txt) | 대상 테이블 규모, 리뷰 분포, 월별 주문 분포, 측정 전 인덱스 상태 |
 
 ## 상품 리뷰 요약
 
@@ -33,3 +30,12 @@
 |---|---|---|
 | 단순 인덱스 | [review-summary-api/naive-index/k6-summary.txt](./review-summary-api/naive-index/k6-summary.txt) | [review-summary-api/naive-index/run-window.json](./review-summary-api/naive-index/run-window.json) |
 | 쿼리 형태 맞춤 인덱스 | [review-summary-api/query-shaped-index/k6-summary.txt](./review-summary-api/query-shaped-index/k6-summary.txt) | [review-summary-api/query-shaped-index/run-window.json](./review-summary-api/query-shaped-index/run-window.json) |
+
+p99 보조 증거는 [review-summary-api/percentiles-prometheus.txt](./review-summary-api/percentiles-prometheus.txt)에 기록했다.
+
+## Grafana 스크린샷
+
+| 측정 조건 | 증거 |
+|---|---|
+| 단순 인덱스 | [grafana-screenshots/review-summary-naive-index.png](./grafana-screenshots/review-summary-naive-index.png) |
+| 쿼리 형태 맞춤 인덱스 | [grafana-screenshots/review-summary-query-shaped-index.png](./grafana-screenshots/review-summary-query-shaped-index.png) |

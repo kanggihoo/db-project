@@ -2,14 +2,13 @@
 
 6단계는 PostgreSQL 집계 쿼리에서 기준 상태, 단순 인덱스, 쿼리 형태 맞춤 인덱스 측정 조건이 스캔, 조인, 정렬, 집계 실행 계획을 어떻게 바꾸는지 측정하는 학습 단계다.
 
-## 현재 상태
+## Current Status
 
-6단계는 진행 전이다.
+Phase 6 is complete.
 
-- 주 증거는 `psql` 기반 `EXPLAIN (ANALYZE, BUFFERS)`다.
-- k6/Grafana는 상품 리뷰 요약 API의 대표 증거로만 사용한다.
-- 6단계 전용 인덱스는 `scripts/phase-06/*-prepare.sql`에서만 생성/삭제한다.
-- `docker/postgres/init.sql`에는 6단계 실험 인덱스를 추가하지 않는다.
+- SQL-only experiment 1: 상품 리뷰 요약 집계를 기준 상태, 단순 인덱스, 쿼리 형태 맞춤 인덱스 조건에서 비교했다.
+- SQL-only experiment 2: 월별 주문 집계를 기준 상태, 단순 인덱스, 쿼리 형태 맞춤 인덱스 조건에서 비교했다.
+- API comparison: Product Review Summary API를 단순 인덱스와 쿼리 형태 맞춤 인덱스 조건에서 k6/Grafana로 비교했다.
 
 ## 문서
 

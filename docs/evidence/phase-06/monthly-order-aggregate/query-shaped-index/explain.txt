@@ -1,0 +1,37 @@
+                                                                       QUERY PLAN                                                                       
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize GroupAggregate  (cost=12324.20..12350.78 rows=100 width=30) (actual time=89.335..92.287 rows=100 loops=1)
+   Group Key: (date_trunc('month'::text, o.created_at)), u.grade
+   Buffers: shared hit=1586 read=4690
+   ->  Gather Merge  (cost=12324.20..12347.53 rows=200 width=30) (actual time=89.327..92.222 rows=300 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=1586 read=4690
+         ->  Sort  (cost=11324.18..11324.43 rows=100 width=30) (actual time=85.115..85.129 rows=100 loops=3)
+               Sort Key: (date_trunc('month'::text, o.created_at)) DESC, u.grade
+               Sort Method: quicksort  Memory: 29kB
+               Buffers: shared hit=1586 read=4690
+               Worker 0:  Sort Method: quicksort  Memory: 29kB
+               Worker 1:  Sort Method: quicksort  Memory: 29kB
+               ->  Partial HashAggregate  (cost=11319.60..11320.85 rows=100 width=30) (actual time=84.942..84.959 rows=100 loops=3)
+                     Group Key: date_trunc('month'::text, o.created_at), u.grade
+                     Batches: 1  Memory Usage: 32kB
+                     Buffers: shared hit=1556 read=4690
+                     Worker 0:  Batches: 1  Memory Usage: 32kB
+                     Worker 1:  Batches: 1  Memory Usage: 32kB
+                     ->  Hash Join  (cost=403.00..9236.27 rows=208333 width=26) (actual time=2.915..57.955 rows=166667 loops=3)
+                           Hash Cond: (o.user_id = u.id)
+                           Buffers: shared hit=1556 read=4690
+                           ->  Parallel Seq Scan on orders o  (cost=0.00..7765.33 rows=208333 width=28) (actual time=0.046..10.428 rows=166667 loops=3)
+                                 Buffers: shared hit=992 read=4690
+                           ->  Hash  (cost=278.00..278.00 rows=10000 width=14) (actual time=2.753..2.754 rows=10000 loops=3)
+                                 Buckets: 16384  Batches: 1  Memory Usage: 597kB
+                                 Buffers: shared hit=534
+                                 ->  Seq Scan on users u  (cost=0.00..278.00 rows=10000 width=14) (actual time=0.018..1.076 rows=10000 loops=3)
+                                       Buffers: shared hit=534
+ Planning:
+   Buffers: shared hit=282
+ Planning Time: 2.395 ms
+ Execution Time: 92.631 ms
+(33 rows)
+

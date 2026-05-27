@@ -1,0 +1,88 @@
+PHASE6_ROW_COUNTS
+ table_name | row_count 
+------------+-----------
+ orders     |    500000
+ product    |    100000
+ review     |    300000
+ users      |     10000
+(4 rows)
+
+PHASE6_REVIEWED_PRODUCT_COUNT
+ reviewed_product_count 
+------------------------
+                  95209
+(1 row)
+
+PHASE6_REVIEW_COUNT_DISTRIBUTION
+ min_review_count | max_review_count | avg_review_count 
+------------------+------------------+------------------
+                1 |               12 |             3.15
+(1 row)
+
+PHASE6_REVIEW_TOP_20_PRODUCTS
+ product_id | review_count 
+------------+--------------
+      32243 |           12
+      70273 |           12
+       2330 |           11
+       3794 |           11
+       5998 |           11
+      17155 |           11
+      17641 |           11
+      23210 |           11
+      25773 |           11
+      31546 |           11
+      36596 |           11
+      41071 |           11
+      47772 |           11
+      49583 |           11
+      49924 |           11
+      51863 |           11
+      67860 |           11
+      70856 |           11
+      81474 |           11
+      84739 |           11
+(20 rows)
+
+PHASE6_MONTHLY_ORDER_DISTRIBUTION
+     order_month     | order_count | total_revenue 
+---------------------+-------------+---------------
+ 2026-05-01 00:00:00 |       12768 |     683511000
+ 2026-04-01 00:00:00 |       20512 |    1088472000
+ 2026-03-01 00:00:00 |       21431 |    1140589000
+ 2026-02-01 00:00:00 |       19305 |    1031856000
+ 2026-01-01 00:00:00 |       21120 |    1136061000
+ 2025-12-01 00:00:00 |       21230 |    1136683000
+ 2025-11-01 00:00:00 |       20383 |    1089533000
+ 2025-10-01 00:00:00 |       21452 |    1147809000
+ 2025-09-01 00:00:00 |       20522 |    1098430000
+ 2025-08-01 00:00:00 |       21256 |    1129353000
+ 2025-07-01 00:00:00 |       20985 |    1117663000
+ 2025-06-01 00:00:00 |       20550 |    1097930000
+ 2025-05-01 00:00:00 |       21171 |    1127426000
+ 2025-04-01 00:00:00 |       20598 |    1093225000
+ 2025-03-01 00:00:00 |       21253 |    1134493000
+ 2025-02-01 00:00:00 |       19347 |    1032870000
+ 2025-01-01 00:00:00 |       21432 |    1133221000
+ 2024-12-01 00:00:00 |       21406 |    1145761000
+ 2024-11-01 00:00:00 |       20533 |    1091611000
+ 2024-10-01 00:00:00 |       21220 |    1134829000
+ 2024-09-01 00:00:00 |       20557 |    1097278000
+ 2024-08-01 00:00:00 |       20942 |    1124694000
+ 2024-07-01 00:00:00 |       21017 |    1122306000
+ 2024-06-01 00:00:00 |       20449 |    1090660000
+ 2024-05-01 00:00:00 |        8561 |     455545000
+(25 rows)
+
+PHASE6_INDEX_STATE_BEFORE
+ tablename |          indexname          |                                           indexdef                                           
+-----------+-----------------------------+----------------------------------------------------------------------------------------------
+ orders    | idx_orders_user_id          | CREATE INDEX idx_orders_user_id ON public.orders USING btree (user_id)
+ orders    | orders_pkey                 | CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)
+ product   | idx_product_category_status | CREATE INDEX idx_product_category_status ON public.product USING btree (category_id, status)
+ product   | product_pkey                | CREATE UNIQUE INDEX product_pkey ON public.product USING btree (id)
+ review    | review_pkey                 | CREATE UNIQUE INDEX review_pkey ON public.review USING btree (id)
+ users     | users_email_key             | CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)
+ users     | users_pkey                  | CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)
+(7 rows)
+
