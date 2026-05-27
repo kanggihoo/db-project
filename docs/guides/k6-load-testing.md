@@ -125,3 +125,14 @@ PHASE=phase-06 POOL=pool10 ./k6/run.sh review-summary review-summary-baseline pr
 2. Read `JSON.parse(open(__ENV.PRESET || 'presets/baseline.json'))`.
 3. Keep executor settings driven by preset values.
 4. Run with `./k6/run.sh <scenario> <preset>`.
+
+## Phase 7 Pagination
+
+Phase 7 uses `phase=phase-07` and keeps page/user values out of metric labels. Page depth is represented by `preset`.
+
+```bash
+PHASE=phase-07 SCENARIO=points-offset PRESET_NAME=page0 PRESET=presets/points-page0.json k6 run k6/points-test.js
+PHASE=phase-07 SCENARIO=points-offset PRESET_NAME=mid PRESET=presets/points-mid.json k6 run k6/points-test.js
+PHASE=phase-07 SCENARIO=points-offset PRESET_NAME=deep PRESET=presets/points-deep.json k6 run k6/points-test.js
+PHASE=phase-07 SCENARIO=points-cursor PRESET_NAME=cursor PRESET=presets/points-cursor.json k6 run k6/points-cursor-test.js
+```

@@ -1,0 +1,30 @@
+PHASE7_GLOBAL_CURSOR_SOURCE
+   global_last_created_at   | global_last_id 
+----------------------------+----------------
+ 2026-04-29 15:29:23.624472 |        1256426
+(1 row)
+
+PHASE7_GLOBAL_CURSOR_DEEP
+                                                                                       QUERY PLAN                                                                                        
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=3039.45..3044.96 rows=20 width=53) (actual time=199.486..199.527 rows=20 loops=1)
+   Buffers: shared hit=74184 read=26607
+   ->  Nested Loop  (cost=3039.45..186635.06 rows=666667 width=53) (actual time=199.484..199.523 rows=20 loops=1)
+         Join Filter: (ROW(ph.created_at, ph.id) < ROW(point_history.created_at, point_history.id))
+         Rows Removed by Join Filter: 100001
+         Buffers: shared hit=74184 read=26607
+         ->  Index Scan using idx_point_history_created_id on point_history ph  (cost=0.43..148596.00 rows=2000000 width=53) (actual time=0.016..169.271 rows=100021 loops=1)
+               Buffers: shared hit=73797 read=26607
+         ->  Materialize  (cost=3039.03..3039.06 rows=1 width=16) (actual time=0.000..0.000 rows=1 loops=100021)
+               Buffers: shared hit=387
+               ->  Limit  (cost=3039.03..3039.06 rows=1 width=16) (actual time=9.095..9.095 rows=1 loops=1)
+                     Buffers: shared hit=387
+                     ->  Index Only Scan using idx_point_history_created_id on point_history  (cost=0.43..60772.43 rows=2000000 width=16) (actual time=0.008..6.148 rows=100001 loops=1)
+                           Heap Fetches: 0
+                           Buffers: shared hit=387
+ Planning:
+   Buffers: shared hit=16 read=2
+ Planning Time: 0.192 ms
+ Execution Time: 199.605 ms
+(19 rows)
+

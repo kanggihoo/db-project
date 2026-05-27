@@ -1,0 +1,8 @@
+PHASE7_AMPLIFIED_USER_AND_PAGES
+user_id=707000
+point_count=100000
+size=20
+maxPage=4999
+midPage=2499
+deepPage=3999
+deepOffset=79980

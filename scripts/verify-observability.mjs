@@ -37,12 +37,14 @@ function verifyRunScript() {
   }
 }
 
-function verifyScenario(file, scenario, requestName) {
+function verifyScenario(file, scenario, requestName, defaults = {}) {
+  const phase = defaults.phase || 'phase-01';
+  const preset = defaults.preset || 'baseline';
   const content = read(file);
   for (const expected of [
     `scenario: __ENV.SCENARIO || '${scenario}'`,
-    "phase: __ENV.PHASE || 'phase-01'",
-    "preset: __ENV.PRESET_NAME || 'baseline'",
+    `phase: __ENV.PHASE || '${phase}'`,
+    `preset: __ENV.PRESET_NAME || '${preset}'`,
     "pool: __ENV.POOL || 'pool10'",
     "systemTags: ['status', 'method', 'name', 'expected_response']",
     `name: '${requestName}'`,
@@ -117,6 +119,10 @@ verifyRunScript();
 verifyScenario('k6/orders-test.js', 'orders', 'GET /api/orders');
 verifyScenario('k6/products-test.js', 'products', 'GET /api/products');
 verifyScenario('k6/points-test.js', 'points', 'GET /api/points');
+verifyScenario('k6/points-cursor-test.js', 'points-cursor', 'GET /api/points/cursor', {
+  phase: 'phase-07',
+  preset: 'cursor',
+});
 verifyGrafanaProvisioning();
 verifyDashboard();
 verifySpringHistograms();

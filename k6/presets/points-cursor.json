@@ -1,8 +1,6 @@
 {
   "baseUrl": "http://host.docker.internal:8080",
-  "userStart": 707000,
-  "userEnd": 707000,
-  "page": 0,
+  "userId": 707000,
   "size": 20,
   "rate": 50,
   "duration": "5m",

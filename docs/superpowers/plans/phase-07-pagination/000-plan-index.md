@@ -45,6 +45,7 @@
 | 003 | [Cursor Point API](./003-cursor-point-api.md) | `/api/points/cursor` API와 cursor 응답 DTO 구현 |
 | 004 | [k6 Pagination Scenarios](./004-k6-pagination-scenarios.md) | Offset page별 preset과 Cursor k6 시나리오 추가 |
 | 005 | [Evidence Capture And Report](./005-evidence-capture-and-report.md) | Phase 7 evidence 수집 절차와 report 작성 |
+| 006 | [Hot User Amplification](./006-hot-user-amplification.md) | Phase 7 전용 가상 hot user 100,000건 보강과 추가 evidence 수집 |
 | 999 | [Integration Stabilization](./999-integration-stabilization.md) | 테스트, 문서 일관성, evidence 구조 최종 검증 |
 
 ## File Ownership
@@ -102,4 +103,3 @@ rtk gradlew compileJava
 rtk rg -n "phase-07|Point History|point_history|/api/points/cursor|idx_point_history_user_created_id|EXPLAIN \\(ANALYZE, BUFFERS\\)" docs scripts k6 ecommerce/src/main ecommerce/src/test
 rtk powershell -NoProfile -Command "$paths = @('docs/phases/07-pagination/README.md','docs/phases/07-pagination/scope.md','docs/phases/07-pagination/runbook.md','docs/phases/07-pagination/observability.md','docs/phases/07-pagination/report.md','docs/evidence/phase-07/README.md','scripts/phase-07/00-data-profile.sql','k6/points-cursor-test.js'); $paths | ForEach-Object { if (-not (Test-Path $_)) { throw \"Missing $_\" } }"
 ```
-
