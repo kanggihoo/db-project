@@ -15,6 +15,7 @@
 구현 기준 문서:
 
 - [Phase 7 페이지네이션 최적화 설계](../../specs/2026-05-27-phase-7-pagination-design.md)
+- [Phase 7 페이지네이션 재측정 Spec](../../specs/2026-05-28-phase-7-pagination-retest-spec.md)
 - [Phase 7 roadmap](../../../roadmap/08-phase-7-pagination.md)
 
 ## Plan Decisions
@@ -46,6 +47,7 @@
 | 004 | [k6 Pagination Scenarios](./004-k6-pagination-scenarios.md) | Offset page별 preset과 Cursor k6 시나리오 추가 |
 | 005 | [Evidence Capture And Report](./005-evidence-capture-and-report.md) | Phase 7 evidence 수집 절차와 report 작성 |
 | 006 | [Hot User Amplification](./006-hot-user-amplification.md) | Phase 7 전용 가상 hot user 100,000건 보강과 추가 evidence 수집 |
+| 010 | [Retest Plan Index](./010-retest-plan-index.md) | A/B/C 재측정 계획의 단계별 인덱스 |
 | 999 | [Integration Stabilization](./999-integration-stabilization.md) | 테스트, 문서 일관성, evidence 구조 최종 검증 |
 
 ## File Ownership
