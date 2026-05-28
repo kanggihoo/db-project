@@ -1,70 +1,78 @@
-# Phase 7 Evidence
+# Phase 7 증거
 
-## Measurement Condition
+## 주요 측정 조건
 
-- seed preset: `loadtest`
-- table: `point_history`
-- selected user: `374`
-- selected user point count: `1912`
-- size: `20`
-- maxPage: `95`
-- midPage: `47`
-- deepPage: `76`
-- deepOffset: `1520`
-- API runtime: local Spring Boot on `localhost:8080`
-- k6 runtime: Docker compose `grafana/k6`
-- k6 load: `50 rps`, `5m`, `100` pre-allocated VUs, `300` max VUs
+| 항목 | 값 |
+|---|---|
+| table | `point_history` |
+| retest hot user | `707000` |
+| point count | `100000` |
+| size | `20` |
+| max page | `4999` |
+| logical order | `created_at DESC, id DESC` |
+| k6 load | `50 rps`, `5m`, `100` pre-allocated VUs, `300` max VUs |
+| cache 조건 | warm-cache 반복 부하 |
 
-## Result Summary
+## Retest Sampling 결과 요약
 
 | 비교 | 결과 |
 |---|---|
-| global offset deep vs cursor deep | Offset deep `220.430 ms`, Cursor deep `199.605 ms`. Cursor SQL script includes the cursor-source lookup, so API evidence is the primary cursor comparison. |
-| user offset page0 vs deep | Offset page0 `0.175 ms`, Offset deep `6.889 ms`. |
-| user offset deep vs cursor deep | Offset deep `6.889 ms`, Cursor deep `3.430 ms`. |
-| offset deep vs cursor API p95 | Offset deep p95 `11.77 ms`, Cursor p95 `5.92 ms`. |
-| Offset/Page count query | `offset-page-api.txt` recorded `45,003` count calls, mean `0.31 ms`, total `14,032.30 ms`. |
-| Cursor count query | `cursor-api.txt` recorded no `count(*) from point_history` query. |
-| Grafana screenshot | Not captured in this run. Primary evidence is k6 stdout, `EXPLAIN`, and `pg_stat_statements`; Docker k6 was run without Prometheus remote write. |
+| retest hot user profile | `user_id=707000`, `point_count=100000`, `max_page=4999` |
+| retest cursor samples | 10개 sample page: `[0,10,50,100,500,1000,2000,3000,4000,4999]` |
+| retest offset sampling EXPLAIN | page0 `0.122 ms`, page1000 `2.841 ms`, page4999 `49.515 ms` |
+| retest cursor page10/page1000/page4999 EXPLAIN | page10 `0.122 ms`, page1000 `0.117 ms`, page4999 `0.158 ms`; cursor-source `OFFSET` lookup 없음 |
+| retest count-only EXPLAIN | `count(*) where user_id=707000` 실행 시간 `11.195 ms` |
+| retest offset sampling k6 | `15000` 요청, p95 page0 `16.99 ms`, page4999 `31.84 ms`, 실패율 `0.10%` |
+| retest cursor sampling k6 | `15001` 요청, p95 page0 `11.27 ms`, page4999 `31.93 ms`, 실패율 `0.00%` |
+| retest offset pg_stat_statements | count query `14985` calls, mean `7.04 ms`, total `105490.65 ms`; offset data query 관측 |
+| retest cursor pg_stat_statements | next-slice query 관측; `count(*) from point_history` query 없음 |
+| retest Grafana 스크린샷 | 기존 shared `DB Lab Overview`를 보조 증거로 캡처 |
 
-## Amplified Hot User Result Summary
-
-| 비교 | 결과 |
-|---|---|
-| amplified user | `user_id=707000`, `point_count=100000`, `midPage=2499`, `deepPage=3999`, `deepOffset=79980` |
-| amplified SQL-only offset page0 vs deep | Offset page0 `0.097 ms`, Offset deep `33.426 ms` |
-| amplified SQL-only cursor deep | Cursor deep `36.383 ms`, but this includes cursor-source lookup via deep offset and is not meaningful Cursor API evidence |
-| amplified API p95 | Offset page0 `13.93 ms`, Offset mid `85.31 ms`, Offset deep `38.68 ms`, Cursor `4.95 ms` |
-| amplified Offset/Page count query | `amplified-offset-page-api.txt` recorded `45,003` count calls, mean `8.90 ms`, total `400,662.47 ms` |
-| amplified Cursor count query | `amplified-cursor-api.txt` recorded no `count(*) from point_history` query |
-
-## Evidence Index
+## Retest 증거 목차
 
 | 종류 | 파일 | 설명 |
 |---|---|---|
-| data profile | [data-profile/point-history-total-count.txt](./data-profile/point-history-total-count.txt) | 전체 `point_history` row 수 |
-| data profile | [data-profile/hot-user-point-counts.txt](./data-profile/hot-user-point-counts.txt) | hot user 후보 |
-| data profile | [data-profile/selected-user-and-pages.txt](./data-profile/selected-user-and-pages.txt) | 선정 user와 page 계산 |
-| data profile | [data-profile/amplified-user-and-pages.txt](./data-profile/amplified-user-and-pages.txt) | Phase 7 전용 가상 hot user와 page 계산 |
-| explain | [explain/global-offset-page0.txt](./explain/global-offset-page0.txt) | 전체 테이블 Offset shallow |
-| explain | [explain/global-offset-deep.txt](./explain/global-offset-deep.txt) | 전체 테이블 Offset deep |
-| explain | [explain/global-cursor-deep.txt](./explain/global-cursor-deep.txt) | 전체 테이블 Cursor deep |
-| explain | [explain/user-offset-page0.txt](./explain/user-offset-page0.txt) | hot user Offset shallow |
-| explain | [explain/user-offset-deep.txt](./explain/user-offset-deep.txt) | hot user Offset deep |
-| explain | [explain/user-cursor-deep.txt](./explain/user-cursor-deep.txt) | hot user Cursor deep |
-| explain | [explain/amplified-user-offset-page0.txt](./explain/amplified-user-offset-page0.txt) | amplified hot user Offset shallow |
-| explain | [explain/amplified-user-offset-deep.txt](./explain/amplified-user-offset-deep.txt) | amplified hot user Offset deep |
-| explain | [explain/amplified-user-cursor-deep.txt](./explain/amplified-user-cursor-deep.txt) | amplified hot user Cursor deep with cursor-source lookup |
-| k6 | [k6/offset-page0-summary.txt](./k6/offset-page0-summary.txt) | Offset page0 p95 |
-| k6 | [k6/offset-mid-summary.txt](./k6/offset-mid-summary.txt) | Offset mid p95 |
-| k6 | [k6/offset-deep-summary.txt](./k6/offset-deep-summary.txt) | Offset deep p95 |
-| k6 | [k6/cursor-summary.txt](./k6/cursor-summary.txt) | Cursor p95 |
-| k6 | [k6/amplified-offset-page0-summary.txt](./k6/amplified-offset-page0-summary.txt) | amplified Offset page0 p95 |
-| k6 | [k6/amplified-offset-mid-summary.txt](./k6/amplified-offset-mid-summary.txt) | amplified Offset mid p95 |
-| k6 | [k6/amplified-offset-deep-summary.txt](./k6/amplified-offset-deep-summary.txt) | amplified Offset deep p95 |
-| k6 | [k6/amplified-cursor-summary.txt](./k6/amplified-cursor-summary.txt) | amplified Cursor p95 |
-| pg_stat_statements | [pg-stat-statements/offset-page-api.txt](./pg-stat-statements/offset-page-api.txt) | Offset/Page SQL snapshot |
-| pg_stat_statements | [pg-stat-statements/cursor-api.txt](./pg-stat-statements/cursor-api.txt) | Cursor SQL snapshot |
-| pg_stat_statements | [pg-stat-statements/amplified-offset-page-api.txt](./pg-stat-statements/amplified-offset-page-api.txt) | amplified Offset/Page SQL snapshot |
-| pg_stat_statements | [pg-stat-statements/amplified-cursor-api.txt](./pg-stat-statements/amplified-cursor-api.txt) | amplified Cursor SQL snapshot |
-| grafana | - | Not captured in this run |
+| 데이터 profile | [data-profile/retest-hot-user-profile.txt](./data-profile/retest-hot-user-profile.txt) | retest hot user row count와 max page |
+| 데이터 profile | [data-profile/retest-cursor-samples.txt](./data-profile/retest-cursor-samples.txt) | SQL로 생성한 cursor sample table |
+| 데이터 profile | [data-profile/retest-cursor-samples.json](./data-profile/retest-cursor-samples.json) | k6 preset에 사용한 cursor sample |
+| 실행계획 | [explain/retest-offset-sampling.txt](./explain/retest-offset-sampling.txt) | page0/page1000/page4999 Offset sampling EXPLAIN |
+| 실행계획 | [explain/retest-cursor-page10.txt](./explain/retest-cursor-page10.txt) | logical page10 Cursor next-slice EXPLAIN |
+| 실행계획 | [explain/retest-cursor-page1000.txt](./explain/retest-cursor-page1000.txt) | logical page1000 Cursor next-slice EXPLAIN |
+| 실행계획 | [explain/retest-cursor-page4999.txt](./explain/retest-cursor-page4999.txt) | logical page4999 Cursor next-slice EXPLAIN |
+| 실행계획 | [explain/retest-count-only.txt](./explain/retest-count-only.txt) | count-only EXPLAIN |
+| 부하 테스트 | [k6/retest-offset-sampling-summary.txt](./k6/retest-offset-sampling-summary.txt) | page bucket별 Trend가 포함된 Offset sampling k6 summary |
+| 부하 테스트 | [k6/retest-cursor-sampling-summary.txt](./k6/retest-cursor-sampling-summary.txt) | page bucket별 Trend가 포함된 Cursor sampling k6 summary |
+| SQL 통계 | [pg-stat-statements/retest-offset-sampling-api.txt](./pg-stat-statements/retest-offset-sampling-api.txt) | Offset/Page API SQL 스냅샷 |
+| SQL 통계 | [pg-stat-statements/retest-cursor-sampling-api.txt](./pg-stat-statements/retest-cursor-sampling-api.txt) | Cursor API SQL 스냅샷 |
+| Grafana | [grafana/retest-db-lab-overview.png](./grafana/retest-db-lab-overview.png) | shared DB Lab Overview 보조 스크린샷 |
+
+## 기존 증거 목차
+
+아래 파일들은 Phase 7 기존 증거로 보존한다. 최종 보고서의 primary 증거는 위 A/B/C retest artifact다.
+
+| 종류 | 파일 | 설명 |
+|---|---|---|
+| 데이터 profile | [data-profile/hot-user-point-counts.txt](./data-profile/hot-user-point-counts.txt) | natural hot user 후보 |
+| 데이터 profile | [data-profile/selected-user-and-pages.txt](./data-profile/selected-user-and-pages.txt) | natural selected user와 page 계산 |
+| 데이터 profile | [data-profile/amplified-user-and-pages.txt](./data-profile/amplified-user-and-pages.txt) | 기존 amplified hot user page 계산 |
+| 실행계획 | [explain/global-offset-page0.txt](./explain/global-offset-page0.txt) | global Offset shallow |
+| 실행계획 | [explain/global-offset-deep.txt](./explain/global-offset-deep.txt) | global Offset deep |
+| 실행계획 | [explain/global-cursor-deep.txt](./explain/global-cursor-deep.txt) | cursor-source lookup이 포함된 global Cursor deep |
+| 실행계획 | [explain/user-offset-page0.txt](./explain/user-offset-page0.txt) | natural hot user Offset shallow |
+| 실행계획 | [explain/user-offset-deep.txt](./explain/user-offset-deep.txt) | natural hot user Offset deep |
+| 실행계획 | [explain/user-cursor-deep.txt](./explain/user-cursor-deep.txt) | cursor-source lookup이 포함된 natural hot user Cursor deep |
+| 실행계획 | [explain/amplified-user-offset-page0.txt](./explain/amplified-user-offset-page0.txt) | amplified hot user Offset shallow |
+| 실행계획 | [explain/amplified-user-offset-deep.txt](./explain/amplified-user-offset-deep.txt) | amplified hot user Offset deep |
+| 실행계획 | [explain/amplified-user-cursor-deep.txt](./explain/amplified-user-cursor-deep.txt) | cursor-source lookup이 포함된 amplified hot user Cursor deep |
+| 부하 테스트 | [k6/offset-page0-summary.txt](./k6/offset-page0-summary.txt) | natural Offset page0 p95 |
+| 부하 테스트 | [k6/offset-mid-summary.txt](./k6/offset-mid-summary.txt) | natural Offset mid p95 |
+| 부하 테스트 | [k6/offset-deep-summary.txt](./k6/offset-deep-summary.txt) | natural Offset deep p95 |
+| 부하 테스트 | [k6/cursor-summary.txt](./k6/cursor-summary.txt) | natural Cursor p95 |
+| 부하 테스트 | [k6/amplified-offset-page0-summary.txt](./k6/amplified-offset-page0-summary.txt) | amplified Offset page0 p95 |
+| 부하 테스트 | [k6/amplified-offset-mid-summary.txt](./k6/amplified-offset-mid-summary.txt) | amplified Offset mid p95 |
+| 부하 테스트 | [k6/amplified-offset-deep-summary.txt](./k6/amplified-offset-deep-summary.txt) | amplified Offset deep p95 |
+| 부하 테스트 | [k6/amplified-cursor-summary.txt](./k6/amplified-cursor-summary.txt) | amplified Cursor p95 |
+| SQL 통계 | [pg-stat-statements/offset-page-api.txt](./pg-stat-statements/offset-page-api.txt) | natural Offset/Page SQL 스냅샷 |
+| SQL 통계 | [pg-stat-statements/cursor-api.txt](./pg-stat-statements/cursor-api.txt) | natural Cursor SQL 스냅샷 |
+| SQL 통계 | [pg-stat-statements/amplified-offset-page-api.txt](./pg-stat-statements/amplified-offset-page-api.txt) | amplified Offset/Page SQL 스냅샷 |
+| SQL 통계 | [pg-stat-statements/amplified-cursor-api.txt](./pg-stat-statements/amplified-cursor-api.txt) | amplified Cursor SQL 스냅샷 |

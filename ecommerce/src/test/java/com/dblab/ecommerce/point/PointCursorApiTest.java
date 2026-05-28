@@ -5,30 +5,53 @@ import com.dblab.ecommerce.dto.PointHistoryCursorResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureRestTestClient
 @Import(TestcontainersConfiguration.class)
 @Sql("/test-data/point-history-cursor-setup.sql")
 class PointCursorApiTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private RestTestClient restClient;
+
+    @Test
+    @DisplayName("offset API uses createdAt and id descending order")
+    void offsetApiUsesCreatedAtAndIdDescendingOrder() {
+        restClient.get()
+                .uri("/api/points?userId=7300&page=0&size=2")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .value(body -> {
+                    assertThat(body).contains("\"id\":7302");
+                    assertThat(body).contains("\"id\":7301");
+                    assertThat(body.indexOf("\"id\":7302"))
+                            .isLessThan(body.indexOf("\"id\":7301"));
+                });
+    }
 
     @Test
     @DisplayName("cursor API returns first page and next cursor")
     void cursorApiReturnsFirstPageAndNextCursor() {
-        PointHistoryCursorResponse response = restTemplate.getForObject(
-                "/api/points/cursor?userId=7300&size=2",
-                PointHistoryCursorResponse.class);
+        PointHistoryCursorResponse response = restClient.get()
+                .uri("/api/points/cursor?userId=7300&size=2")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PointHistoryCursorResponse.class)
+                .returnResult()
+                .getResponseBody();
 
+        assertThat(response).isNotNull();
         assertThat(response.items()).hasSize(2);
         assertThat(response.hasNext()).isTrue();
         assertThat(response.nextCursor()).isNotNull();
@@ -40,16 +63,26 @@ class PointCursorApiTest {
     @Test
     @DisplayName("cursor API returns rows after supplied cursor")
     void cursorApiReturnsRowsAfterSuppliedCursor() {
-        PointHistoryCursorResponse first = restTemplate.getForObject(
-                "/api/points/cursor?userId=7300&size=2",
-                PointHistoryCursorResponse.class);
+        PointHistoryCursorResponse first = restClient.get()
+                .uri("/api/points/cursor?userId=7300&size=2")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PointHistoryCursorResponse.class)
+                .returnResult()
+                .getResponseBody();
 
-        PointHistoryCursorResponse second = restTemplate.getForObject(
-                "/api/points/cursor?userId=7300&size=2&lastCreatedAt={lastCreatedAt}&lastId={lastId}",
-                PointHistoryCursorResponse.class,
-                first.nextCursor().lastCreatedAt(),
-                first.nextCursor().lastId());
+        assertThat(first).isNotNull();
+        PointHistoryCursorResponse second = restClient.get()
+                .uri("/api/points/cursor?userId=7300&size=2&lastCreatedAt={lastCreatedAt}&lastId={lastId}",
+                        first.nextCursor().lastCreatedAt(),
+                        first.nextCursor().lastId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PointHistoryCursorResponse.class)
+                .returnResult()
+                .getResponseBody();
 
+        assertThat(second).isNotNull();
         assertThat(second.items())
                 .extracting("id")
                 .containsExactly(7303L, 7304L);

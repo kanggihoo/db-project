@@ -1,141 +1,242 @@
-# Phase 7 Report
+# Phase 7 보고서
 
-## Summary
+## 1. 요약
 
-Phase 7은 `point_history`에서 Offset deep page 비용과 Cursor pagination 개선 효과를 확인했다.
+Phase 7 재측정은 Offset/Page와 Cursor를 단순 속도 경쟁으로 비교하지 않는다.
 
-핵심 결과:
+Offset/Page는 번호 기반 임의 페이지 접근과 전체 개수 기반 UI를 제공하지만, 깊은 페이지로 갈수록 앞 row를 지나가는 비용과 `Page<T>`의 count query 비용을 부담한다. Cursor는 번호 기반 페이지 점프를 제공하지 않는다. 대신 클라이언트가 이전 응답에서 받은 cursor를 이미 가지고 있을 때, count query 없이 다음 slice를 조회한다.
 
-- hot user `374`의 **Point History** `1912`건을 기준으로 API/k6를 실행했다.
-- Offset API는 `Page<T>`를 유지하므로 data query 외에 count query가 발생했다.
-- Cursor API는 `size + 1` 조회로 `hasNext`를 판단하며 count query를 발생시키지 않았다.
-- k6 p95는 Offset deep `11.77 ms`, Cursor `5.92 ms`로 Cursor가 더 낮았다.
-- global SQL-only Cursor 결과는 cursor 기준값을 얻기 위해 내부에서 `OFFSET 100000`을 먼저 수행하므로, Cursor pagination 자체의 유의미한 개선 evidence로 보지 않는다.
+이번 재측정은 `point_history` hot user `707000` 조건에서 이 trade-off를 A/B/C 증거로 분리해 확인했다.
 
-## Measurement Condition
+- A. Offset/Page depth: SQL-only 증거에서 깊은 offset일수록 더 많은 row를 읽거나 지나가는 것을 확인했다.
+- B. Cursor next-slice: cursor 값을 사전 계산해 API 측정에서 cursor-source `OFFSET` lookup을 제외했다.
+- C. Count query: Offset/Page에서는 count query가 발생했고 Cursor에서는 발생하지 않았다.
 
-- seed preset: `loadtest`
-- table: `point_history`
-- selected user: `374`
-- selected user point count: `1912`
-- size: `20`
-- maxPage: `95`
-- midPage: `47`
-- deepPage: `76`
-- deepOffset: `1520`
-- API runtime: local Spring Boot on `localhost:8080`
-- k6 runtime: Docker compose `grafana/k6`
-- k6 load: `50 rps`, `5m`, `100` pre-allocated VUs, `300` max VUs
+## 2. 측정 조건
 
-## SQL-only Result
+| 항목 | 값 |
+|---|---|
+| table | `point_history` |
+| hot user | `707000` |
+| point count | `100000` |
+| size | `20` |
+| max page | `4999` |
+| logical order | `created_at DESC, id DESC` |
+| index | `(user_id, created_at DESC, id DESC)` 기준 `idx_point_history_user_created_id` |
+| API 실행 환경 | local Spring Boot on `localhost:8080` |
+| k6 실행 환경 | Docker compose `grafana/k6` |
+| k6 load | `50 rps`, `5m`, `100` pre-allocated VUs, `300` max VUs |
+| cache 조건 | warm-cache 반복 부하 |
 
-| 실험 | evidence | 주요 결과 |
-|---|---|---|
-| global offset page0 | [global-offset-page0.txt](../../evidence/phase-07/explain/global-offset-page0.txt) | Execution Time `0.127 ms` |
-| global offset deep | [global-offset-deep.txt](../../evidence/phase-07/explain/global-offset-deep.txt) | Execution Time `220.430 ms` |
-| global cursor deep | [global-cursor-deep.txt](../../evidence/phase-07/explain/global-cursor-deep.txt) | Execution Time `199.605 ms`; cursor-source lookup 포함 |
-| user offset page0 | [user-offset-page0.txt](../../evidence/phase-07/explain/user-offset-page0.txt) | Execution Time `0.175 ms` |
-| user offset deep | [user-offset-deep.txt](../../evidence/phase-07/explain/user-offset-deep.txt) | Execution Time `6.889 ms` |
-| user cursor deep | [user-cursor-deep.txt](../../evidence/phase-07/explain/user-cursor-deep.txt) | Execution Time `3.430 ms`; cursor-source lookup 포함 |
+`pg_stat_statements_reset()`은 run별 SQL 통계를 분리하기 위해서만 사용했다. PostgreSQL shared buffers, OS page cache, JVM 상태, connection pool 상태를 초기화하지 않았다.
 
-## API/k6 Result
+## 3. Page와 Cursor가 같은 UX가 아닌 이유
 
-| 실험 | p95 | evidence |
-|---|---:|---|
-| offset page0 | `6.9 ms` | [offset-page0-summary.txt](../../evidence/phase-07/k6/offset-page0-summary.txt) |
-| offset mid | `10.15 ms` | [offset-mid-summary.txt](../../evidence/phase-07/k6/offset-mid-summary.txt) |
-| offset deep | `11.77 ms` | [offset-deep-summary.txt](../../evidence/phase-07/k6/offset-deep-summary.txt) |
-| cursor | `5.92 ms` | [cursor-summary.txt](../../evidence/phase-07/k6/cursor-summary.txt) |
+Offset/Page는 "N번째 페이지를 보여줘"라는 요구를 처리하고, total elements와 total pages를 제공할 수 있다. 번호 기반 navigation에는 유리하지만, 깊은 페이지에서는 앞 row를 skip해야 하고 `Page<T>`가 count query 비용을 추가한다.
 
-## COUNT Query Result
+Cursor는 "이 마지막 row 다음 slice를 보여줘"라는 요구를 처리한다. 순차 탐색과 infinite scroll에는 적합하지만, 임의 page 번호 점프를 대체하지 않는다. Cursor가 page `4999`로 직접 점프한다고 가정해 측정하면 일반적인 cursor navigation에 없는 cursor source lookup 비용이 섞인다.
 
-| 조건 | count query 호출 | evidence |
-|---|---:|---|
-| Offset/Page | `45,003` calls, mean `0.31 ms`, total `14,032.30 ms` | [offset-page-api.txt](../../evidence/phase-07/pg-stat-statements/offset-page-api.txt) |
-| Cursor | `0` count calls observed | [cursor-api.txt](../../evidence/phase-07/pg-stat-statements/cursor-api.txt) |
+따라서 이번 재측정에서는 cursor sample을 준비 단계에서 사전 계산했고, Cursor API latency에는 그 lookup 비용을 포함하지 않았다.
 
-## Interpretation
+## 4. A. Offset/Page Depth 결과
 
-Offset deep page는 같은 user 범위에서도 더 많은 row를 skip하면서 page0보다 실행 시간이 증가했다. Cursor 방식은 `created_at DESC, id DESC` 순서를 기준으로 마지막 row 이후를 조회하므로 deep page 위치에서도 count query 없이 다음 slice를 가져올 수 있다.
+### 측정 조건
 
-Global cursor SQL-only 결과는 cursor 값을 찾기 위한 source lookup을 같은 SQL에 포함한다. `13-global-cursor-deep-explain.sql`은 deep 위치의 `created_at`, `id`를 알 수 없는 상태에서 비교를 만들기 위해 먼저 `OFFSET 100000`으로 cursor source row를 찾고, 그 다음 cursor 조건으로 다음 rows를 조회한다. 이 방식은 실제 Cursor API처럼 client가 이전 응답의 `lastCreatedAt`, `lastId`를 넘기는 흐름이 아니므로 Offset 비용이 결과에 섞인다.
+Offset SQL과 API는 아래 정렬 기준을 사용했다.
 
-따라서 global Offset deep `220.430 ms`와 global Cursor deep `199.605 ms`의 차이는 작고, Cursor pagination 개선 효과를 입증하는 유의미한 결과로 해석하지 않는다. 이 값은 오히려 “cursor 기준값을 deep offset으로 다시 찾으면 Cursor 방식의 이점이 거의 사라진다”는 한계 evidence로 본다. Cursor API의 primary evidence는 hot user API/k6 p95와 `pg_stat_statements`의 count query 제거 여부다.
+```sql
+ORDER BY created_at DESC, id DESC
+LIMIT 20 OFFSET ...
+```
 
-Grafana screenshot은 이번 run에서 남기지 않았다. k6는 stdout summary 중심으로 Docker compose `k6` 컨테이너에서 실행했고 Prometheus remote write를 사용하지 않았다. 이후 Grafana evidence가 필요하면 같은 preset을 `prometheus` 모드로 재실행해 shared `DB Lab Overview`를 캡처한다.
+k6 sampling run은 warm-cache 조건에서 `[0,10,50,100,500,1000,2000,3000,4000,4999]` page 중 하나를 매 iteration마다 무작위 선택했다.
 
-## Amplified Hot User Follow-up
+### 핵심 수치
 
-자연 발생 hot user `374`는 `point_history`가 `1912`건이라 deep page 차이가 작게 나타날 수 있다. Phase 7의 pagination contrast를 더 명확히 보기 위해 기존 `loadtest` seed는 유지하고, Phase 7 전용 가상 hot user를 추가한다.
+| 증거 | Page | Offset | 결과 |
+|---|---:|---:|---|
+| SQL-only | `0` | `0` | 실행 시간 `0.122 ms`; index scan rows `20` |
+| SQL-only | `1000` | `20000` | 실행 시간 `2.841 ms`; index scan rows `20020` |
+| SQL-only | `4999` | `99980` | 실행 시간 `49.515 ms`; rows `100000`, external sort 관측 |
+| k6 p95 | `0` | `0` | `16.99 ms` |
+| k6 p95 | `1000` | `20000` | `19.45 ms` |
+| k6 p95 | `4999` | `99980` | `31.84 ms` |
+| k6 run | 전체 sample | mixed | `15000` 요청, 실패율 `0.10%`, threshold `<5%` 통과 |
 
-추가 계획:
+### 원본 증거
 
-- plan: [006-hot-user-amplification.md](../../superpowers/plans/phase-07-pagination/006-hot-user-amplification.md)
-- SQL: `scripts/phase-07/05-hot-user-amplify.sql`
-- user_id: `707000`
-- target point count: `100000`
-- size: `20`
-- maxPage: `4999`
-- midPage: `2499`
-- deepPage: `3999`
-- deepOffset: `79980`
+- [retest-offset-sampling.txt](../../evidence/phase-07/explain/retest-offset-sampling.txt)
+- [retest-offset-sampling-summary.txt](../../evidence/phase-07/k6/retest-offset-sampling-summary.txt)
+- [retest-offset-sampling-api.txt](../../evidence/phase-07/pg-stat-statements/retest-offset-sampling-api.txt)
 
-이 follow-up run은 기존 seed 분포를 바꾸지 않고 `point_history` 단일 user의 deep offset 비용만 확대한다. 따라서 Phase 7의 최종 pagination 판단은 natural hot user run과 amplified hot user run을 분리해서 기록한다.
+### 해석
 
-### Amplified SQL-only Result
+SQL-only 증거는 offset skip 비용을 직접 보여준다. page `1000`은 `20020` rows를 지나갔고, page `4999`는 `100000` rows를 처리했다. k6 sampling에서도 깊은 page bucket이 얕은 bucket보다 불리해지는 경향이 보였다.
 
-| 실험 | evidence | 주요 결과 |
-|---|---|---|
-| amplified user offset page0 | [amplified-user-offset-page0.txt](../../evidence/phase-07/explain/amplified-user-offset-page0.txt) | Execution Time `0.097 ms` |
-| amplified user offset deep | [amplified-user-offset-deep.txt](../../evidence/phase-07/explain/amplified-user-offset-deep.txt) | Execution Time `33.426 ms` |
-| amplified user cursor deep | [amplified-user-cursor-deep.txt](../../evidence/phase-07/explain/amplified-user-cursor-deep.txt) | Execution Time `36.383 ms`; cursor-source lookup 포함 |
+### 한계
 
-SQL-only cursor deep은 이번에도 cursor 기준값을 얻기 위해 `OFFSET 79980`으로 source row를 먼저 찾는다. 따라서 `33.426 ms` vs `36.383 ms`는 Cursor API 개선 효과를 보여주는 결과가 아니다. 이 결과는 cursor 기준값을 offset으로 구하면 Cursor 방식의 장점이 사라진다는 한계를 다시 확인한다.
+k6 run은 warm-cache 반복 부하이며 cold read 증거가 아니다. 또한 `15000` HTTP 요청 중 `15`개가 실패했으므로 API summary에는 약간의 noise가 섞여 있다. page depth skip 동작의 primary 증거는 SQL-only EXPLAIN이다.
 
-### Amplified API/k6 Result
+## 5. B. Cursor Next-Slice 결과
 
-| 실험 | p95 | evidence |
-|---|---:|---|
-| amplified offset page0 | `13.93 ms` | [amplified-offset-page0-summary.txt](../../evidence/phase-07/k6/amplified-offset-page0-summary.txt) |
-| amplified offset mid | `85.31 ms` | [amplified-offset-mid-summary.txt](../../evidence/phase-07/k6/amplified-offset-mid-summary.txt) |
-| amplified offset deep | `38.68 ms` | [amplified-offset-deep-summary.txt](../../evidence/phase-07/k6/amplified-offset-deep-summary.txt) |
-| amplified cursor | `4.95 ms` | [amplified-cursor-summary.txt](../../evidence/phase-07/k6/amplified-cursor-summary.txt) |
+### 측정 조건
 
-Amplified API run에서는 Cursor p95가 Offset page0/mid/deep보다 모두 낮았다. Offset mid p95가 deep보다 높게 나온 것은 Offset pagination의 이론적 특성과 맞지 않으므로, page depth 자체의 단조 증가 evidence로 해석하지 않는다. 두 Offset deep-page 계열 모두 Cursor보다 현저히 높다는 점만 이번 run의 안정적인 결론으로 둔다.
+Cursor sample은 Offset과 같은 logical page set 기준으로 사전 계산했다. page `0`은 cursor 없이 요청한다. page `> 0`은 이전 logical row의 `lastCreatedAt`, `lastId`를 요청에 넣는다.
 
-#### Why Offset mid was slower than Offset deep
+Cursor sample lookup은 측정 준비 작업이다. API latency에는 포함하지 않았다.
 
-Offset pagination은 같은 조건에서 `OFFSET` 값이 커질수록 더 많은 row를 skip하므로 일반적으로 뒤 페이지가 더 비싸진다. 그런데 이번 amplified k6 run에서는 mid page `2499`의 p95가 `85.31 ms`, deep page `3999`의 p95가 `38.68 ms`로 mid가 더 느렸다.
+### 핵심 수치
 
-가능한 원인:
+| 증거 | Logical page | Cursor | 결과 |
+|---|---:|---|---|
+| SQL-only | `10` | `2026-05-26T23:56:40`, `707000200` | 실행 시간 `0.122 ms` |
+| SQL-only | `1000` | `2026-05-26T18:26:40`, `707020000` | 실행 시간 `0.117 ms` |
+| SQL-only | `4999` | `2026-05-25T20:13:40`, `707099980` | 실행 시간 `0.158 ms` |
+| k6 p95 | `0` | 없음 | `11.27 ms` |
+| k6 p95 | `1000` | 사전 계산 | `16.46 ms` |
+| k6 p95 | `4999` | 사전 계산 | `31.93 ms` |
+| k6 run | 전체 sample | mixed | `15001` 요청, 실패율 `0.00%` |
 
-- 순차 실행에 따른 PostgreSQL buffer cache와 OS page cache 차이: page0, mid, deep 순서로 실행했기 때문에 deep run 시점에는 `point_history` index/table page가 더 많이 cache에 올라와 있었을 수 있다.
-- `Page<T>` count query 영향: Offset API는 page depth와 무관하게 매 요청마다 `count(*) from point_history where user_id = ?`를 실행한다. amplified Offset run에서 count query 총 실행 시간은 `400,662.47 ms`였고, 이 비용이 p95에 섞여 page offset 비용만 분리해 보여주지 않는다.
-- JVM, GC, Docker scheduling, connection pool 상태 차이: 각 preset을 별도 5분 run으로 순차 실행했기 때문에 동일한 runtime condition으로 보기 어렵다.
-- tail latency 민감도: p95는 일시적인 stall에 민감하다. mid run의 max latency는 `3.12s`, deep run의 max latency는 `2s`였으므로 mid run에 더 큰 spike가 있었다.
+### 원본 증거
 
-따라서 이번 amplified k6 결과는 “Offset page가 깊어질수록 항상 더 느리다”는 단조 증가 증거가 아니라, “큰 hot user 조건에서 Offset/Page 계열은 Cursor보다 p95와 count query 비용이 크게 불리하다”는 증거로 해석한다.
+- [retest-cursor-samples.txt](../../evidence/phase-07/data-profile/retest-cursor-samples.txt)
+- [retest-cursor-samples.json](../../evidence/phase-07/data-profile/retest-cursor-samples.json)
+- [retest-cursor-page10.txt](../../evidence/phase-07/explain/retest-cursor-page10.txt)
+- [retest-cursor-page1000.txt](../../evidence/phase-07/explain/retest-cursor-page1000.txt)
+- [retest-cursor-page4999.txt](../../evidence/phase-07/explain/retest-cursor-page4999.txt)
+- [retest-cursor-sampling-summary.txt](../../evidence/phase-07/k6/retest-cursor-sampling-summary.txt)
+- [retest-cursor-sampling-api.txt](../../evidence/phase-07/pg-stat-statements/retest-cursor-sampling-api.txt)
 
-#### Recommended rerun strategy
+### 해석
 
-page depth 비용을 더 엄밀히 확인하려면 아래 방식으로 재시도한다.
+Cursor SQL-only script에는 CTE `OFFSET` source lookup이 없다. 아래 next-slice query 자체만 측정한다.
 
-- Offset `page0`, `mid`, `deep`, Cursor를 최소 3회 반복 실행하고 median p95를 비교한다.
-- 실행 순서를 바꾼다. 예: `deep -> mid -> page0 -> cursor`, `cursor -> page0 -> deep -> mid`.
-- 각 run 전 `pg_stat_statements_reset()`을 실행하고, run별 `pg_stat_statements` snapshot을 분리 저장한다.
-- Offset/Page의 count query 비용과 data query 비용을 따로 해석한다.
-- 필요하면 count 없는 Offset baseline, 예를 들어 `Slice` 또는 `List` 기반 Offset API를 추가해 page depth skip 비용만 Cursor와 비교한다.
-- cache warm/cold 조건을 명시한다. 운영 재현보다 원리 확인이 목적이면 warm-up run을 버리고 두 번째 run부터 evidence로 사용한다.
+```sql
+WHERE user_id = 707000
+  AND (created_at, id) < (:last_created_at, :last_id)
+ORDER BY created_at DESC, id DESC
+LIMIT 20
+```
 
-### Amplified COUNT Query Result
+page `10`, `1000`, `4999`에서 SQL 실행 시간은 약 `0.1 ms` 수준을 유지했다. 이는 row-value predicate 형태의 Cursor next-slice 조회가 page 번호 skip이 아니라, 제공된 cursor key와 `LIMIT 20` 중심으로 실행될 수 있다는 primary 증거다.
 
-| 조건 | count query 호출 | evidence |
-|---|---:|---|
-| amplified Offset/Page | `45,003` calls, mean `8.90 ms`, total `400,662.47 ms` | [amplified-offset-page-api.txt](../../evidence/phase-07/pg-stat-statements/amplified-offset-page-api.txt) |
-| amplified Cursor | `0` count calls observed | [amplified-cursor-api.txt](../../evidence/phase-07/pg-stat-statements/amplified-cursor-api.txt) |
+단, 이 SQL-only 증거는 실제 API가 생성한 Hibernate SQL과 완전히 같은 shape가 아니다. SQL-only script는 `(created_at, id) < (...)` 형태를 사용하지만, 현재 JPQL 기반 Cursor API는 아래와 같은 OR 조건으로 SQL을 생성한다.
 
-100,000건 hot user에서는 `Page<T>` count query 비용이 더 크게 드러났다. Offset/Page run의 count query 총 실행 시간은 `400,662.47 ms`로, Cursor API가 count query를 제거하는 효과가 natural hot user run보다 더 명확하다.
+```sql
+WHERE user_id = ?
+  AND (
+    created_at < ?
+    OR (created_at = ? AND id < ?)
+  )
+ORDER BY created_at DESC, id DESC
+FETCH FIRST ? ROWS ONLY
+```
 
-## Phase 8 Handoff
+추가 확인 결과, page `4999` cursor 값으로 실제 API SQL shape를 EXPLAIN하면 `Index Cond`가 `user_id`에만 걸리고 cursor 조건은 `Filter`로 처리됐다. 이때 `Rows Removed by Filter: 99980`, 실행 시간 `70.718 ms`가 관측됐다. 따라서 현재 k6에서 깊은 Cursor bucket의 p95가 상승한 원인은 cursor-source lookup이 아니라, 실제 API SQL shape가 복합 인덱스 seek로 최적화되지 않는 문제로 보는 것이 더 타당하다.
 
-Phase 8에서는 HTTP p95, Hikari pending/active, `pg_stat_activity`, `pg_stat_statements`를 연결해 병목 관측 흐름을 정리한다.
+### 한계
+
+k6 cursor p95는 깊은 sample bucket에서 여전히 상승했다. 이를 cursor-source lookup 비용으로 해석하면 안 된다. source lookup은 요청에 포함되지 않았기 때문이다. 현재 확인된 가장 중요한 원인은 SQL-only script와 실제 API SQL shape 차이다. 실제 API SQL은 `created_at < ? OR (created_at = ? AND id < ?)` 조건이 `Filter`로 처리될 수 있고, 깊은 cursor에서는 앞 row를 대량으로 버릴 수 있다.
+
+## 6. C. Count Query 결과
+
+### 측정 조건
+
+Offset/Page는 Spring Data `Page<T>`를 사용하므로 각 page 요청에서 data query와 count query가 함께 실행될 수 있다. Cursor는 `size + 1` row로 `hasNext`를 판단하므로 total count가 필요 없다.
+
+### 핵심 수치
+
+| 실행 | Query shape | 호출 수 | 평균 | 총합 |
+|---|---|---:|---:|---:|
+| Offset/Page | `select count(*) from point_history ...` | `14985` | `7.04 ms` | `105490.65 ms` |
+| Offset/Page | `offset ... fetch first ...`를 포함한 정렬 data query | `13468` | `4.50 ms` | `60608.89 ms` |
+| Offset/Page | offset 없는 first-page 정렬 data query | `1517` | `0.04 ms` | `60.71 ms` |
+| Cursor | next-slice data query | `13532` | `4.54 ms` | `61473.24 ms` |
+| Cursor | first cursor page query | `1469` | `0.06 ms` | `86.42 ms` |
+| Count-only SQL | `count(*) where user_id = 707000` | n/a | n/a | 실행 시간 `11.195 ms` |
+
+### 원본 증거
+
+- [retest-offset-sampling-api.txt](../../evidence/phase-07/pg-stat-statements/retest-offset-sampling-api.txt)
+- [retest-cursor-sampling-api.txt](../../evidence/phase-07/pg-stat-statements/retest-cursor-sampling-api.txt)
+- [retest-count-only.txt](../../evidence/phase-07/explain/retest-count-only.txt)
+
+### 해석
+
+Count query 비용은 page depth skip 비용과 별도 비용이다. Offset/Page는 둘 다 부담한다. data query는 skip 비용을 낼 수 있고, `Page<T>`는 total elements 계산을 위해 count 비용도 낸다. Cursor는 API path에서 count query를 제거한다.
+
+이번 재측정에서 Cursor `pg_stat_statements`에는 `select count(*) from point_history` query가 없었다.
+
+### 한계
+
+Offset/Page count query calls는 HTTP 요청 수보다 약간 적었다. `pg_stat_statements`가 normalized SQL shape로 묶고, run에 소량의 실패 요청이 포함됐기 때문이다. Count-only EXPLAIN은 count 자체의 DB 비용을 분리한 증거이며, 전체 API latency와 같은 값이 아니다.
+
+## 7. 종합 해석
+
+Page와 Cursor는 다른 UX contract다.
+
+Page는 임의 page 번호 접근과 total count 기반 UI가 필요할 때 적합하다. 큰 hot user 조건에서는 deep offset skip 비용과 count query 비용을 부담한다.
+
+Cursor는 순차 탐색에 적합하다. 임의 page 번호 점프를 포기하는 대신 cursor key를 사용해 다음 slice를 count 없이 조회할 수 있다.
+
+이번 Phase 7 재측정은 이전 cursor-source lookup SQL보다 이 trade-off를 더 명확히 보여준다. Cursor next-slice EXPLAIN에서 deep `OFFSET` lookup을 제거했기 때문이다. 다만 현재 API 구현은 JPQL OR 조건 때문에 SQL-only의 row-value predicate 실행계획과 달라질 수 있다. 따라서 현재 k6에서 Cursor와 Offset의 p95 차이가 작게 나온 것은 Cursor pagination 개념의 한계라기보다, API SQL shape가 아직 최적화되지 않은 구현 한계로 분류해야 한다.
+
+Grafana 스크린샷은 보조 증거다. Phase 7 재측정을 위해 새 dashboard나 Phase 7 전용 panel을 추가하지 않았다. Offset/Page skip 비용은 EXPLAIN으로, count query 비용은 `pg_stat_statements`로 판정한다. Grafana는 run 중 request rate, failure rate, Hikari 상태, table access 상태를 함께 확인하기 위한 보조 자료다.
+
+증거:
+
+- [retest-db-lab-overview.png](../../evidence/phase-07/grafana/retest-db-lab-overview.png)
+
+## 8. 개선 수정 필요 사항
+
+### Cursor API SQL shape 개선
+
+현재 `PointHistoryRepository.findNextCursorPage`는 JPQL로 cursor 조건을 표현한다. Hibernate는 이를 `created_at < ? OR (created_at = ? AND id < ?)` 형태로 생성하며, PostgreSQL에서 복합 인덱스 `(user_id, created_at DESC, id DESC)`의 cursor 범위 조건으로 충분히 밀어 넣지 못할 수 있다.
+
+개선 방향은 Cursor next-slice 조회를 native query로 분리해 실제 SQL이 row-value predicate를 사용하도록 고정하는 것이다.
+
+```sql
+WHERE user_id = ?
+  AND (created_at, id) < (?, ?)
+ORDER BY created_at DESC, id DESC
+LIMIT ?
+```
+
+수정 후에는 다음을 다시 수집해야 한다.
+
+- 실제 API SQL shape의 `EXPLAIN (ANALYZE, BUFFERS)`
+- page `1000`, `4999`에서 `Rows Removed by Filter`가 사라지거나 크게 줄었는지 여부
+- Offset/Page와 Cursor k6 sampling 재실행 결과
+- `pg_stat_statements`에서 Cursor next-slice query 평균 시간이 감소했는지 여부
+
+이 수정이 끝나기 전까지 현재 k6 결과는 "Cursor가 Offset보다 근본적으로 빠르지 않다"는 결론의 근거로 사용하면 안 된다. 현재 결과는 "Cursor API에서 count query는 제거됐지만, 깊은 cursor에서 실제 SQL shape가 seek로 최적화되지 않았다"는 구현 개선 근거로 해석해야 한다.
+
+### Offset/Page 측정 분리
+
+Offset/Page API는 `Page<T>`를 사용하므로 data query와 count query가 함께 섞인다. Offset skip 비용만 비교하려면 `Page<T>` 기반 API와 별도로 `Slice<T>` 또는 `List` 기반 offset 측정 API를 준비해 count query를 제거한 조건을 추가해야 한다.
+
+### k6 측정 보정
+
+Offset k6 custom trend에는 실패 응답의 duration이 page bucket trend에 들어갈 수 있다. 다음 재측정에서는 `res.status === 200`일 때만 page별 custom trend에 값을 추가하고, 실패 응답은 별도 counter로 분리해야 한다.
+
+## 9. 한계
+
+- 이번 결과는 warm-cache 반복 부하이며 cold read 동작이 아니다.
+- `pg_stat_statements_reset()`은 run 통계를 분리했을 뿐 cache를 초기화하지 않았다.
+- Offset k6에는 실패율 `0.10%`가 있었지만 설정된 failure threshold는 통과했다.
+- Cursor sample 값은 사전 계산했다. 이는 next-slice 측정을 위한 의도적 조건이며, 이 증거는 직접 page jump 비용을 측정하지 않는다.
+- Cursor SQL-only script는 row-value predicate를 사용하지만, 현재 API SQL은 JPQL OR 조건으로 생성된다. 이 차이 때문에 SQL-only Cursor 결과와 k6 Cursor 결과를 직접 연결하면 안 된다.
+- k6 sampling run은 전략별 1회만 수행했다. 더 엄밀한 latency 결론을 내려면 Offset과 Cursor sampling을 최소 3회 반복하고, 실행 순서를 바꾼 뒤 median p95를 비교해야 한다.
+- 기존 natural hot user와 amplified one-page run은 기존 증거로 남긴다. 최종 Phase 7 해석의 primary 증거는 retest A/B/C artifact다.
+
+## 10. Phase 8 인계
+
+Phase 8에서는 HTTP p95, Hikari pending/active 상태, `pg_stat_activity`, `pg_stat_statements`를 하나의 병목 관측 흐름으로 연결한다.
+
+Phase 7에서 넘길 관측 기준은 아래와 같다.
+
+- SQL shape 증거와 API latency를 분리한다.
+- Grafana는 query cost의 주요 증명 자료가 아니라 runtime context로 본다.
+- Count query 비용과 data query skip 비용을 분리한다.
+- p95를 비교하기 전에 cache 조건과 run order를 명시한다.
+- Cursor API는 native query 또는 동등한 SQL shape 개선 후 다시 측정한다.

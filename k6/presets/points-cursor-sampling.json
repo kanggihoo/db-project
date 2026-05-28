@@ -1,0 +1,62 @@
+{
+  "baseUrl": "http://host.docker.internal:8080",
+  "userId": 707000,
+  "size": 20,
+  "rate": 50,
+  "duration": "5m",
+  "preAllocatedVUs": 100,
+  "maxVUs": 300,
+  "timeout": "5s",
+  "samples": [
+    {
+      "page": 0,
+      "lastCreatedAt": null,
+      "lastId": null
+    },
+    {
+      "page": 10,
+      "lastCreatedAt": "2026-05-26T23:56:40",
+      "lastId": 707000200
+    },
+    {
+      "page": 50,
+      "lastCreatedAt": "2026-05-26T23:43:20",
+      "lastId": 707001000
+    },
+    {
+      "page": 100,
+      "lastCreatedAt": "2026-05-26T23:26:40",
+      "lastId": 707002000
+    },
+    {
+      "page": 500,
+      "lastCreatedAt": "2026-05-26T21:13:20",
+      "lastId": 707010000
+    },
+    {
+      "page": 1000,
+      "lastCreatedAt": "2026-05-26T18:26:40",
+      "lastId": 707020000
+    },
+    {
+      "page": 2000,
+      "lastCreatedAt": "2026-05-26T12:53:20",
+      "lastId": 707040000
+    },
+    {
+      "page": 3000,
+      "lastCreatedAt": "2026-05-26T07:20:00",
+      "lastId": 707060000
+    },
+    {
+      "page": 4000,
+      "lastCreatedAt": "2026-05-26T01:46:40",
+      "lastId": 707080000
+    },
+    {
+      "page": 4999,
+      "lastCreatedAt": "2026-05-25T20:13:40",
+      "lastId": 707099980
+    }
+  ]
+}
