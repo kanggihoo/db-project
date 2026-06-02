@@ -2,17 +2,17 @@ package com.dblab.ecommerce.service;
 
 import java.util.Arrays;
 
-public enum ProductSearchStrategy {
+public enum ProductSearchStrategyName {
     BASELINE("baseline"),
     QUERYDSL("querydsl");
 
     private final String value;
 
-    ProductSearchStrategy(String value) {
+    ProductSearchStrategyName(String value) {
         this.value = value;
     }
 
-    public static ProductSearchStrategy from(String value) {
+    public static ProductSearchStrategyName from(String value) {
         if (value == null || value.isBlank()) {
             return QUERYDSL;
         }
@@ -22,5 +22,9 @@ public enum ProductSearchStrategy {
                 .filter(strategy -> strategy.value.equalsIgnoreCase(normalized))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported product search strategy: " + value));
+    }
+
+    public String value() {
+        return value;
     }
 }

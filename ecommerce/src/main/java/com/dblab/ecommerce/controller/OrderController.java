@@ -1,7 +1,6 @@
 package com.dblab.ecommerce.controller;
 
 import com.dblab.ecommerce.dto.OrderResponse;
-import com.dblab.ecommerce.service.OrderLoadingStrategy;
 import com.dblab.ecommerce.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +21,6 @@ public class OrderController {
     public List<OrderResponse> getOrders(
             @RequestParam Long userId,
             @RequestParam(required = false) String strategy) {
-        return orderService.getOrdersByUserId(userId, OrderLoadingStrategy.from(strategy));
+        return orderService.getOrdersByUserId(userId, strategy);
     }
 }

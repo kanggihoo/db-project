@@ -2,7 +2,7 @@ package com.dblab.ecommerce.service;
 
 import java.util.Arrays;
 
-public enum OrderLoadingStrategy {
+public enum OrderLoadingStrategyName {
     LAZY("lazy"),
     FETCH_JOIN("fetch-join"),
     BATCH_SIZE("batch-size"),
@@ -10,7 +10,7 @@ public enum OrderLoadingStrategy {
 
     private final String value;
 
-    OrderLoadingStrategy(String value) {
+    OrderLoadingStrategyName(String value) {
         this.value = value;
     }
 
@@ -18,7 +18,7 @@ public enum OrderLoadingStrategy {
         return value;
     }
 
-    public static OrderLoadingStrategy from(String value) {
+    public static OrderLoadingStrategyName from(String value) {
         if (value == null || value.isBlank()) {
             return LAZY;
         }

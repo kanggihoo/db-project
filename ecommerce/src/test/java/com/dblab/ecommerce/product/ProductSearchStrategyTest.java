@@ -7,8 +7,11 @@ import com.dblab.ecommerce.entity.Product;
 import com.dblab.ecommerce.repository.ProductQueryRepository;
 import com.dblab.ecommerce.repository.ProductRepository;
 import com.dblab.ecommerce.repository.ProductReviewSummaryRepository;
-import com.dblab.ecommerce.service.ProductSearchStrategy;
+import com.dblab.ecommerce.service.ProductSearchStrategyName;
 import com.dblab.ecommerce.service.ProductService;
+import com.dblab.ecommerce.service.product.BaselineProductSearchStrategy;
+import com.dblab.ecommerce.service.product.ProductSearchStrategyRegistry;
+import com.dblab.ecommerce.service.product.QuerydslProductSearchStrategy;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
@@ -38,6 +41,9 @@ import static org.mockito.Mockito.when;
         QuerydslConfig.class,
         ProductQueryRepository.class,
         ProductReviewSummaryRepository.class,
+        ProductSearchStrategyRegistry.class,
+        BaselineProductSearchStrategy.class,
+        QuerydslProductSearchStrategy.class,
         ProductService.class
 })
 @Sql("/test-data/product-setup.sql")
@@ -53,9 +59,9 @@ class ProductSearchStrategyTest {
     @DisplayName("baseline and querydsl return the same responses for shared category and status conditions")
     void baselineAndQuerydslReturnSameResponsesForSharedConditions() {
         List<ProductResponse> baseline = productService.searchProducts(
-                200L, Product.Status.ON_SALE, ProductSearchStrategy.BASELINE);
+                200L, Product.Status.ON_SALE, ProductSearchStrategyName.BASELINE);
         List<ProductResponse> querydsl = productService.searchProducts(
-                200L, Product.Status.ON_SALE, ProductSearchStrategy.QUERYDSL);
+                200L, Product.Status.ON_SALE, ProductSearchStrategyName.QUERYDSL);
 
         assertThat(sorted(querydsl)).isEqualTo(sorted(baseline));
     }
@@ -65,7 +71,7 @@ class ProductSearchStrategyTest {
     void omittedStrategyDefaultsToQuerydsl() {
         List<ProductResponse> omitted = productService.searchProducts(200L, Product.Status.SOLD_OUT);
         List<ProductResponse> querydsl = productService.searchProducts(
-                200L, Product.Status.SOLD_OUT, ProductSearchStrategy.QUERYDSL);
+                200L, Product.Status.SOLD_OUT, ProductSearchStrategyName.QUERYDSL);
 
         assertThat(sorted(omitted)).isEqualTo(sorted(querydsl));
     }
@@ -76,7 +82,11 @@ class ProductSearchStrategyTest {
         ProductRepository baselineRepository = mock(ProductRepository.class);
         ProductQueryRepository queryRepository = mock(ProductQueryRepository.class);
         ProductReviewSummaryRepository reviewSummaryRepository = mock(ProductReviewSummaryRepository.class);
-        ProductService service = new ProductService(baselineRepository, queryRepository, reviewSummaryRepository);
+        ProductSearchStrategyRegistry registry = new ProductSearchStrategyRegistry(List.of(
+                new BaselineProductSearchStrategy(baselineRepository),
+                new QuerydslProductSearchStrategy(queryRepository)
+        ));
+        ProductService service = new ProductService(registry, reviewSummaryRepository);
         List<ProductResponse> expected = List.of(
                 new ProductResponse(205L, 200L, "Sold Out Product 0", 10000, Product.Status.SOLD_OUT));
         when(queryRepository.searchProducts(200L, Product.Status.SOLD_OUT)).thenReturn(expected);
@@ -94,7 +104,7 @@ class ProductSearchStrategyTest {
     @DisplayName("querydsl omits null category predicate and filters by status only")
     void querydslOmitsNullCategoryCondition() {
         List<ProductResponse> result = productService.searchProducts(
-                null, Product.Status.SOLD_OUT, ProductSearchStrategy.QUERYDSL);
+                null, Product.Status.SOLD_OUT, ProductSearchStrategyName.QUERYDSL);
 
         assertThat(sorted(result))
                 .extracting(ProductResponse::productId, ProductResponse::status)
@@ -108,7 +118,7 @@ class ProductSearchStrategyTest {
     @DisplayName("querydsl omits null status predicate and filters by category only")
     void querydslOmitsNullStatusCondition() {
         List<ProductResponse> result = productService.searchProducts(
-                201L, null, ProductSearchStrategy.QUERYDSL);
+                201L, null, ProductSearchStrategyName.QUERYDSL);
 
         assertThat(sorted(result))
                 .extracting(ProductResponse::productId, ProductResponse::status)
@@ -122,7 +132,7 @@ class ProductSearchStrategyTest {
     @DisplayName("querydsl with no filters returns all fixture rows")
     void querydslWithNoFiltersReturnsAllFixtureRows() {
         List<ProductResponse> result = productService.searchProducts(
-                null, null, ProductSearchStrategy.QUERYDSL);
+                null, null, ProductSearchStrategyName.QUERYDSL);
 
         assertThat(sorted(result))
                 .extracting(ProductResponse::productId)
@@ -135,11 +145,11 @@ class ProductSearchStrategyTest {
         Statistics statistics = statistics();
 
         statistics.clear();
-        productService.searchProducts(200L, Product.Status.ON_SALE, ProductSearchStrategy.BASELINE);
+        productService.searchProducts(200L, Product.Status.ON_SALE, ProductSearchStrategyName.BASELINE);
         long baselineStatements = statistics.getPrepareStatementCount();
 
         statistics.clear();
-        productService.searchProducts(200L, Product.Status.ON_SALE, ProductSearchStrategy.QUERYDSL);
+        productService.searchProducts(200L, Product.Status.ON_SALE, ProductSearchStrategyName.QUERYDSL);
         long querydslStatements = statistics.getPrepareStatementCount();
 
         assertThat(baselineStatements).isEqualTo(1);
