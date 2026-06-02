@@ -116,6 +116,8 @@ Makefile 변수명은 대문자 snake case를 사용한다.
 | `PHASE` | phase id | `phase-02` |
 | `SCENARIO` | k6 또는 실험 시나리오 | `products` |
 | `PRESET` | 부하 테스트 preset | `baseline` |
+| `K6_PRESET` | k6 preset override when different from `PRESET` | `review-summary-baseline` |
+| `GRAFANA_PRESET` | Grafana preset variable override when different from `PRESET` | `baseline` |
 | `MODE` | 실행 모드 | `local`, `prometheus` |
 | `POOL` | connection pool preset | `pool10` |
 | `PROFILE` | app profile | `local`, `test`, `pool10` |
@@ -140,6 +142,8 @@ TAIL ?= 120
 ```
 
 ## Makefile 예시
+
+작은 프로젝트는 단일 Makefile을 사용할 수 있다. target이 늘어나면 루트 Makefile은 include 중심으로 두고 `makefiles/*.mk`로 책임을 나눈다.
 
 ```makefile
 .PHONY: help server-start seed k6-run k6-evidence evidence-capture grafana-capture grafana-generate
@@ -416,4 +420,3 @@ Windows PowerShell/CMD 네이티브 실행은 기본 지원 환경으로 보지 
 - 반복 실행 명령을 `package.json`, shell script, README에 각각 다른 이름으로 중복 정의하지 않는다.
 - 같은 기능의 Make target 이름을 프로젝트마다 다르게 만들지 않는다.
 - agent가 매번 `scripts/` 파일명을 직접 찾아 실행해야 하는 구조로 두지 않는다.
-
