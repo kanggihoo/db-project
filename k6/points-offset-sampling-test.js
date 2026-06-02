@@ -1,52 +1,48 @@
 import http from 'k6/http';
-import { check } from 'k6';
 import { Trend } from 'k6/metrics';
+import { loadConfig, createRequestTags } from './lib/config.js';
+import { buildConstantArrivalRateOptions } from './lib/scenarios.js';
+import { checkHttpOk } from './lib/checks.js';
 
-const preset = JSON.parse(open(__ENV.PRESET || 'presets/points-offset-sampling.json'));
+const config = loadConfig({
+    defaultPresetPath: 'presets/points-offset-sampling.json',
+    defaultPhase: 'phase-07',
+    defaultScenario: 'points-offset-sampling',
+    defaultPresetName: 'offset-sampling',
+    defaultPool: 'pool10',
+    defaultTimeout: '5s',
+    defaultThresholds: {
+        http_req_failed: ['rate<0.05'],
+        http_req_duration: ['p(95)<5000'],
+    },
+});
 
-const BASE_URL = preset.baseUrl || 'http://host.docker.internal:8080';
-const USER_ID = Number(preset.userId || 707000);
-const SIZE = Number(preset.size || 20);
-const TIMEOUT = preset.timeout || '5s';
-const PAGES = preset.pages || [0, 10, 50, 100, 500, 1000, 2000, 3000, 4000, 4999];
+const USER_ID = Number(config.preset.userId || 707000);
+const SIZE = Number(config.preset.size || 20);
+const PAGES = config.preset.pages || [0, 10, 50, 100, 500, 1000, 2000, 3000, 4000, 4999];
 
 const trends = {};
 for (const page of PAGES) {
     trends[page] = new Trend(`points_offset_page_${page}_duration`, true);
 }
 
-const commonTags = {
-    phase: __ENV.PHASE || 'phase-07',
-    scenario: __ENV.SCENARIO || 'points-offset-sampling',
-    preset: __ENV.PRESET_NAME || 'offset-sampling',
-    pool: __ENV.POOL || 'pool10',
-};
+const requestTags = createRequestTags(config, 'GET /api/points');
 
 export const options = {
-    tags: commonTags,
-    systemTags: ['status', 'method', 'name', 'expected_response'],
-    scenarios: {
-        steady: {
-            executor: 'constant-arrival-rate',
-            rate: Number(preset.rate || 50),
-            timeUnit: '1s',
-            duration: preset.duration || '5m',
-            preAllocatedVUs: Number(preset.preAllocatedVUs || 100),
-            maxVUs: Number(preset.maxVUs || 300),
-        },
-    },
-    thresholds: {
-        http_req_failed: ['rate<0.05'],
-        http_req_duration: ['p(95)<5000'],
-    },
+    ...buildConstantArrivalRateOptions(config, {
+        defaultRate: 50,
+        defaultDuration: '5m',
+        defaultPreAllocatedVUs: 100,
+        defaultMaxVUs: 300,
+    }),
 };
 
 export default function () {
     const page = PAGES[Math.floor(Math.random() * PAGES.length)];
-    const res = http.get(`${BASE_URL}/api/points?userId=${USER_ID}&page=${page}&size=${SIZE}`, {
-        timeout: TIMEOUT,
+    const res = http.get(`${config.baseUrl}/api/points?userId=${USER_ID}&page=${page}&size=${SIZE}`, {
+        timeout: config.timeout,
         tags: {
-            ...commonTags,
+            ...requestTags,
             name: 'GET /api/points',
             page_bucket: String(page),
         },
@@ -54,8 +50,5 @@ export default function () {
 
     trends[page].add(res.timings.duration);
 
-    check(res, {
-        'status 200': (r) => r.status === 200,
-        'response time < 5s': (r) => r.timings.duration < 5000,
-    });
+    checkHttpOk(res, 5000);
 }

@@ -1,47 +1,39 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-const preset = JSON.parse(open(__ENV.PRESET || 'presets/points-cursor.json'));
+import { loadConfig, createRequestTags } from './lib/config.js';
+import { buildConstantArrivalRateOptions } from './lib/scenarios.js';
+import { checkHttpOk } from './lib/checks.js';
 
-const BASE_URL = preset.baseUrl || 'http://host.docker.internal:8080';
-const USER_ID = Number(preset.userId || 1);
-const SIZE = Number(preset.size || 20);
-const TIMEOUT = preset.timeout || '5s';
-
-const commonTags = {
-    phase: __ENV.PHASE || 'phase-07',
-    scenario: __ENV.SCENARIO || 'points-cursor',
-    preset: __ENV.PRESET_NAME || 'cursor',
-    pool: __ENV.POOL || 'pool10',
-};
-
-const requestTags = {
-    ...commonTags,
-    name: 'GET /api/points/cursor',
-};
-
-export const options = {
-    tags: commonTags,
-    systemTags: ['status', 'method', 'name', 'expected_response'],
-    scenarios: {
-        steady: {
-            executor: 'constant-arrival-rate',
-            rate: Number(preset.rate || 50),
-            timeUnit: '1s',
-            duration: preset.duration || '5m',
-            preAllocatedVUs: Number(preset.preAllocatedVUs || 100),
-            maxVUs: Number(preset.maxVUs || 300),
-        },
-    },
-    thresholds: {
+const config = loadConfig({
+    defaultPresetPath: 'presets/points-cursor.json',
+    defaultPhase: 'phase-07',
+    defaultScenario: 'points-cursor',
+    defaultPresetName: 'cursor',
+    defaultPool: 'pool10',
+    defaultTimeout: '5s',
+    defaultThresholds: {
         http_req_failed: ['rate<0.05'],
         http_req_duration: ['p(95)<5000'],
     },
+});
+const USER_ID = Number(config.preset.userId || 1);
+const SIZE = Number(config.preset.size || 20);
+
+const requestTags = createRequestTags(config, 'GET /api/points/cursor');
+
+export const options = {
+    ...buildConstantArrivalRateOptions(config, {
+        defaultRate: 50,
+        defaultDuration: '5m',
+        defaultPreAllocatedVUs: 100,
+        defaultMaxVUs: 300,
+    }),
 };
 
 export default function () {
-    const first = http.get(`${BASE_URL}/api/points/cursor?userId=${USER_ID}&size=${SIZE}`, {
-        timeout: TIMEOUT,
+    const first = http.get(`${config.baseUrl}/api/points/cursor?userId=${USER_ID}&size=${SIZE}`, {
+        timeout: config.timeout,
         tags: requestTags,
     });
 
@@ -61,13 +53,10 @@ export default function () {
 
     const lastCreatedAt = encodeURIComponent(body.nextCursor.lastCreatedAt);
     const lastId = body.nextCursor.lastId;
-    const next = http.get(`${BASE_URL}/api/points/cursor?userId=${USER_ID}&size=${SIZE}&lastCreatedAt=${lastCreatedAt}&lastId=${lastId}`, {
-        timeout: TIMEOUT,
+    const next = http.get(`${config.baseUrl}/api/points/cursor?userId=${USER_ID}&size=${SIZE}&lastCreatedAt=${lastCreatedAt}&lastId=${lastId}`, {
+        timeout: config.timeout,
         tags: requestTags,
     });
 
-    check(next, {
-        'next status 200': (r) => r.status === 200,
-        'next response time < 5s': (r) => r.timings.duration < 5000,
-    });
+    checkHttpOk(next, 5000);
 }
