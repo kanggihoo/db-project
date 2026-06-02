@@ -1,0 +1,3 @@
+# Keep Makefile As Thin Command Interface
+
+The root `Makefile` should remain the public command interface for **Phase Evidence** workflows, while target implementation belongs in focused `makefiles/*.mk` includes. This keeps commands discoverable through `make help` without turning the root Makefile into a phase-specific command registry. New **Learning Phases** should prefer common targets such as `phase-sql`, `k6-evidence`, `grafana-capture`, and `evidence-capture` with explicit variables instead of adding new `phaseN-*` targets. `PRESET` remains the public compatibility variable, while `K6_PRESET` and `GRAFANA_PRESET` allow k6 runtime presets and Grafana dashboard preset labels to diverge when needed.
