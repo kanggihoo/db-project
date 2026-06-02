@@ -1,9 +1,17 @@
 import { check } from 'k6';
 
+function durationLabel(maxDurationMs) {
+    if (maxDurationMs % 1000 === 0) {
+        return `${maxDurationMs / 1000}s`;
+    }
+
+    return `${maxDurationMs}ms`;
+}
+
 export function checkHttpOk(response, maxDurationMs) {
     return check(response, {
         'status 200': (r) => r.status === 200,
-        [`response time < ${maxDurationMs}ms`]: (r) => r.timings.duration < maxDurationMs,
+        [`response time < ${durationLabel(maxDurationMs)}`]: (r) => r.timings.duration < maxDurationMs,
     });
 }
 
@@ -18,7 +26,7 @@ export function checkHttpOkJsonArray(response, maxDurationMs) {
 
     return check(response, {
         'status 200': (r) => r.status === 200,
-        [`response time < ${maxDurationMs}ms`]: (r) => r.timings.duration < maxDurationMs,
+        [`response time < ${durationLabel(maxDurationMs)}`]: (r) => r.timings.duration < maxDurationMs,
         'body is array': responseIsJsonArray,
     });
 }

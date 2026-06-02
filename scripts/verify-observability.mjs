@@ -23,6 +23,13 @@ function assertIncludes(file, expected) {
   assert(content.includes(expected), `${file} must include ${expected}`);
 }
 
+function assertAny(content, candidates, message) {
+  assert(
+    candidates.some((candidate) => content.includes(candidate)),
+    `${message}. Expected one of: ${candidates.join(', ')}`,
+  );
+}
+
 function verifyRunScript() {
   const content = read('k6/run.sh');
   for (const expected of [
@@ -41,17 +48,35 @@ function verifyScenario(file, scenario, requestName, defaults = {}) {
   const phase = defaults.phase || 'phase-01';
   const preset = defaults.preset || 'baseline';
   const content = read(file);
-  for (const expected of [
-    `scenario: __ENV.SCENARIO || '${scenario}'`,
-    `phase: __ENV.PHASE || '${phase}'`,
-    `preset: __ENV.PRESET_NAME || '${preset}'`,
-    "pool: __ENV.POOL || 'pool10'",
-    "systemTags: ['status', 'method', 'name', 'expected_response']",
-    `name: '${requestName}'`,
-    'tags: requestTags',
-  ]) {
-    assert(content.includes(expected), `${file} must include ${expected}`);
+  const usesSharedLib = content.includes('loadConfig(');
+
+  if (usesSharedLib) {
+    assertAny(content, [`defaultScenario: '${scenario}'`, `defaultScenario: "${scenario}"`], `${file} must pass defaultScenario`);
+    assertAny(content, [`defaultPhase: '${phase}'`, `defaultPhase: "${phase}"`], `${file} must pass defaultPhase`);
+    assertAny(content, [`defaultPresetName: '${preset}'`, `defaultPresetName: "${preset}"`], `${file} must pass defaultPresetName`);
+    assertAny(content, ["defaultPool: 'pool10'", 'defaultPool: "pool10"'], `${file} must pass defaultPool`);
+    assertAny(
+      content,
+      ['buildConstantArrivalRateOptions(config, {', 'buildConstantArrivalRateOptions(config, {'],
+      `${file} must use buildConstantArrivalRateOptions`,
+    );
+    assertAny(content, ["createRequestTags(config, '", 'createRequestTags(config, "'], `${file} must use createRequestTags`);
+    assert(content.includes(`'${requestName}'`) || content.includes(`\"${requestName}\"`), `${file} must include request name '${requestName}'`);
+  } else {
+    for (const expected of [
+      `scenario: __ENV.SCENARIO || '${scenario}'`,
+      `phase: __ENV.PHASE || '${phase}'`,
+      `preset: __ENV.PRESET_NAME || '${preset}'`,
+      "pool: __ENV.POOL || 'pool10'",
+      "systemTags: ['status', 'method', 'name', 'expected_response']",
+      `name: '${requestName}'`,
+      'tags: requestTags',
+    ]) {
+      assert(content.includes(expected), `${file} must include ${expected}`);
+    }
   }
+
+  assert(content.includes("systemTags: ['status', 'method', 'name', 'expected_response']") || content.includes('buildConstantArrivalRateOptions(config'), `${file} must include expected systemTags via options`);
 }
 
 function verifyGrafanaProvisioning() {
