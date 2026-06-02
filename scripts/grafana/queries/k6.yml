@@ -1,0 +1,51 @@
+k6.run.p95:
+  expr: histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval])))
+  zeroWhenNoData: true
+k6.run.p99:
+  expr: histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval])))
+  zeroWhenNoData: true
+k6.run.actual_rps:
+  expr: sum(rate(k6_http_reqs_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval]))
+  zeroWhenNoData: true
+k6.run.error_rate:
+  expr: avg(k6_http_req_failed_rate{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}) * 100
+  zeroWhenNoData: true
+k6.run.checks_success:
+  expr: avg(k6_checks_rate{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}) * 100
+  zeroWhenNoData: true
+k6.run.dropped_iterations:
+  expr: sum(increase(k6_dropped_iterations_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__range]))
+  zeroWhenNoData: true
+k6.run.pg_connections_used:
+  expr: sum(pg_stat_database_numbackends) / max(pg_settings_max_connections) * 100
+  zeroWhenNoData: true
+k6.run.hikari_pending_max:
+  expr: max(max_over_time(hikaricp_connections_pending[$__range]))
+  zeroWhenNoData: true
+k6.load.vus:
+  expr: sum(k6_vus{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"})
+  zeroWhenNoData: true
+k6.load.request_rate:
+  expr: sum(rate(k6_http_reqs_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval]))
+  zeroWhenNoData: true
+k6.load.success_request_rate:
+  expr: sum(rate(k6_http_reqs_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool", expected_response="true"}[$__rate_interval]))
+  zeroWhenNoData: true
+k6.load.error_request_rate:
+  expr: sum(rate(k6_http_reqs_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool", expected_response="false"}[$__rate_interval]))
+  zeroWhenNoData: true
+k6.load.p95_latency:
+  expr: histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval])))
+  zeroWhenNoData: true
+k6.load.iteration_p95:
+  expr: histogram_quantile(0.95, sum(rate(k6_iteration_duration_seconds{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval])))
+  zeroWhenNoData: true
+k6.load.checks_by_name:
+  expr: avg by (check) (k6_checks_rate{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}) * 100
+  zeroWhenNoData: true
+k6.load.dropped_iterations_rate:
+  expr: sum(rate(k6_dropped_iterations_total{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval]))
+  zeroWhenNoData: true
+k6.focus.latency:
+  expr: histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase="$phase", scenario="$scenario", preset="$preset", pool="$pool"}[$__rate_interval])))
+  zeroWhenNoData: true

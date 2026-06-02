@@ -1,0 +1,21 @@
+spring.api.request_rate_by_uri:
+  expr: sum by (uri) (rate(http_server_requests_seconds_count{uri=~"$uri", uri!="/actuator/prometheus", uri!="/**"}[$__rate_interval]))
+  zeroWhenNoData: true
+spring.api.p95_by_uri:
+  expr: histogram_quantile(0.95, sum by (le, uri) (rate(http_server_requests_seconds_bucket{uri=~"$uri", uri!="/actuator/prometheus", uri!="/**"}[$__rate_interval])))
+  zeroWhenNoData: true
+spring.api.errors_by_status:
+  expr: sum by (status) (rate(http_server_requests_seconds_count{status!~"2..", uri!="/actuator/prometheus", uri!="/**"}[$__rate_interval]))
+  zeroWhenNoData: true
+spring.runtime.timeout_count:
+  expr: sum(increase(hikaricp_connections_timeout_total[$__range]))
+  zeroWhenNoData: true
+spring.runtime.heap_used:
+  expr: sum(jvm_memory_used_bytes{area="heap"}) * 100 / sum(jvm_memory_max_bytes{area="heap"})
+  zeroWhenNoData: true
+spring.runtime.process_cpu:
+  expr: process_cpu_usage * 100
+  zeroWhenNoData: true
+spring.runtime.gc_pause:
+  expr: sum(rate(jvm_gc_pause_seconds_sum[$__rate_interval]))
+  zeroWhenNoData: true

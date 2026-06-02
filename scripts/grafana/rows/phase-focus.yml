@@ -1,0 +1,102 @@
+id: phase-focus
+rows:
+  - title: Phase 1 Baseline Focus
+    panels:
+      - type: timeseries
+        title: Phase 1 Baseline Focus Latency
+        query: k6.focus.latency
+        layout:
+          x: 0
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: p95
+      - type: timeseries
+        title: Phase 1 Baseline Focus Table Scan
+        query: postgres.seq_scan_by_table
+        layout:
+          x: 12
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: '{{relname}}'
+  - title: Phase 2 Index Focus
+    panels:
+      - type: timeseries
+        title: Phase 2 Index Focus Latency
+        query: k6.focus.latency
+        layout:
+          x: 0
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: p95
+      - type: timeseries
+        title: Phase 2 Index Focus Table Scan
+        query: postgres.seq_scan_by_table
+        layout:
+          x: 12
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: '{{relname}}'
+  - title: Phase 3 N+1 Focus
+    panels:
+      - type: timeseries
+        title: Phase 3 N+1 Focus Latency
+        query: k6.focus.latency
+        layout:
+          x: 0
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: p95
+      - type: timeseries
+        title: Phase 3 N+1 Focus Table Scan
+        query: postgres.seq_scan_by_table
+        layout:
+          x: 12
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: '{{relname}}'
+  - title: Phase 4 Transaction Focus
+    panels:
+      - type: timeseries
+        title: Phase 4 Transaction Focus Latency
+        query: k6.focus.latency
+        layout:
+          x: 0
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: p95
+      - type: timeseries
+        title: Phase 4 Transaction Focus Table Scan
+        query: postgres.seq_scan_by_table
+        layout:
+          x: 12
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: '{{relname}}'
+  - title: Phase 7 Pagination Focus
+    panels:
+      - type: timeseries
+        title: Phase 7 Pagination Focus Latency
+        query: k6.focus.latency
+        layout:
+          x: 0
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: p95
+      - type: timeseries
+        title: Phase 7 Pagination Focus Table Scan
+        query: postgres.seq_scan_by_table
+        layout:
+          x: 12
+          yOffset: 0
+          w: 12
+          h: 8
+        legend: '{{relname}}'

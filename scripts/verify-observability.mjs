@@ -125,6 +125,27 @@ function verifyDashboard() {
     targetsWithoutFallback.length === 0,
     `dashboard targets must use no-data fallback: ${targetsWithoutFallback.slice(0, 3).join(', ')}`,
   );
+
+  const positionedPanels = dashboard.panels
+    .filter((panel) => panel.gridPos)
+    .map((panel) => ({
+      title: panel.title,
+      type: panel.type,
+      ...panel.gridPos,
+    }));
+  const overlaps = [];
+  for (let i = 0; i < positionedPanels.length; i += 1) {
+    for (let j = i + 1; j < positionedPanels.length; j += 1) {
+      const a = positionedPanels[i];
+      const b = positionedPanels[j];
+      const overlapsX = a.x < b.x + b.w && b.x < a.x + a.w;
+      const overlapsY = a.y < b.y + b.h && b.y < a.y + a.h;
+      if (overlapsX && overlapsY) {
+        overlaps.push(`${a.title} (${a.type}) overlaps ${b.title} (${b.type})`);
+      }
+    }
+  }
+  assert(overlaps.length === 0, `dashboard panels must not overlap: ${overlaps.slice(0, 3).join(', ')}`);
 }
 
 function verifySpringHistograms() {
