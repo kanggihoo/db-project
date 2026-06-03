@@ -1,44 +1,34 @@
 import http from 'k6/http';
-import { check } from 'k6';
 
-const preset = JSON.parse(open(__ENV.PRESET || 'presets/baseline.json'));
-const BASE_URL = preset.baseUrl || 'http://host.docker.internal:8080';
-const USER_START = Number(preset.userStart || 1);
-const USER_END = Number(preset.userEnd || USER_START);
-const TIMEOUT = preset.timeout || '5s';
+import { loadConfig, createRequestTags } from './lib/config.js';
+import { buildConstantArrivalRateOptions } from './lib/scenarios.js';
+import { checkHttpOk } from './lib/checks.js';
+
+const config = loadConfig({
+    defaultPresetPath: 'presets/baseline.json',
+    defaultPhase: 'phase-01',
+    defaultScenario: 'orders',
+    defaultPresetName: 'baseline',
+    defaultPool: 'pool10',
+    defaultTimeout: '5s',
+    defaultThresholds: {
+        http_req_failed: ['rate<0.05'],
+        http_req_duration: ['p(95)<5000'],
+    },
+});
+const USER_START = Number(config.preset.userStart || 1);
+const USER_END = Number(config.preset.userEnd || USER_START);
 const STRATEGY = __ENV.STRATEGY || 'lazy';
-const DEFAULT_THRESHOLDS = {
-    http_req_failed: ['rate<0.05'],
-    http_req_duration: ['p(95)<5000'],
-};
-const THRESHOLDS = preset.thresholds === undefined ? DEFAULT_THRESHOLDS : preset.thresholds;
 
-const commonTags = {
-    phase: __ENV.PHASE || 'phase-01',
-    scenario: __ENV.SCENARIO || 'orders',
-    preset: __ENV.PRESET_NAME || 'baseline',
-    pool: __ENV.POOL || 'pool10',
-};
-
-const requestTags = {
-    ...commonTags,
-    name: 'GET /api/orders',
-};
+const requestTags = createRequestTags(config, 'GET /api/orders');
 
 export const options = {
-    tags: commonTags,
-    systemTags: ['status', 'method', 'name', 'expected_response'],
-    scenarios: {
-        steady: {
-            executor: 'constant-arrival-rate',
-            rate: Number(preset.rate || 50),
-            timeUnit: '1s',
-            duration: preset.duration || '5m',
-            preAllocatedVUs: Number(preset.preAllocatedVUs || 100),
-            maxVUs: Number(preset.maxVUs || 300),
-        },
-    },
-    thresholds: THRESHOLDS,
+    ...buildConstantArrivalRateOptions(config, {
+        defaultRate: 50,
+        defaultDuration: '5m',
+        defaultPreAllocatedVUs: 100,
+        defaultMaxVUs: 300,
+    }),
 };
 
 function randomBetween(start, end) {
@@ -47,13 +37,10 @@ function randomBetween(start, end) {
 
 export default function () {
     const userId = randomBetween(USER_START, USER_END);
-    const res = http.get(`${BASE_URL}/api/orders?userId=${userId}&strategy=${STRATEGY}`, {
-        timeout: TIMEOUT,
+    const res = http.get(`${config.baseUrl}/api/orders?userId=${userId}&strategy=${STRATEGY}`, {
+        timeout: config.timeout,
         tags: requestTags,
     });
 
-    check(res, {
-        'status 200': (r) => r.status === 200,
-        'response time < 5s': (r) => r.timings.duration < 5000,
-    });
+    checkHttpOk(res, 5000);
 }

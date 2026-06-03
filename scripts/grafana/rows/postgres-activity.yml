@@ -1,0 +1,39 @@
+id: postgres-activity
+title: PostgreSQL Activity
+panels:
+  - type: timeseries
+    title: Active Sessions
+    query: postgres.active_sessions
+    layout:
+      x: 0
+      yOffset: 0
+      w: 12
+      h: 8
+    legend: active
+  - type: timeseries
+    title: Locks
+    query: postgres.locks
+    layout:
+      x: 12
+      yOffset: 0
+      w: 12
+      h: 8
+    legend: '{{mode}}'
+  - type: timeseries
+    title: Commit Rate
+    query: postgres.commit_rate
+    layout:
+      x: 0
+      yOffset: 8
+      w: 12
+      h: 8
+    legend: commit
+  - type: timeseries
+    title: Rollback Rate
+    query: postgres.rollback_rate
+    layout:
+      x: 12
+      yOffset: 8
+      w: 12
+      h: 8
+    legend: rollback

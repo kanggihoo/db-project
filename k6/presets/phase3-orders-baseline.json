@@ -1,0 +1,13 @@
+{
+  "baseUrl": "http://host.docker.internal:8080",
+  "rate": 1,
+  "duration": "5m",
+  "preAllocatedVUs": 20,
+  "maxVUs": 100,
+  "timeout": "30s",
+  "userStart": 1,
+  "userEnd": 1000,
+  "categoryStart": 1,
+  "categoryEnd": 200,
+  "size": 20
+}

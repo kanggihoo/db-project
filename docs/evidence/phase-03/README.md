@@ -8,7 +8,7 @@ Phase 3 evidence는 주문 목록 API의 N+1 재현과 로딩 전략별 개선 �
 |---|---|
 | phase | `phase-03` |
 | scenario | `orders` |
-| preset | `baseline` |
+| preset | `baseline` historical label |
 | pool | `pool10` |
 | API | `GET /api/orders?userId=&strategy=` |
 | baseUrl | `http://host.docker.internal:8080` |
@@ -19,6 +19,8 @@ Phase 3 evidence는 주문 목록 API의 N+1 재현과 로딩 전략별 개선 �
 | timeout | `30s` |
 | user range | `1..1000` |
 | page size | `20` |
+
+Stored Phase 3 evidence was captured before phase-specific k6 presets were split from the common `baseline`. To rerun the same Phase 3 workload after the Phase 4 setup cleanup, use `phase3-orders-baseline`.
 
 ## Strategy Evidence
 

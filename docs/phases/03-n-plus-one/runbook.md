@@ -43,9 +43,11 @@ After creating indexes, run `VACUUM ANALYZE` through `scripts/phase-03/00-reset-
 
 For each strategy, reset statistics, run k6, then capture `pg_stat_statements`. Use the default server profile for `lazy`, `fetch-join`, and `entity-graph`; restart the server with `phase3-batch` only for `batch-size`.
 
+The stored Phase 3 evidence has the historical k6 label `preset=baseline`. After the Phase 4 branch setup split phase-specific presets from the common baseline, use `phase3-orders-baseline` for equivalent Phase 3 reruns.
+
 ```bash
 rtk docker compose exec -T postgres psql -U app -d ecommerce < scripts/phase-03/00-reset-statistics.sql
-PHASE=phase-03 POOL=pool10 STRATEGY=lazy K6_LOG_FILE=docs/evidence/phase-03/orders/lazy/k6-summary.txt ./k6/run.sh orders baseline prometheus
+PHASE=phase-03 POOL=pool10 STRATEGY=lazy K6_LOG_FILE=docs/evidence/phase-03/orders/lazy/k6-summary.txt ./k6/run.sh orders phase3-orders-baseline prometheus
 rtk docker compose exec -T postgres psql -U app -d ecommerce < scripts/phase-03/01-pg-stat-statements.sql | tee docs/evidence/phase-03/orders/lazy/pg-stat-statements.txt
 rtk docker compose exec -T postgres psql -U app -d ecommerce -v user_id=100 < scripts/phase-03/02-order-shape.sql | tee docs/evidence/phase-03/orders/lazy/sql-count.txt
 ```
@@ -57,7 +59,7 @@ For BatchSize, restart the server with the isolated profile before running the s
 ```bash
 ./scripts/server.sh phase3-batch
 rtk docker compose exec -T postgres psql -U app -d ecommerce < scripts/phase-03/00-reset-statistics.sql
-PHASE=phase-03 POOL=pool10 STRATEGY=batch-size K6_LOG_FILE=docs/evidence/phase-03/orders/batch-size/k6-summary.txt ./k6/run.sh orders baseline prometheus
+PHASE=phase-03 POOL=pool10 STRATEGY=batch-size K6_LOG_FILE=docs/evidence/phase-03/orders/batch-size/k6-summary.txt ./k6/run.sh orders phase3-orders-baseline prometheus
 rtk docker compose exec -T postgres psql -U app -d ecommerce < scripts/phase-03/01-pg-stat-statements.sql | tee docs/evidence/phase-03/orders/batch-size/pg-stat-statements.txt
 rtk docker compose exec -T postgres psql -U app -d ecommerce -v user_id=100 < scripts/phase-03/02-order-shape.sql | tee docs/evidence/phase-03/orders/batch-size/sql-count.txt
 ```

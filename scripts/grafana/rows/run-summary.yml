@@ -1,0 +1,73 @@
+id: run-summary
+title: Run Summary
+panels:
+  - type: stat
+    title: k6 p95
+    query: k6.run.p95
+    unit: s
+    layout:
+      x: 0
+      yOffset: 0
+      w: 6
+      h: 4
+  - type: stat
+    title: k6 p99
+    query: k6.run.p99
+    unit: s
+    layout:
+      x: 6
+      yOffset: 0
+      w: 6
+      h: 4
+  - type: stat
+    title: Actual RPS
+    query: k6.run.actual_rps
+    unit: reqps
+    layout:
+      x: 12
+      yOffset: 0
+      w: 6
+      h: 4
+  - type: stat
+    title: Error Rate
+    query: k6.run.error_rate
+    unit: percent
+    layout:
+      x: 18
+      yOffset: 0
+      w: 6
+      h: 4
+  - type: stat
+    title: Checks Success
+    query: k6.run.checks_success
+    unit: percent
+    layout:
+      x: 0
+      yOffset: 4
+      w: 6
+      h: 4
+  - type: stat
+    title: Dropped Iterations
+    query: k6.run.dropped_iterations
+    layout:
+      x: 6
+      yOffset: 4
+      w: 6
+      h: 4
+  - type: stat
+    title: PG Connections Used
+    query: k6.run.pg_connections_used
+    unit: percent
+    layout:
+      x: 12
+      yOffset: 4
+      w: 6
+      h: 4
+  - type: stat
+    title: Hikari Pending Max
+    query: k6.run.hikari_pending_max
+    layout:
+      x: 18
+      yOffset: 4
+      w: 6
+      h: 4

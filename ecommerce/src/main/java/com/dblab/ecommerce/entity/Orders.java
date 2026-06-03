@@ -56,6 +56,10 @@ public class Orders {
     @Builder.Default
     private List<OrderItem> orderItems = new ArrayList<>();
 
+    public void markPreparing() {
+        this.status = Status.PREPARING;
+    }
+
     public enum Status {
         PENDING, PAID, PREPARING, SHIPPED, DELIVERED, CANCELLED
     }

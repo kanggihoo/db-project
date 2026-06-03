@@ -1,13 +1,16 @@
 package com.dblab.ecommerce.controller;
 
 import com.dblab.ecommerce.dto.ProductResponse;
+import com.dblab.ecommerce.dto.ProductReviewSummaryResponse;
 import com.dblab.ecommerce.entity.Product;
 import com.dblab.ecommerce.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,8 +23,18 @@ public class ProductController {
 
     @GetMapping
     public List<ProductResponse> searchProducts(
-            @RequestParam Long categoryId,
-            @RequestParam Product.Status status) {
-        return productService.searchProducts(categoryId, status);
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Product.Status status,
+            @RequestParam(defaultValue = "querydsl") String strategy) {
+        try {
+            return productService.searchProducts(categoryId, status, strategy);
+        } catch (IllegalArgumentException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
+        }
+    }
+
+    @GetMapping("/review-summary")
+    public List<ProductReviewSummaryResponse> getReviewSummary() {
+        return productService.getReviewSummary();
     }
 }

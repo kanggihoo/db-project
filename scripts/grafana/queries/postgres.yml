@@ -1,0 +1,24 @@
+postgres.active_sessions:
+  expr: sum(pg_stat_activity_count{state="active"})
+  zeroWhenNoData: true
+postgres.locks:
+  expr: sum by (mode) (pg_locks_count)
+  zeroWhenNoData: true
+postgres.commit_rate:
+  expr: rate(pg_stat_database_xact_commit[$__rate_interval])
+  zeroWhenNoData: true
+postgres.rollback_rate:
+  expr: rate(pg_stat_database_xact_rollback[$__rate_interval])
+  zeroWhenNoData: true
+postgres.seq_scan_by_table:
+  expr: sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~"$table"}[$__rate_interval]))
+  zeroWhenNoData: true
+postgres.index_scan_by_table:
+  expr: sum by (relname) (rate(pg_stat_user_tables_idx_scan{relname=~"$table"}[$__rate_interval]))
+  zeroWhenNoData: true
+postgres.seq_tuples_read:
+  expr: sum by (relname) (rate(pg_stat_user_tables_seq_tup_read{relname=~"$table"}[$__rate_interval]))
+  zeroWhenNoData: true
+postgres.index_tuples_fetch:
+  expr: sum by (relname) (rate(pg_stat_user_tables_idx_tup_fetch{relname=~"$table"}[$__rate_interval]))
+  zeroWhenNoData: true

@@ -1,0 +1,13 @@
+Scenario: Dirty Read prevention
+Test: TransactionIsolationTest.dirtyReadIsPreventedEvenWithReadUncommitted
+Database: PostgreSQL Testcontainers using src/test/resources/init.sql
+Fixture: product id=900001 base_price=10000
+
+Sequence:
+1. txA updates product 900001 base_price to 15000 without commit.
+2. txB requests READ_UNCOMMITTED and reads product 900001 base_price.
+3. txB sees 10000, not txA's uncommitted 15000.
+4. txA rolls back.
+
+Expected: PostgreSQL prevents Dirty Read.
+Result: PASS - TransactionIsolationTest completed successfully in Gradle.

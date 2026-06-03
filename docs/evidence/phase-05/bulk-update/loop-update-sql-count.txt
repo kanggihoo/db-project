@@ -1,0 +1,11 @@
+테스트 fixture/configuration 기준 row-by-row dirty checking update 측정
+
+Marker:
+PHASE5_ROW_BY_ROW_UPDATE_SQL_COUNT=4
+
+Result:
+- `PENDING` 주문 3개를 로딩했다.
+- 각 managed entity에 `markPreparing()`을 호출했다.
+- Persistence context를 flush했다.
+- Hibernate `entityUpdateCount`는 3이었다.
+- 이 테스트 실행에서 Hibernate `prepareStatementCount`는 4였다. Fixture/configuration 기준 select 1회와 주문별 update 실행 3회를 의미한다.

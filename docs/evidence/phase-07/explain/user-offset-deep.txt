@@ -1,0 +1,24 @@
+PHASE7_USER_OFFSET_DEEP
+user_id= 374
+deep_offset= 1520
+                                                                         QUERY PLAN                                                                         
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=1718.06..1718.06 rows=1 width=53) (actual time=6.812..6.815 rows=20 loops=1)
+   Buffers: shared hit=1382 read=467
+   ->  Sort  (cost=1716.87..1718.06 rows=475 width=53) (actual time=6.637..6.771 rows=1540 loops=1)
+         Sort Key: created_at DESC, id DESC
+         Sort Method: quicksort  Memory: 302kB
+         Buffers: shared hit=1382 read=467
+         ->  Bitmap Heap Scan on point_history  (cost=16.11..1695.75 rows=475 width=53) (actual time=0.568..6.201 rows=1912 loops=1)
+               Recheck Cond: (user_id = 374)
+               Heap Blocks: exact=1827
+               Buffers: shared hit=1376 read=467
+               ->  Bitmap Index Scan on idx_point_history_user_created_id  (cost=0.00..15.99 rows=475 width=0) (actual time=0.325..0.325 rows=1912 loops=1)
+                     Index Cond: (user_id = 374)
+                     Buffers: shared hit=7 read=9
+ Planning:
+   Buffers: shared hit=135
+ Planning Time: 0.535 ms
+ Execution Time: 6.889 ms
+(17 rows)
+

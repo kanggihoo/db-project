@@ -14,7 +14,7 @@ Fetch Join과 EntityGraph는 `Orders -> OrderItems -> ProductSku -> Product` 경
 |---|---|
 | phase | `phase-03` |
 | scenario | `orders` |
-| preset | `baseline` |
+| preset | `baseline` historical label |
 | pool | `pool10` |
 | API | `GET /api/orders?userId=&strategy=` |
 | entity path | `Orders -> OrderItems -> ProductSku -> Product -> ProductImages` |
@@ -26,6 +26,8 @@ Fetch Join과 EntityGraph는 `Orders -> OrderItems -> ProductSku -> Product` 경
 | timeout | `30s` |
 | user range | `1..1000` |
 | page size | `20` |
+
+Phase 3 evidence 수집 당시에는 Phase 3 비교 조건이 `baseline` preset 파일에 들어 있었다. Phase 4 준비 과정에서 공통 `baseline`은 다시 50 rps 기준선으로 복원했고, 같은 조건으로 Phase 3를 재실행할 때는 `phase3-orders-baseline` preset을 사용한다.
 
 SQL calls/request는 `pg_stat_statements`의 반복 app query calls를 k6 `http_reqs`로 나눠 계산했다. `VACUUM ANALYZE`와 대표 `EXPLAIN` 수집 과정에서 생긴 one-off helper query는 비교값에서 제외했다.
 

@@ -1,0 +1,30 @@
+                                                                   QUERY PLAN                                                                   
+------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=59293.02..59293.27 rows=100 width=102) (actual time=389.547..389.560 rows=100 loops=1)
+   Buffers: shared hit=828 read=14959, temp read=1368 written=2482
+   ->  Sort  (cost=59293.02..59376.35 rows=33333 width=102) (actual time=389.545..389.551 rows=100 loops=1)
+         Sort Key: (avg(r.rating)) DESC, p.id
+         Sort Method: quicksort  Memory: 38kB
+         Buffers: shared hit=828 read=14959, temp read=1368 written=2482
+         ->  HashAggregate  (cost=51162.28..58019.05 rows=33333 width=102) (actual time=320.998..389.334 rows=100 loops=1)
+               Group Key: p.id
+               Filter: (count(r.id) >= 10)
+               Planned Partitions: 4  Batches: 5  Memory Usage: 8241kB  Disk Usage: 11760kB
+               Rows Removed by Filter: 99900
+               Buffers: shared hit=822 read=14959, temp read=1368 written=2482
+               ->  Hash Right Join  (cost=5359.00..21818.53 rows=300000 width=42) (actual time=47.832..208.745 rows=304791 loops=1)
+                     Hash Cond: (r.product_id = p.id)
+                     Buffers: shared hit=822 read=14959
+                     ->  Seq Scan on review r  (cost=0.00..15672.00 rows=300000 width=20) (actual time=0.047..34.884 rows=300000 loops=1)
+                           Buffers: shared hit=566 read=12106
+                     ->  Hash  (cost=4109.00..4109.00 rows=100000 width=30) (actual time=47.394..47.396 rows=100000 loops=1)
+                           Buckets: 131072  Batches: 1  Memory Usage: 7125kB
+                           Buffers: shared hit=256 read=2853
+                           ->  Seq Scan on product p  (cost=0.00..4109.00 rows=100000 width=30) (actual time=0.021..23.666 rows=100000 loops=1)
+                                 Buffers: shared hit=256 read=2853
+ Planning:
+   Buffers: shared hit=166 read=3
+ Planning Time: 2.604 ms
+ Execution Time: 393.093 ms
+(26 rows)
+

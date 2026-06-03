@@ -1,0 +1,3 @@
+# Keep k6 Scenario Entrypoints With Shared Runtime Helpers
+
+k6 scripts should keep scenario-specific entrypoints such as `orders-test.js`, `products-test.js`, `points-test.js`, and `review-summary-test.js`, while shared runtime plumbing belongs in `k6/lib/`. This keeps each **Measurement Condition** readable as an explicit API workload instead of hiding scenario behavior inside one generic runner, while still avoiding repeated preset loading, label construction, option generation, and common response checks. The shared helpers must preserve the low-cardinality evidence labels `phase`, `scenario`, `preset`, and `pool`; scenario-specific request parameters such as user IDs, pages, cursors, and SQL text stay out of Prometheus labels.

@@ -1,0 +1,3 @@
+# Manage DB Lab Overview Dashboard as YAML Source
+
+The shared `DB Lab Overview` dashboard should be managed from YAML source under `scripts/grafana/`, with generated JSON kept as the Grafana provisioning artifact at `docker/grafana/dashboards/db-lab-overview.json`. This keeps **Phase Evidence** comparable through one dashboard while making PromQL aliases, row definitions, and dashboard metadata easier to review than a monolithic JavaScript generator. The generated JSON is not the source of truth, and dashboard row/panel redesigns should be made as explicit follow-up decisions rather than being mixed into YAML parity refactors.

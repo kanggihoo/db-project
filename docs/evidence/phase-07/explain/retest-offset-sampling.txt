@@ -1,0 +1,49 @@
+PHASE7_RETEST_OFFSET_PAGE0
+user_id= 707000
+                                                                            QUERY PLAN                                                                            
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.43..19.24 rows=20 width=53) (actual time=0.063..0.066 rows=20 loops=1)
+   Buffers: shared hit=7
+   ->  Index Scan using idx_point_history_user_created_id on point_history  (cost=0.43..95577.18 rows=101640 width=53) (actual time=0.062..0.064 rows=20 loops=1)
+         Index Cond: (user_id = 707000)
+         Buffers: shared hit=7
+ Planning:
+   Buffers: shared hit=119 read=1 dirtied=1
+ Planning Time: 0.967 ms
+ Execution Time: 0.122 ms
+(9 rows)
+
+PHASE7_RETEST_OFFSET_PAGE1000
+user_id= 707000
+                                                                             QUERY PLAN                                                                              
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=18807.35..18826.15 rows=20 width=53) (actual time=2.814..2.817 rows=20 loops=1)
+   Buffers: shared hit=349
+   ->  Index Scan using idx_point_history_user_created_id on point_history  (cost=0.43..95577.18 rows=101640 width=53) (actual time=0.020..2.327 rows=20020 loops=1)
+         Index Cond: (user_id = 707000)
+         Buffers: shared hit=349
+ Planning Time: 0.035 ms
+ Execution Time: 2.841 ms
+(7 rows)
+
+PHASE7_RETEST_OFFSET_PAGE4999
+user_id= 707000
+                                                                            QUERY PLAN                                                                             
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=39444.04..39444.09 rows=20 width=53) (actual time=48.233..48.297 rows=20 loops=1)
+   Buffers: shared hit=1737, temp read=1004 written=1007
+   ->  Sort  (cost=39194.09..39448.19 rows=101640 width=53) (actual time=34.709..45.751 rows=100000 loops=1)
+         Sort Key: created_at DESC, id DESC
+         Sort Method: external merge  Disk: 8032kB
+         Buffers: shared hit=1737, temp read=1004 written=1007
+         ->  Bitmap Heap Scan on point_history  (cost=2804.14..27265.64 rows=101640 width=53) (actual time=4.780..12.534 rows=100000 loops=1)
+               Recheck Cond: (user_id = 707000)
+               Heap Blocks: exact=1236
+               Buffers: shared hit=1731
+               ->  Bitmap Index Scan on idx_point_history_user_created_id  (cost=0.00..2778.73 rows=101640 width=0) (actual time=4.635..4.635 rows=100000 loops=1)
+                     Index Cond: (user_id = 707000)
+                     Buffers: shared hit=495
+ Planning Time: 0.036 ms
+ Execution Time: 49.515 ms
+(15 rows)
+

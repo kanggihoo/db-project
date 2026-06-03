@@ -23,6 +23,13 @@ function assertIncludes(file, expected) {
   assert(content.includes(expected), `${file} must include ${expected}`);
 }
 
+function assertAny(content, candidates, message) {
+  assert(
+    candidates.some((candidate) => content.includes(candidate)),
+    `${message}. Expected one of: ${candidates.join(', ')}`,
+  );
+}
+
 function verifyRunScript() {
   const content = read('k6/run.sh');
   for (const expected of [
@@ -37,19 +44,39 @@ function verifyRunScript() {
   }
 }
 
-function verifyScenario(file, scenario, requestName) {
+function verifyScenario(file, scenario, requestName, defaults = {}) {
+  const phase = defaults.phase || 'phase-01';
+  const preset = defaults.preset || 'baseline';
   const content = read(file);
-  for (const expected of [
-    `scenario: __ENV.SCENARIO || '${scenario}'`,
-    "phase: __ENV.PHASE || 'phase-01'",
-    "preset: __ENV.PRESET_NAME || 'baseline'",
-    "pool: __ENV.POOL || 'pool10'",
-    "systemTags: ['status', 'method', 'name', 'expected_response']",
-    `name: '${requestName}'`,
-    'tags: requestTags',
-  ]) {
-    assert(content.includes(expected), `${file} must include ${expected}`);
+  const usesSharedLib = content.includes('loadConfig(');
+
+  if (usesSharedLib) {
+    assertAny(content, [`defaultScenario: '${scenario}'`, `defaultScenario: "${scenario}"`], `${file} must pass defaultScenario`);
+    assertAny(content, [`defaultPhase: '${phase}'`, `defaultPhase: "${phase}"`], `${file} must pass defaultPhase`);
+    assertAny(content, [`defaultPresetName: '${preset}'`, `defaultPresetName: "${preset}"`], `${file} must pass defaultPresetName`);
+    assertAny(content, ["defaultPool: 'pool10'", 'defaultPool: "pool10"'], `${file} must pass defaultPool`);
+    assertAny(
+      content,
+      ['buildConstantArrivalRateOptions(config, {', 'buildConstantArrivalRateOptions(config, {'],
+      `${file} must use buildConstantArrivalRateOptions`,
+    );
+    assertAny(content, ["createRequestTags(config, '", 'createRequestTags(config, "'], `${file} must use createRequestTags`);
+    assert(content.includes(`'${requestName}'`) || content.includes(`\"${requestName}\"`), `${file} must include request name '${requestName}'`);
+  } else {
+    for (const expected of [
+      `scenario: __ENV.SCENARIO || '${scenario}'`,
+      `phase: __ENV.PHASE || '${phase}'`,
+      `preset: __ENV.PRESET_NAME || '${preset}'`,
+      "pool: __ENV.POOL || 'pool10'",
+      "systemTags: ['status', 'method', 'name', 'expected_response']",
+      `name: '${requestName}'`,
+      'tags: requestTags',
+    ]) {
+      assert(content.includes(expected), `${file} must include ${expected}`);
+    }
   }
+
+  assert(content.includes("systemTags: ['status', 'method', 'name', 'expected_response']") || content.includes('buildConstantArrivalRateOptions(config'), `${file} must include expected systemTags via options`);
 }
 
 function verifyGrafanaProvisioning() {
@@ -98,6 +125,27 @@ function verifyDashboard() {
     targetsWithoutFallback.length === 0,
     `dashboard targets must use no-data fallback: ${targetsWithoutFallback.slice(0, 3).join(', ')}`,
   );
+
+  const positionedPanels = dashboard.panels
+    .filter((panel) => panel.gridPos)
+    .map((panel) => ({
+      title: panel.title,
+      type: panel.type,
+      ...panel.gridPos,
+    }));
+  const overlaps = [];
+  for (let i = 0; i < positionedPanels.length; i += 1) {
+    for (let j = i + 1; j < positionedPanels.length; j += 1) {
+      const a = positionedPanels[i];
+      const b = positionedPanels[j];
+      const overlapsX = a.x < b.x + b.w && b.x < a.x + a.w;
+      const overlapsY = a.y < b.y + b.h && b.y < a.y + a.h;
+      if (overlapsX && overlapsY) {
+        overlaps.push(`${a.title} (${a.type}) overlaps ${b.title} (${b.type})`);
+      }
+    }
+  }
+  assert(overlaps.length === 0, `dashboard panels must not overlap: ${overlaps.slice(0, 3).join(', ')}`);
 }
 
 function verifySpringHistograms() {
@@ -117,6 +165,10 @@ verifyRunScript();
 verifyScenario('k6/orders-test.js', 'orders', 'GET /api/orders');
 verifyScenario('k6/products-test.js', 'products', 'GET /api/products');
 verifyScenario('k6/points-test.js', 'points', 'GET /api/points');
+verifyScenario('k6/points-cursor-test.js', 'points-cursor', 'GET /api/points/cursor', {
+  phase: 'phase-07',
+  preset: 'cursor',
+});
 verifyGrafanaProvisioning();
 verifyDashboard();
 verifySpringHistograms();

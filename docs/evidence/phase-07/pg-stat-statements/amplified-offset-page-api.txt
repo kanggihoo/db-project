@@ -1,0 +1,8 @@
+PHASE7_PG_STAT_STATEMENTS_POINT_HISTORY
+ calls | mean_ms | total_ms  |  rows  |                                                                                                query                                                                                                 
+-------+---------+-----------+--------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 45003 |    8.90 | 400662.47 |  45003 | select count(*) from point_history ph1_0 where ph1_0.user_id=$1
+ 30002 |   12.46 | 373961.02 | 600040 | select ph1_0.id,ph1_0.amount,ph1_0.balance_after,ph1_0.created_at,ph1_0.description,ph1_0.type,ph1_0.user_id from point_history ph1_0 where ph1_0.user_id=$1 offset $2 rows fetch first $3 rows only
+ 15001 |    0.17 |   2518.53 | 300020 | select ph1_0.id,ph1_0.amount,ph1_0.balance_after,ph1_0.created_at,ph1_0.description,ph1_0.type,ph1_0.user_id from point_history ph1_0 where ph1_0.user_id=$1 fetch first $2 rows only
+(3 rows)
+

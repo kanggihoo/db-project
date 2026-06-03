@@ -1,0 +1,7 @@
+PHASE7_PG_STAT_STATEMENTS_POINT_HISTORY
+ calls | mean_ms | total_ms |  rows  |                                                                                                                                                 query                                                                                                                                                 
+-------+---------+----------+--------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 15000 |    0.18 |  2729.49 | 315000 | select ph1_0.id,ph1_0.amount,ph1_0.balance_after,ph1_0.created_at,ph1_0.description,ph1_0.type,ph1_0.user_id from point_history ph1_0 where ph1_0.user_id=$1 order by ph1_0.created_at desc,ph1_0.id desc fetch first $2 rows only
+ 15000 |    0.17 |  2509.76 | 315000 | select ph1_0.id,ph1_0.amount,ph1_0.balance_after,ph1_0.created_at,ph1_0.description,ph1_0.type,ph1_0.user_id from point_history ph1_0 where ph1_0.user_id=$1 and (ph1_0.created_at<$2 or (ph1_0.created_at=$3 and ph1_0.id<$4)) order by ph1_0.created_at desc,ph1_0.id desc fetch first $5 rows only
+(2 rows)
+

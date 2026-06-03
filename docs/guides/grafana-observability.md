@@ -8,6 +8,10 @@
 
 상세 요구사항은 [DB Lab Grafana Dashboard Spec](../superpowers/specs/db-lab-grafana-dashboard-spec.md)을 기준으로 한다. 이 결정의 배경은 [ADR 0005](../adr/0005-use-one-observability-dashboard-for-comparable-phase-evidence.md)에 기록한다.
 
+Grafana는 k6 또는 long-running application run의 time-series를 확인할 때 사용한다. Phase 4 transaction isolation처럼 Testcontainers에서 두 JDBC connection의 실행 순서를 고정하는 테스트는 Grafana가 primary evidence가 아니다. 이 경우 integration test output과 phase report를 우선하고, runtime pressure를 추가로 보고 싶을 때만 Grafana를 선택 evidence로 사용한다.
+
+Phase 6 집계 쿼리 최적화는 별도 dashboard JSON이나 전용 focus row를 만들지 않는다. Product Review Summary API의 대표 k6 실행 구간은 `DB Lab Overview`의 공통 row인 Run Summary, k6 Load, Spring API, Hikari Pool, Table Access에서 확인한다. 쿼리 단위의 primary evidence는 `EXPLAIN (ANALYZE, BUFFERS)`와 `pg_stat_statements` snapshot 파일에 남기며, SQL 원문이나 query id처럼 cardinality가 높은 값을 Prometheus label로 추가하지 않는다.
+
 ## Measurement Conditions
 
 k6 지표는 비교 가능한 Phase Evidence를 위해 낮은 cardinality label만 사용한다.

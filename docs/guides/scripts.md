@@ -2,6 +2,8 @@
 
 > 프로젝트 루트의 `scripts/` 디렉토리에 있는 실행 스크립트를 설명한다.
 
+반복 실행하는 프로젝트 작업은 루트 `Makefile`과 [Commands](./commands.md)를 우선 사용한다. 이 문서는 Makefile target이 호출하는 내부 구현 스크립트를 설명한다.
+
 ## Directory
 
 ```text
@@ -9,6 +11,7 @@ scripts/
 ├── capture-grafana-dashboard.mjs
 ├── generate-db-lab-dashboard.mjs
 ├── grafana-capture-utils.mjs
+├── run-phase-sql.mjs
 ├── phase-02/
 │   ├── 00-clean-product-indexes.sql
 │   ├── 01-main-pre-index-explain.sql
@@ -141,12 +144,13 @@ rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition
 
 Phase 3 orders strategy 증빙은 같은 wrapper에 `STRATEGY` 환경변수를 함께 넘긴다.
 
-Phase 3 closeout evidence의 `baseline` preset은 `rate=1`, 30초 timeout을 사용한다. threshold 실패 구간도 Grafana window로 남겨야 하면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`을 함께 사용한다.
+Phase 3 rerun evidence는 `phase3-orders-baseline` preset을 사용한다. 저장된 Phase 3 evidence는 preset 분리 이전에 수집되어 Grafana label에는 historical `preset=baseline`이 남아 있다. threshold 실패 구간도 Grafana window로 남겨야 하면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`을 함께 사용한다.
 
 ```bash
 STRATEGY=lazy rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-lazy \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-lazy.png
@@ -154,6 +158,7 @@ STRATEGY=lazy rtk npm run evidence:capture -- \
 STRATEGY=fetch-join rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-fetch-join \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-fetch-join.png
@@ -161,6 +166,7 @@ STRATEGY=fetch-join rtk npm run evidence:capture -- \
 STRATEGY=batch-size rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-batch-size \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-batch-size.png
@@ -168,6 +174,7 @@ STRATEGY=batch-size rtk npm run evidence:capture -- \
 STRATEGY=entity-graph rtk npm run evidence:capture -- \
   --phase phase-03 \
   --scenario orders \
+  --preset phase3-orders-baseline \
   --condition pool10-entity-graph \
   --table orders \
   --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-entity-graph.png
@@ -202,6 +209,16 @@ docker/grafana/dashboards/db-lab-overview.json
 
 - k6 실행이나 Playwright 캡처 중에 자동으로 호출되지는 않는다.
 - dashboard JSON을 다시 만든 뒤 Grafana 컨테이너가 이미 떠 있다면 dashboard reload 또는 컨테이너 재시작이 필요할 수 있다.
+
+## scripts/run-phase-sql.mjs
+
+Phase SQL 스크립트를 표준 변수 기반으로 실행하는 내부 runner다. 반복 실행은 루트 Makefile의 `phase-sql` target을 사용한다.
+
+```bash
+make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=baseline ACTION=explain OUTPUT=docs/evidence/phase-06/review-aggregate/baseline/explain.txt
+```
+
+이 스크립트는 현재 `phase-06`만 지원하며, 호스트의 SQL 파일을 읽어 `docker compose exec -T postgres psql -U app -d ecommerce -f -`에 stdin으로 전달한다. `OUTPUT`을 지정하면 대상 디렉토리를 만들고 psql stdout을 파일로 저장한다.
 
 ## scripts/capture-grafana-dashboard.mjs
 
@@ -251,7 +268,7 @@ Useful options:
 | `--url <url>` | Start from a custom Grafana dashboard URL. Explicit variable options still override matching `var-*` parameters. |
 | `--output <path>` | Override the final PNG path. |
 | `--parts-dir <path>` | Override the temporary part capture directory. |
-| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-07`. |
+| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-04`, `phase-07`. |
 | `--scenario <name>` | Set `var-scenario`. |
 | `--preset <name>` | Set `var-preset`. |
 | `--pool <name>` | Set `var-pool`. |

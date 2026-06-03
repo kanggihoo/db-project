@@ -1,0 +1,16 @@
+PHASE7_RETEST_COUNT_ONLY
+user_id= 707000
+                                                                               QUERY PLAN                                                                                
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=4049.23..4049.24 rows=1 width=8) (actual time=11.125..11.126 rows=1 loops=1)
+   Buffers: shared hit=499
+   ->  Index Only Scan using idx_point_history_user_created_id on point_history  (cost=0.43..3795.13 rows=101640 width=0) (actual time=0.059..7.796 rows=100000 loops=1)
+         Index Cond: (user_id = 707000)
+         Heap Fetches: 0
+         Buffers: shared hit=499
+ Planning:
+   Buffers: shared hit=91
+ Planning Time: 0.673 ms
+ Execution Time: 11.195 ms
+(10 rows)
+
