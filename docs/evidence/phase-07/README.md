@@ -13,6 +13,14 @@
 | k6 load | `50 rps`, `5m`, `100` pre-allocated VUs, `300` max VUs |
 | cache 조건 | warm-cache 반복 부하 |
 
+## Fixture cleanup
+
+Phase 7 retest hot user fixture는 long-lived Docker volume에서 다른 Phase로 이동할 때 제거할 수 있다. Evidence 캡처 전에는 cleanup을 실행하지 않는다.
+
+- cleanup script: [scripts/phase-07/06-hot-user-cleanup.sql](../../../scripts/phase-07/06-hot-user-cleanup.sql)
+- cleanup 절차와 검증 query: [Phase 7 runbook](../../phases/07-pagination/runbook.md#8-phase-7-hot-user-cleanup)
+- 더 강한 격리가 필요하면 `docker compose down -v && docker compose up -d && ./scripts/seed.sh loadtest`로 새 loadtest seed를 만든다.
+
 ## Retest Sampling 결과 요약
 
 | 비교 | 결과 |
