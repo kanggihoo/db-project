@@ -1,5 +1,9 @@
 # Claude / Agent
-.agents
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/phase-evidence-portfolio-review/
+!.agents/skills/phase-evidence-portfolio-review/**
 .claude
 
 # Gradle
