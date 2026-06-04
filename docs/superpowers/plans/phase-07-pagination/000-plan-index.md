@@ -32,6 +32,7 @@
 | 정렬 기준 | `created_at DESC, id DESC` |
 | 전체 테이블 인덱스 | `idx_point_history_created_id(created_at DESC, id DESC)` |
 | hot user 인덱스 | `idx_point_history_user_created_id(user_id, created_at DESC, id DESC)` |
+| Phase 7 fixture cleanup | `707000` amplified data는 Phase 7이 cleanup 절차까지 소유 |
 | k6 대상 | hot user API 실험만 |
 | Grafana | shared `DB Lab Overview`를 보조 evidence로 사용하고 새 대시보드 파일은 만들지 않음 |
 
@@ -48,6 +49,7 @@
 | 005 | [Evidence Capture And Report](./005-evidence-capture-and-report.md) | Phase 7 evidence 수집 절차와 report 작성 |
 | 006 | [Hot User Amplification](./006-hot-user-amplification.md) | Phase 7 전용 가상 hot user 100,000건 보강과 추가 evidence 수집 |
 | 010 | [Retest Plan Index](./010-retest-plan-index.md) | A/B/C 재측정 계획의 단계별 인덱스 |
+| 018 | [Phase 7 Data Cleanup](./018-phase-7-data-cleanup.md) | long-lived Docker volume에서 Phase 7 증폭 데이터 제거 절차 문서화 |
 | 999 | [Integration Stabilization](./999-integration-stabilization.md) | 테스트, 문서 일관성, evidence 구조 최종 검증 |
 
 ## File Ownership
@@ -61,6 +63,8 @@
 | `docs/phases/07-pagination/report.md` | 결과 요약과 해석 |
 | `docs/evidence/phase-07/README.md` | evidence index |
 | `scripts/phase-07/*.sql` | 데이터 프로파일, 인덱스 prepare, EXPLAIN 쿼리 |
+| `scripts/phase-07/05-hot-user-amplify.sql` | Phase 7 전용 `707000` amplified hot user 생성 |
+| `scripts/phase-07/06-hot-user-cleanup.sql` | Phase 7 전용 `707000` amplified hot user 제거 |
 | `ecommerce/src/main/java/com/dblab/ecommerce/dto/PointHistoryCursor.java` | Cursor 값 DTO |
 | `ecommerce/src/main/java/com/dblab/ecommerce/dto/PointHistoryCursorResponse.java` | Cursor API 응답 DTO |
 | `ecommerce/src/main/java/com/dblab/ecommerce/repository/PointHistoryRepository.java` | Offset/Page query와 Cursor query |
@@ -89,6 +93,8 @@
 - k6 label에는 `userId`, `page`, SQL text 같은 high-cardinality 값을 넣지 않는다.
 - page 차이는 `preset` 이름으로 구분한다.
 - Grafana screenshot은 보조 evidence다. 핵심 판단은 k6 summary, `EXPLAIN`, `pg_stat_statements`로 한다.
+- Phase 7 amplified data는 기본 `loadtest` seed로 간주하지 않는다.
+- 같은 Docker volume으로 다른 Phase를 진행할 때는 Phase 7 cleanup SQL로 `707000` 데이터를 제거한다.
 
 ## Verification Policy
 
@@ -103,5 +109,5 @@ rtk gradlew compileJava
 
 ```bash
 rtk rg -n "phase-07|Point History|point_history|/api/points/cursor|idx_point_history_user_created_id|EXPLAIN \\(ANALYZE, BUFFERS\\)" docs scripts k6 ecommerce/src/main ecommerce/src/test
-rtk powershell -NoProfile -Command "$paths = @('docs/phases/07-pagination/README.md','docs/phases/07-pagination/scope.md','docs/phases/07-pagination/runbook.md','docs/phases/07-pagination/observability.md','docs/phases/07-pagination/report.md','docs/evidence/phase-07/README.md','scripts/phase-07/00-data-profile.sql','k6/points-cursor-test.js'); $paths | ForEach-Object { if (-not (Test-Path $_)) { throw \"Missing $_\" } }"
+rtk powershell -NoProfile -Command "$paths = @('docs/phases/07-pagination/README.md','docs/phases/07-pagination/scope.md','docs/phases/07-pagination/runbook.md','docs/phases/07-pagination/observability.md','docs/phases/07-pagination/report.md','docs/evidence/phase-07/README.md','scripts/phase-07/00-data-profile.sql','scripts/phase-07/06-hot-user-cleanup.sql','k6/points-cursor-test.js'); $paths | ForEach-Object { if (-not (Test-Path $_)) { throw \"Missing $_\" } }"
 ```
