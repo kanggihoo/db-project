@@ -41,14 +41,14 @@
 | 015 | [Evidence Capture And Grafana](./015-evidence-capture-and-grafana.md) | k6, `pg_stat_statements`, Grafana screenshot evidence 수집 |
 | 016 | [Report And Evidence Docs](./016-report-and-evidence-docs.md) | Phase 7 report와 evidence index를 A/B/C 구조로 갱신 |
 | 017 | [Retest Verification Stabilization](./017-retest-verification-stabilization.md) | 테스트, 문서 링크, evidence 구조 최종 검증 |
-| 018 | [Phase 7 Data Cleanup](./018-phase-7-data-cleanup.md) | Phase 7 전용 amplified data cleanup 절차와 검증 |
+| 018 | [Phase 7 Data And Index Cleanup](./018-phase-7-data-cleanup.md) | Phase 7 전용 amplified data와 pagination index cleanup 절차와 검증 |
 
 ## File Ownership
 
 | Path | Responsibility |
 |---|---|
 | `scripts/phase-07/05-hot-user-amplify.sql` | `707000` hot user와 100,000건 `point_history` 생성 |
-| `scripts/phase-07/06-hot-user-cleanup.sql` | long-lived Docker volume에서 `707000` hot user와 `point_history` 제거 |
+| `scripts/phase-07/06-hot-user-cleanup.sql` | long-lived Docker volume에서 `707000` hot user, `point_history`, Phase 7 pagination index 제거 |
 | `ecommerce/src/main/java/com/dblab/ecommerce/service/PointService.java` | Offset/Page 정렬 기준 적용 |
 | `ecommerce/src/test/java/com/dblab/ecommerce/point/PointCursorApiTest.java` | Offset 정렬과 Cursor API 동작 검증 |
 | `scripts/phase-07/31-retest-offset-sampling-explain.sql` | Offset sample page별 EXPLAIN |
@@ -71,4 +71,4 @@
 - `pg_stat_statements_reset()`은 통계 분리용이며 cache 초기화로 해석하지 않는다.
 - Grafana screenshot은 보조 evidence다.
 - Phase 7의 primary evidence는 `EXPLAIN`, k6 summary, `pg_stat_statements` snapshot이다.
-- Phase 7 amplified data는 Phase 7 전용 fixture이며, cleanup 책임은 다음 Phase가 아니라 Phase 7에 둔다.
+- Phase 7 amplified data와 pagination index는 Phase 7 전용 fixture이며, cleanup 책임은 다음 Phase가 아니라 Phase 7에 둔다.

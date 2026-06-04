@@ -73,9 +73,9 @@ scripts/phase-07/05-hot-user-amplify.sql
 scripts/phase-07/06-hot-user-cleanup.sql
 ```
 
-cleanup은 Phase 7이 추가한 user와 `point_history`만 제거해야 한다. 삭제 조건은 `user_id=707000`, `id` 범위, `description='phase7 hot user amplification'`처럼 Phase 7 fixture를 식별할 수 있는 값으로 제한한다. 전체 `point_history`나 기본 `loadtest` seed 데이터는 삭제하지 않는다.
+cleanup은 Phase 7이 추가한 user와 `point_history`, Phase 7 전용 pagination index만 제거해야 한다. 삭제 조건은 `user_id=707000`, `id` 범위, `description='phase7 hot user amplification'`처럼 Phase 7 fixture를 식별할 수 있는 값으로 제한한다. 전체 `point_history`나 기본 `loadtest` seed 데이터는 삭제하지 않는다.
 
-Phase 간 완전 격리가 필요하면 `docker compose down -v` 후 `./scripts/seed.sh loadtest`로 DB를 재생성한다. DB volume을 유지한 채 다음 Phase로 이동할 때는 Phase 7 cleanup SQL을 실행하고, `user_id=707000`의 `point_history` count가 0건인지 확인한다.
+Phase 간 완전 격리가 필요하면 `docker compose down -v` 후 `./scripts/seed.sh loadtest`로 DB를 재생성한다. DB volume을 유지한 채 다음 Phase로 이동할 때는 Phase 7 cleanup SQL을 실행하고, `user_id=707000`의 `point_history` count와 Phase 7 index count가 0건인지 확인한다.
 
 ## 인덱스 전략
 
@@ -309,7 +309,7 @@ Phase 디렉터리는 표준 5개 문서만 둔다.
 - Phase 7의 주 대상은 **Point History** 단일 테이블이다.
 - **Delivery Tracking**은 이번 Phase의 필수 실험에서 제외한다.
 - 기존 seed 조건은 유지한다.
-- amplified hot user 데이터는 Phase 7 전용 fixture이며, long-lived Docker volume에서는 Phase 7 cleanup 절차로 제거한다.
+- amplified hot user 데이터와 pagination index는 Phase 7 전용 fixture이며, long-lived Docker volume에서는 Phase 7 cleanup 절차로 제거한다.
 - 전체 `point_history` SQL-only 실험은 필수 evidence로 둔다.
 - API/k6 실험은 hot user의 **Point History** 목록으로 진행한다.
 - Offset API와 Cursor API는 분리한다.
