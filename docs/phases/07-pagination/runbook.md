@@ -108,3 +108,37 @@ docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT pg_stat_stat
 docker compose run --rm -e PHASE=phase-07 -e SCENARIO=points-cursor-sampling -e PRESET_NAME=cursor-sampling -e PRESET=presets/points-cursor-sampling.json k6 run --out experimental-prometheus-rw /scripts/points-cursor-sampling-test.js
 docker compose exec -T postgres psql -U app -d ecommerce -f /tmp/30-pg-stat-statements.sql
 ```
+
+## 8. Phase 7 hot user cleanup
+
+Cleanup은 Phase 7 evidence를 모두 캡처한 뒤에만 실행한다. 같은 Docker volume을 유지한 채 다른 Phase로 이동할 때 `user_id=707000`과 Phase 7 전용 `point_history` 증폭 fixture만 제거하기 위한 절차다.
+
+postgres container에서 repository root가 `/workspace`로 mount되어 있으면 아래 명령을 실행한다.
+
+```bash
+rtk docker compose exec -T postgres psql -U app -d ecommerce -f /workspace/scripts/phase-07/06-hot-user-cleanup.sql
+```
+
+현재 `docker-compose.yml`처럼 `/workspace` mount가 없으면 script를 container로 복사한 뒤 실행한다.
+
+```bash
+rtk docker compose cp scripts/phase-07/06-hot-user-cleanup.sql postgres:/tmp/06-hot-user-cleanup.sql
+rtk docker compose exec -T postgres psql -U app -d ecommerce -f /tmp/06-hot-user-cleanup.sql
+```
+
+cleanup 후에는 Phase 7 fixture가 제거됐는지 확인한다.
+
+```bash
+rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_point_count FROM point_history WHERE user_id = 707000;"
+rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_user_count FROM users WHERE id = 707000;"
+```
+
+두 count가 모두 `0`이어야 한다.
+
+Phase 간 상태 격리가 더 중요하면 cleanup SQL 대신 새 volume에서 다시 시작한다.
+
+```bash
+rtk docker compose down -v
+rtk docker compose up -d
+./scripts/seed.sh loadtest
+```
