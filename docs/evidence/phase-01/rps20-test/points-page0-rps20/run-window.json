@@ -1,0 +1,13 @@
+{
+  "phase": "phase-01",
+  "scenario": "points",
+  "preset": "phase1-points-page0-rps20",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "exitStatus": 99,
+  "resultStatus": "threshold_failed",
+  "startedAt": 1781621807646,
+  "endedAt": 1781622116840,
+  "grafanaFrom": 1781621797646,
+  "grafanaTo": 1781622136840
+}

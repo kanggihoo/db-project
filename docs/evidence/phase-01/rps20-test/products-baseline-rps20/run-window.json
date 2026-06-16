@@ -1,0 +1,13 @@
+{
+  "phase": "phase-01",
+  "scenario": "products",
+  "preset": "baseline-rps20",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "exitStatus": 0,
+  "resultStatus": "passed",
+  "startedAt": 1781621461828,
+  "endedAt": 1781621764271,
+  "grafanaFrom": 1781621451828,
+  "grafanaTo": 1781621784271
+}

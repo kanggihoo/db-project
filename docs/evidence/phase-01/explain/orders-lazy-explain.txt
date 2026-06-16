@@ -1,0 +1,68 @@
+Pager usage is off.
+ORDERS_BY_USER_EXPLAIN
+                                   QUERY PLAN                                   
+--------------------------------------------------------------------------------
+ Gather Merge  (cost=9286.77..9292.60 rows=50 width=60)
+   Workers Planned: 2
+   ->  Sort  (cost=8286.75..8286.81 rows=25 width=60)
+         Sort Key: id
+         ->  Parallel Seq Scan on orders  (cost=0.00..8286.17 rows=25 width=60)
+               Filter: (user_id = 950)
+(6 rows)
+
+ORDERS_BY_USER_EXPLAIN_ANALYZE
+                                                          QUERY PLAN                                                          
+------------------------------------------------------------------------------------------------------------------------------
+ Gather Merge  (cost=9286.77..9292.60 rows=50 width=60) (actual time=122.719..138.268 rows=414 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=74 read=5682
+   ->  Sort  (cost=8286.75..8286.81 rows=25 width=60) (actual time=114.378..114.383 rows=138 loops=3)
+         Sort Key: id
+         Sort Method: quicksort  Memory: 35kB
+         Buffers: shared hit=74 read=5682
+         Worker 0:  Sort Method: quicksort  Memory: 34kB
+         Worker 1:  Sort Method: quicksort  Memory: 37kB
+         ->  Parallel Seq Scan on orders  (cost=0.00..8286.17 rows=25 width=60) (actual time=2.516..113.709 rows=138 loops=3)
+               Filter: (user_id = 950)
+               Rows Removed by Filter: 166529
+               Buffers: shared read=5682
+ Planning Time: 0.047 ms
+ Execution Time: 138.328 ms
+(16 rows)
+
+ORDER_ITEM_BY_ORDER_ID_EXPLAIN
+                                         QUERY PLAN                                          
+---------------------------------------------------------------------------------------------
+ Gather  (cost=1327.16..20469.69 rows=2 width=79)
+   Workers Planned: 2
+   InitPlan 1
+     ->  Limit  (cost=0.42..327.16 rows=1 width=8)
+           ->  Index Scan using orders_pkey on orders  (cost=0.42..19931.42 rows=61 width=8)
+                 Filter: (user_id = 950)
+   ->  Parallel Seq Scan on order_item  (cost=0.00..19142.33 rows=1 width=79)
+         Filter: (order_id = (InitPlan 1).col1)
+(8 rows)
+
+ORDER_ITEM_BY_ORDER_ID_EXPLAIN_ANALYZE
+                                                               QUERY PLAN                                                                
+-----------------------------------------------------------------------------------------------------------------------------------------
+ Gather  (cost=1327.16..20469.69 rows=2 width=79) (actual time=12.401..357.488 rows=2 loops=1)
+   Workers Planned: 2
+   Workers Launched: 2
+   Buffers: shared hit=9407 read=4542
+   InitPlan 1
+     ->  Limit  (cost=0.42..327.16 rows=1 width=8) (actual time=11.351..11.352 rows=1 loops=1)
+           Buffers: shared read=15
+           ->  Index Scan using orders_pkey on orders  (cost=0.42..19931.42 rows=61 width=8) (actual time=11.349..11.350 rows=1 loops=1)
+                 Filter: (user_id = 950)
+                 Rows Removed by Filter: 862
+                 Buffers: shared read=15
+   ->  Parallel Seq Scan on order_item  (cost=0.00..19142.33 rows=1 width=79) (actual time=180.709..319.060 rows=1 loops=3)
+         Filter: (order_id = (InitPlan 1).col1)
+         Rows Removed by Filter: 333333
+         Buffers: shared hit=9407 read=4527
+ Planning Time: 0.093 ms
+ Execution Time: 357.564 ms
+(17 rows)
+

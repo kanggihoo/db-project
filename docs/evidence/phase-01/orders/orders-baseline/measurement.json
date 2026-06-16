@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "phase": "phase-01",
+  "scenario": "orders",
+  "condition": "orders-baseline",
+  "preset": "baseline",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "target": {
+    "method": "GET",
+    "endpoint": "/api/orders",
+    "queryParams": {
+      "userId": "1..1000",
+      "strategy": "lazy"
+    },
+    "strategy": "lazy"
+  },
+  "workload": {
+    "rate": 50,
+    "duration": "5m",
+    "timeout": "5s",
+    "preAllocatedVUs": 100,
+    "maxVUs": 300
+  },
+  "evidence": {
+    "exitStatus": 99,
+    "files": {
+      "summaryJson": "docs/evidence/phase-01/orders/orders-baseline/k6-summary.json",
+      "runWindow": "docs/evidence/phase-01/orders/orders-baseline/run-window.json",
+      "exitStatus": "docs/evidence/phase-01/orders/orders-baseline/k6-exit-status.txt"
+    }
+  },
+  "execution": {
+    "command": "npm run k6:evidence -- --phase phase-01 --scenario orders --preset baseline --pool pool10 --mode prometheus --condition orders-baseline",
+    "exitStatus": 99,
+    "resultStatus": "threshold_failed"
+  },
+  "git": {
+    "commitSha": "1828ced5ef7eb13b483dfa3d1df6a592c6c3663e",
+    "dirty": true
+  }
+}

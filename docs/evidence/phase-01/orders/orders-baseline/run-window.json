@@ -1,0 +1,13 @@
+{
+  "phase": "phase-01",
+  "scenario": "orders",
+  "preset": "baseline",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "exitStatus": 99,
+  "resultStatus": "threshold_failed",
+  "startedAt": 1781617063960,
+  "endedAt": 1781617372948,
+  "grafanaFrom": 1781617053960,
+  "grafanaTo": 1781617392948
+}
