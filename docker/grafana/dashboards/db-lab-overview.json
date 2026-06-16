@@ -2695,14 +2695,467 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 100,
+        "w": 6,
+        "h": 4
+      },
+      "id": 35,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(pg_concurrency_activity_lock_waiting_sessions)) or vector(0)",
+          "range": true,
+          "refId": "b"
+        }
+      ],
+      "title": "Lock Waiting Sessions",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 100,
+        "w": 6,
+        "h": 4
+      },
+      "id": 36,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(pg_concurrency_locks_lock_count{granted=\"false\"})) or vector(0)",
+          "range": true,
+          "refId": "c"
+        }
+      ],
+      "title": "Ungranted Locks",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 100,
+        "w": 6,
+        "h": 4
+      },
+      "id": 37,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum(pg_concurrency_activity_idle_in_transaction_sessions)) or vector(0)",
+          "range": true,
+          "refId": "d"
+        }
+      ],
+      "title": "Idle In Transaction",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 100,
+        "w": 6,
+        "h": 4
+      },
+      "id": 38,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(max(pg_concurrency_activity_max_xact_age_seconds)) or vector(0)",
+          "range": true,
+          "refId": "e"
+        }
+      ],
+      "title": "Max Xact Age",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "id": 39,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum by (granted) (pg_concurrency_locks_lock_count)) or vector(0)",
+          "legendFormat": "{{granted}}",
+          "range": true,
+          "refId": "f"
+        }
+      ],
+      "title": "Locks By Granted State",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "id": 40,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(sum by (wait_event) (pg_concurrency_lock_waits_waiting_sessions)) or vector(0)",
+          "legendFormat": "{{wait_event}}",
+          "range": true,
+          "refId": "g"
+        }
+      ],
+      "title": "Lock Waits By Event",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 100
+        "y": 112
       },
-      "id": 35,
+      "id": 41,
       "panels": [],
       "title": "Table Access",
       "type": "row"
@@ -2768,11 +3221,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 101,
+        "y": 113,
         "w": 24,
         "h": 8
       },
-      "id": 36,
+      "id": 42,
       "options": {
         "legend": {
           "calcs": [
@@ -2797,7 +3250,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "b"
+          "refId": "h"
         }
       ],
       "title": "Seq Scan by Table",
@@ -2864,11 +3317,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 109,
+        "y": 121,
         "w": 24,
         "h": 8
       },
-      "id": 37,
+      "id": 43,
       "options": {
         "legend": {
           "calcs": [
@@ -2893,7 +3346,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_idx_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "c"
+          "refId": "i"
         }
       ],
       "title": "Index Scan by Table",
@@ -2960,11 +3413,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 117,
+        "y": 129,
         "w": 12,
         "h": 8
       },
-      "id": 38,
+      "id": 44,
       "options": {
         "legend": {
           "calcs": [
@@ -2989,7 +3442,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_tup_read{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "d"
+          "refId": "j"
         }
       ],
       "title": "Seq Tuples Read Rate by Table",
@@ -3056,11 +3509,11 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 117,
+        "y": 129,
         "w": 12,
         "h": 8
       },
-      "id": 39,
+      "id": 45,
       "options": {
         "legend": {
           "calcs": [
@@ -3085,7 +3538,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_idx_tup_fetch{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "e"
+          "refId": "k"
         }
       ],
       "title": "Index Tuples Fetch Rate by Table",
@@ -3097,9 +3550,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 125
+        "y": 137
       },
-      "id": 40,
+      "id": 46,
       "panels": [],
       "title": "Phase 1 Baseline Focus",
       "type": "row"
@@ -3165,11 +3618,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 126,
+        "y": 138,
         "w": 12,
         "h": 8
       },
-      "id": 41,
+      "id": 47,
       "options": {
         "legend": {
           "calcs": [
@@ -3194,7 +3647,7 @@
           "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "f"
+          "refId": "l"
         }
       ],
       "title": "Phase 1 Baseline Focus Latency",
@@ -3261,11 +3714,11 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 126,
+        "y": 138,
         "w": 12,
         "h": 8
       },
-      "id": 42,
+      "id": 48,
       "options": {
         "legend": {
           "calcs": [
@@ -3290,7 +3743,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "g"
+          "refId": "m"
         }
       ],
       "title": "Phase 1 Baseline Focus Table Scan",
@@ -3302,9 +3755,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 134
+        "y": 146
       },
-      "id": 43,
+      "id": 49,
       "panels": [],
       "title": "Phase 2 Index Focus",
       "type": "row"
@@ -3370,11 +3823,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 135,
+        "y": 147,
         "w": 12,
         "h": 8
       },
-      "id": 44,
+      "id": 50,
       "options": {
         "legend": {
           "calcs": [
@@ -3399,7 +3852,7 @@
           "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "h"
+          "refId": "n"
         }
       ],
       "title": "Phase 2 Index Focus Latency",
@@ -3466,11 +3919,11 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 135,
+        "y": 147,
         "w": 12,
         "h": 8
       },
-      "id": 45,
+      "id": 51,
       "options": {
         "legend": {
           "calcs": [
@@ -3495,7 +3948,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "i"
+          "refId": "o"
         }
       ],
       "title": "Phase 2 Index Focus Table Scan",
@@ -3507,9 +3960,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 143
+        "y": 155
       },
-      "id": 46,
+      "id": 52,
       "panels": [],
       "title": "Phase 3 N+1 Focus",
       "type": "row"
@@ -3575,11 +4028,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 144,
+        "y": 156,
         "w": 12,
         "h": 8
       },
-      "id": 47,
+      "id": 53,
       "options": {
         "legend": {
           "calcs": [
@@ -3604,7 +4057,7 @@
           "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "j"
+          "refId": "p"
         }
       ],
       "title": "Phase 3 N+1 Focus Latency",
@@ -3671,11 +4124,11 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 144,
+        "y": 156,
         "w": 12,
         "h": 8
       },
-      "id": 48,
+      "id": 54,
       "options": {
         "legend": {
           "calcs": [
@@ -3700,7 +4153,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "k"
+          "refId": "q"
         }
       ],
       "title": "Phase 3 N+1 Focus Table Scan",
@@ -3712,9 +4165,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 152
+        "y": 164
       },
-      "id": 49,
+      "id": 55,
       "panels": [],
       "title": "Phase 4 Transaction Focus",
       "type": "row"
@@ -3780,11 +4233,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 153,
+        "y": 165,
         "w": 12,
         "h": 8
       },
-      "id": 50,
+      "id": 56,
       "options": {
         "legend": {
           "calcs": [
@@ -3809,7 +4262,7 @@
           "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "l"
+          "refId": "r"
         }
       ],
       "title": "Phase 4 Transaction Focus Latency",
@@ -3876,11 +4329,11 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 153,
+        "y": 165,
         "w": 12,
         "h": 8
       },
-      "id": 51,
+      "id": 57,
       "options": {
         "legend": {
           "calcs": [
@@ -3905,7 +4358,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "m"
+          "refId": "s"
         }
       ],
       "title": "Phase 4 Transaction Focus Table Scan",
@@ -3917,9 +4370,9 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 161
+        "y": 173
       },
-      "id": 52,
+      "id": 58,
       "panels": [],
       "title": "Phase 7 Pagination Focus",
       "type": "row"
@@ -3985,11 +4438,11 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 162,
+        "y": 174,
         "w": 12,
         "h": 8
       },
-      "id": 53,
+      "id": 59,
       "options": {
         "legend": {
           "calcs": [
@@ -4014,7 +4467,7 @@
           "expr": "(histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase=\"$phase\", scenario=\"$scenario\", preset=\"$preset\", pool=\"$pool\"}[$__rate_interval])))) or vector(0)",
           "legendFormat": "p95",
           "range": true,
-          "refId": "n"
+          "refId": "t"
         }
       ],
       "title": "Phase 7 Pagination Focus Latency",
@@ -4081,11 +4534,11 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 162,
+        "y": 174,
         "w": 12,
         "h": 8
       },
-      "id": 54,
+      "id": 60,
       "options": {
         "legend": {
           "calcs": [
@@ -4110,7 +4563,7 @@
           "expr": "(sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~\"$table\"}[$__rate_interval]))) or vector(0)",
           "legendFormat": "{{relname}}",
           "range": true,
-          "refId": "o"
+          "refId": "u"
         }
       ],
       "title": "Phase 7 Pagination Focus Table Scan",

@@ -82,6 +82,8 @@ function verifyScenario(file, scenario, requestName, defaults = {}) {
 function verifyGrafanaProvisioning() {
   assertIncludes('docker/grafana/provisioning/datasources/prometheus.yml', 'uid: prometheus');
   assertIncludes('docker/grafana/provisioning/dashboards/dashboards.yml', 'path: /var/lib/grafana/dashboards');
+  assertIncludes('docker-compose.yml', 'PG_EXPORTER_EXTEND_QUERY_PATH');
+  assertIncludes('docker/postgres/postgres-exporter-queries.yml', 'pg_concurrency_activity');
 }
 
 function verifyDashboard() {
@@ -113,6 +115,11 @@ function verifyDashboard() {
     'pg_settings_max_connections',
     'hikaricp_connections_pending',
     'pg_stat_user_tables_seq_scan',
+    'pg_concurrency_activity_lock_waiting_sessions',
+    'pg_concurrency_activity_idle_in_transaction_sessions',
+    'pg_concurrency_activity_max_xact_age_seconds',
+    'pg_concurrency_locks_lock_count',
+    'pg_concurrency_lock_waits_waiting_sessions',
   ]) {
     assert(dashboardText.includes(expected), `dashboard must include ${expected}`);
   }

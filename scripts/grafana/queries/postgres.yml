@@ -10,6 +10,27 @@ postgres.commit_rate:
 postgres.rollback_rate:
   expr: rate(pg_stat_database_xact_rollback[$__rate_interval])
   zeroWhenNoData: true
+postgres.lock_waiting_sessions:
+  expr: sum(pg_concurrency_activity_lock_waiting_sessions)
+  zeroWhenNoData: true
+postgres.idle_in_transaction_sessions:
+  expr: sum(pg_concurrency_activity_idle_in_transaction_sessions)
+  zeroWhenNoData: true
+postgres.open_transactions:
+  expr: sum(pg_concurrency_activity_open_transactions)
+  zeroWhenNoData: true
+postgres.max_xact_age_seconds:
+  expr: max(pg_concurrency_activity_max_xact_age_seconds)
+  zeroWhenNoData: true
+postgres.ungranted_locks:
+  expr: sum(pg_concurrency_locks_lock_count{granted="false"})
+  zeroWhenNoData: true
+postgres.locks_by_granted:
+  expr: sum by (granted) (pg_concurrency_locks_lock_count)
+  zeroWhenNoData: true
+postgres.lock_waits_by_event:
+  expr: sum by (wait_event) (pg_concurrency_lock_waits_waiting_sessions)
+  zeroWhenNoData: true
 postgres.seq_scan_by_table:
   expr: sum by (relname) (rate(pg_stat_user_tables_seq_scan{relname=~"$table"}[$__rate_interval]))
   zeroWhenNoData: true

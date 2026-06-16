@@ -18,6 +18,7 @@ const config = loadConfig({
 const CATEGORY_START = Number(config.preset.categoryStart || 1);
 const CATEGORY_END = Number(config.preset.categoryEnd || CATEGORY_START);
 const STATUSES = config.preset.statuses || ['ON_SALE', 'SOLD_OUT', 'DISCONTINUED'];
+const STRATEGY = __ENV.STRATEGY || 'baseline';
 
 const requestTags = createRequestTags(config, 'GET /api/products');
 
@@ -37,7 +38,7 @@ function randomBetween(start, end) {
 export default function () {
     const categoryId = randomBetween(CATEGORY_START, CATEGORY_END);
     const status = STATUSES[Math.floor(Math.random() * STATUSES.length)];
-    const res = http.get(`${config.baseUrl}/api/products?categoryId=${categoryId}&status=${status}`, {
+    const res = http.get(`${config.baseUrl}/api/products?categoryId=${categoryId}&status=${status}&strategy=${STRATEGY}`, {
         timeout: config.timeout,
         tags: requestTags,
     });

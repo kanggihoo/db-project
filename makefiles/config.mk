@@ -1,17 +1,20 @@
-PHASE ?= phase-06
-SCENARIO ?= review-summary
-PRESET ?= review-summary-baseline
+PHASE ?=
+SCENARIO ?=
+PRESET ?=
 K6_PRESET ?= $(PRESET)
 GRAFANA_PRESET ?= $(PRESET)
 MODE ?= prometheus
 POOL ?= pool10
 PROFILE ?= local
-CONDITION ?= naive-index
-ACTION ?= explain
+CONDITION ?=
+FILE ?=
+SEED_PRESET ?=
+SEED_STATE_SQL ?= scripts/db-state/00-seed-state.sql
+SEED_STATE_OUTPUT ?= docs/evidence/common/seed-$(SEED_PRESET)/seed-state.txt
 TABLE ?=
 OUTPUT ?=
 WINDOW_FILE ?=
 TAIL ?= 120
 
-PHASE_SQL_CONDITION_ARG = $(if $(filter data-profile,$(SCENARIO)),,--condition $(CONDITION))
+require-variable = $(if $(strip $($(1))),,$(error $(1) is required))
 GRAFANA_PHASE_ALIGN_ARG = $(if $(filter phase-06,$(PHASE)),--no-align-phase-rows,)
