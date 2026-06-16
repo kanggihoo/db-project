@@ -128,17 +128,19 @@ Makefile 변수명은 대문자 snake case를 사용한다.
 | `INPUT` | 명시적 입력 경로 | `docs/evidence/phase-02/raw.png` |
 | `TAIL` | 로그 tail 줄 수 | `100` |
 
-기본값은 Makefile 상단에 둔다.
+Phase를 가르는 evidence 변수는 Makefile 상단에서 비워두고 target에서 명시를 강제한다. Phase와 무관한 operational default만 기본값을 둔다.
 
 ```makefile
-PHASE ?= phase-01
-SCENARIO ?= orders
-PRESET ?= baseline
+PHASE ?=
+SCENARIO ?=
+PRESET ?=
 MODE ?= prometheus
 POOL ?= pool10
 PROFILE ?= local
-CONDITION ?= baseline
+CONDITION ?=
 TAIL ?= 120
+
+require-variable = $(if $(strip $($(1))),,$(error $(1) is required))
 ```
 
 ## Makefile 예시
@@ -148,24 +150,26 @@ TAIL ?= 120
 ```makefile
 .PHONY: help server-start seed k6-run k6-evidence evidence-capture grafana-capture grafana-generate
 
-PHASE ?= phase-01
-SCENARIO ?= orders
-PRESET ?= baseline
+PHASE ?=
+SCENARIO ?=
+PRESET ?=
 MODE ?= prometheus
 POOL ?= pool10
 PROFILE ?= local
-CONDITION ?= baseline
+CONDITION ?=
 TABLE ?=
 OUTPUT ?=
+
+require-variable = $(if $(strip $($(1))),,$(error $(1) is required))
 
 help:
 	@echo "Available targets:"
 	@echo "  make server-start POOL=pool10"
 	@echo "  make seed PRESET=loadtest"
 	@echo "  make k6-run SCENARIO=orders PRESET=baseline MODE=local"
-	@echo "  make k6-evidence PHASE=phase-02 SCENARIO=products CONDITION=pool10-post-index"
-	@echo "  make evidence-capture PHASE=phase-02 SCENARIO=products CONDITION=pool10-post-index TABLE=product"
-	@echo "  make grafana-capture PHASE=phase-02 SCENARIO=products POOL=pool10"
+	@echo "  make k6-evidence PHASE=phase-02 SCENARIO=products PRESET=baseline CONDITION=pool10-post-index"
+	@echo "  make evidence-capture PHASE=phase-02 SCENARIO=products PRESET=baseline CONDITION=pool10-post-index TABLE=product"
+	@echo "  make grafana-capture PHASE=phase-02 SCENARIO=products PRESET=baseline POOL=pool10"
 
 server-start:
 	./scripts/server.sh $(POOL)
@@ -174,9 +178,15 @@ seed:
 	./scripts/seed.sh $(PRESET)
 
 k6-run:
+	$(call require-variable,SCENARIO)
+	$(call require-variable,PRESET)
 	PHASE=$(PHASE) POOL=$(POOL) ./k6/run.sh $(SCENARIO) $(PRESET) $(MODE)
 
 k6-evidence:
+	$(call require-variable,PHASE)
+	$(call require-variable,SCENARIO)
+	$(call require-variable,PRESET)
+	$(call require-variable,CONDITION)
 	npm run k6:evidence -- \
 		--phase $(PHASE) \
 		--scenario $(SCENARIO) \
@@ -186,6 +196,10 @@ k6-evidence:
 		--condition $(CONDITION)
 
 evidence-capture:
+	$(call require-variable,PHASE)
+	$(call require-variable,SCENARIO)
+	$(call require-variable,PRESET)
+	$(call require-variable,CONDITION)
 	npm run evidence:capture -- \
 		--phase $(PHASE) \
 		--scenario $(SCENARIO) \
@@ -197,6 +211,9 @@ evidence-capture:
 		$(if $(OUTPUT),--output $(OUTPUT),)
 
 grafana-capture:
+	$(call require-variable,PHASE)
+	$(call require-variable,SCENARIO)
+	$(call require-variable,PRESET)
 	npm run grafana:capture -- \
 		--phase $(PHASE) \
 		--scenario $(SCENARIO) \
@@ -312,7 +329,8 @@ docs/evidence/
       <scenario>-<condition>.png
     <scenario>/
       <condition>/
-        k6-summary.txt
+        k6-summary.json
+        k6-exit-status.txt
         run-window.json
         notes.md
 ```
@@ -320,7 +338,8 @@ docs/evidence/
 권장 이름:
 
 ```text
-docs/evidence/<phase>/<scenario>/<condition>/k6-summary.txt
+docs/evidence/<phase>/<scenario>/<condition>/k6-summary.json
+docs/evidence/<phase>/<scenario>/<condition>/k6-exit-status.txt
 docs/evidence/<phase>/<scenario>/<condition>/run-window.json
 docs/evidence/<phase>/grafana-screenshots/<scenario>-<condition>.png
 ```
