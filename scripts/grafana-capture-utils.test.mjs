@@ -57,6 +57,7 @@ test('getPhaseFromUrl reads the selected Grafana phase variable', () => {
 
 test('getFocusRowTitleForPhase maps phase ids to dashboard focus rows', () => {
   assert.equal(getFocusRowTitleForPhase('phase-03'), 'Phase 3 N+1 Focus');
+  assert.equal(getFocusRowTitleForPhase('phase-04'), 'Phase 4 Transaction Focus');
 });
 
 test('getFocusRowTitleForPhase rejects unsupported phase ids', () => {
@@ -155,7 +156,7 @@ test('shouldRequireRunWindow allows explicit live capture opt-in', () => {
   );
 });
 
-test('buildK6EvidencePaths binds log, run window, and output to the same condition', () => {
+test('buildK6EvidencePaths binds summary json, run window, and output to the same condition', () => {
   assert.deepEqual(
     buildK6EvidencePaths({
       phase: 'phase-02',
@@ -167,8 +168,10 @@ test('buildK6EvidencePaths binds log, run window, and output to the same conditi
     {
       condition: 'pool10-post-index',
       evidenceDir: 'docs/evidence/phase-02/products/pool10-post-index',
-      logFile: 'docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt',
+      measurementFile: 'docs/evidence/phase-02/products/pool10-post-index/measurement.json',
+      summaryJsonFile: 'docs/evidence/phase-02/products/pool10-post-index/k6-summary.json',
       runWindowFile: 'docs/evidence/phase-02/products/pool10-post-index/run-window.json',
+      exitStatusFile: 'docs/evidence/phase-02/products/pool10-post-index/k6-exit-status.txt',
       output: 'docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png',
     },
   );
@@ -183,6 +186,27 @@ test('buildK6EvidencePaths keeps the existing baseline screenshot name without c
       pool: 'pool10',
     }).output,
     'docs/evidence/phase-02/grafana-screenshots/products-baseline-pool10.png',
+  );
+});
+
+test('buildK6EvidencePaths stores Phase 6 review summary API evidence under the API evidence directory', () => {
+  assert.deepEqual(
+    buildK6EvidencePaths({
+      phase: 'phase-06',
+      scenario: 'review-summary',
+      preset: 'review-summary-baseline',
+      pool: 'pool10',
+      condition: 'naive-index',
+    }),
+    {
+      condition: 'naive-index',
+      evidenceDir: 'docs/evidence/phase-06/review-summary-api/naive-index',
+      measurementFile: 'docs/evidence/phase-06/review-summary-api/naive-index/measurement.json',
+      summaryJsonFile: 'docs/evidence/phase-06/review-summary-api/naive-index/k6-summary.json',
+      runWindowFile: 'docs/evidence/phase-06/review-summary-api/naive-index/run-window.json',
+      exitStatusFile: 'docs/evidence/phase-06/review-summary-api/naive-index/k6-exit-status.txt',
+      output: 'docs/evidence/phase-06/grafana-screenshots/review-summary-naive-index.png',
+    },
   );
 });
 
@@ -214,5 +238,20 @@ test('buildGrafanaCaptureArgs passes the exact k6 run window to Grafana capture'
       '--output',
       'docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png',
     ],
+  );
+});
+
+test('buildGrafanaCaptureArgs keeps Phase 6 on common dashboard rows', () => {
+  assert.deepEqual(
+    buildGrafanaCaptureArgs({
+      phase: 'phase-06',
+      scenario: 'review-summary',
+      preset: 'review-summary-baseline',
+      pool: 'pool10',
+      table: 'review',
+      runWindowFile: 'docs/evidence/phase-06/review-summary-api/naive-index/run-window.json',
+      output: 'docs/evidence/phase-06/grafana-screenshots/review-summary-naive-index.png',
+    }).at(-1),
+    '--no-align-phase-rows',
   );
 });

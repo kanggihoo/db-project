@@ -8,17 +8,6 @@
 
 - Phase 0 완료 (인프라 가동, 더미 데이터 삽입 완료)
 
-### 관련 문서
-
-- Phase 문서 허브: [phases/01-baseline/README.md](../phases/01-baseline/README.md)
-- 범위: [phases/01-baseline/scope.md](../phases/01-baseline/scope.md)
-- 실행 절차: [phases/01-baseline/runbook.md](../phases/01-baseline/runbook.md)
-- 관측 전략: [phases/01-baseline/observability.md](../phases/01-baseline/observability.md)
-- 결과 보고서: [phases/01-baseline/report.md](../phases/01-baseline/report.md)
-- 과거 계획: [superpowers/plans/phase-01-baseline/000-legacy-plan.md](../superpowers/plans/phase-01-baseline/000-legacy-plan.md)
-- k6 공통 가이드: [guides/k6-load-testing.md](../guides/k6-load-testing.md)
-- Grafana 공통 가이드: [guides/grafana-observability.md](../guides/grafana-observability.md)
-
 ### 구현 대상
 
 - ERD 기반 엔티티 구현 (인덱스, 최적화 일절 없이)

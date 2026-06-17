@@ -1,0 +1,12 @@
+hikari.active_connections:
+  expr: hikaricp_connections_active
+  zeroWhenNoData: true
+hikari.max_connections:
+  expr: hikaricp_connections_max
+  zeroWhenNoData: true
+hikari.pending_threads:
+  expr: hikaricp_connections_pending
+  zeroWhenNoData: true
+hikari.acquire_time:
+  expr: rate(hikaricp_connections_acquire_seconds_sum[$__rate_interval]) / rate(hikaricp_connections_acquire_seconds_count[$__rate_interval])
+  zeroWhenNoData: true

@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -49,5 +51,21 @@ class PointHistoryRepositoryTest {
                 savedUserId, PageRequest.of(100, 10));
         assertThat(page.getContent()).isEmpty();
         System.out.println("Offset 페이징 100페이지 — 빈 결과 확인");
+    }
+
+    @Test
+    void cursor_첫_페이지는_createdAt_id_내림차순으로_size_plus_one건_조회한다() {
+        List<PointHistory> rows = pointHistoryRepository.findFirstCursorPage(
+                savedUserId, PageRequest.of(0, 11));
+
+        assertThat(rows).hasSize(11);
+        assertThat(rows)
+                .isSortedAccordingTo((left, right) -> {
+                    int createdCompare = right.getCreatedAt().compareTo(left.getCreatedAt());
+                    if (createdCompare != 0) {
+                        return createdCompare;
+                    }
+                    return right.getId().compareTo(left.getId());
+                });
     }
 }

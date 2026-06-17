@@ -1,0 +1,37 @@
+PHASE7_POINT_HISTORY_TOTAL_COUNT
+ point_history_count 
+---------------------
+             2000000
+(1 row)
+
+PHASE7_HOT_USER_POINT_COUNTS
+ user_id | point_count 
+---------+-------------
+     374 |        1912
+     286 |        1910
+     889 |        1908
+     930 |        1905
+    1000 |        1904
+     520 |        1903
+      90 |        1902
+     782 |        1902
+     353 |        1901
+     824 |        1898
+      65 |        1897
+     169 |        1896
+     504 |        1896
+     338 |        1894
+     498 |        1893
+     922 |        1892
+     539 |        1891
+     615 |        1888
+     743 |        1887
+     422 |        1886
+(20 rows)
+
+PHASE7_INDEX_STATE_BEFORE
+ schemaname |   tablename   |     indexname      |                                    indexdef                                     
+------------+---------------+--------------------+---------------------------------------------------------------------------------
+ public     | point_history | point_history_pkey | CREATE UNIQUE INDEX point_history_pkey ON public.point_history USING btree (id)
+(1 row)
+

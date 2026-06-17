@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "phase": "phase-01",
+  "scenario": "products",
+  "condition": "products-baseline-rps20",
+  "preset": "baseline-rps20",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "target": {
+    "method": "GET",
+    "endpoint": "/api/products",
+    "queryParams": {
+      "categoryId": "1..200",
+      "status": "ON_SALE/SOLD_OUT/DISCONTINUED",
+      "strategy": "baseline"
+    },
+    "strategy": "baseline"
+  },
+  "workload": {
+    "rate": 20,
+    "duration": "5m",
+    "timeout": "5s",
+    "preAllocatedVUs": 100,
+    "maxVUs": 300
+  },
+  "evidence": {
+    "exitStatus": 0,
+    "files": {
+      "summaryJson": "docs/evidence/phase-01/rps20-test/products-baseline-rps20/k6-summary.json",
+      "runWindow": "docs/evidence/phase-01/rps20-test/products-baseline-rps20/run-window.json",
+      "exitStatus": "docs/evidence/phase-01/rps20-test/products-baseline-rps20/k6-exit-status.txt"
+    }
+  },
+  "execution": {
+    "command": "PHASE=phase-01 POOL=pool10 ./k6/run.sh products baseline-rps20 prometheus",
+    "exitStatus": 0,
+    "resultStatus": "passed"
+  }
+}

@@ -30,6 +30,9 @@ services:
     container_name: postgres_exporter
     environment:
       DATA_SOURCE_NAME: "postgresql://prometheus:prometheus@postgres:5432/ecommerce?sslmode=disable"
+      PG_EXPORTER_EXTEND_QUERY_PATH: "/etc/postgres-exporter/queries.yml"
+    volumes:
+      - ./docker/postgres/postgres-exporter-queries.yml:/etc/postgres-exporter/queries.yml:ro
     ports:
       - "9187:9187"
     depends_on:

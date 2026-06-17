@@ -18,7 +18,9 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public List<OrderResponse> getOrders(@RequestParam Long userId) {
-        return orderService.getOrdersByUserId(userId);
+    public List<OrderResponse> getOrders(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String strategy) {
+        return orderService.getOrdersByUserId(userId, strategy);
     }
 }

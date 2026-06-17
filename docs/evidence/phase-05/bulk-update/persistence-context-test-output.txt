@@ -1,0 +1,252 @@
+[rtk] /!\ No hook installed — run `rtk init -g` for automatic token savings
+Initialized native services in: C:\Users\SSAFY\.gradle\native
+Initialized jansi services in: C:\Users\SSAFY\.gradle\native
+Found daemon DaemonInfo{pid=8244, address=[7e714fe3-159d-4951-8509-b65fe88c0a09 port:62956, addresses:[/127.0.0.1]], state=Idle, lastBusy=1778196881472, context=DefaultDaemonContext[uid=d9eec322-6978-4d17-acde-eb4110435d20,javaHome=C:\Program Files\Java\jdk-21.0.10,javaVersion=21,javaVendor=Oracle Corporation,daemonRegistryDir=C:\Users\SSAFY\.gradle\daemon,pid=8244,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]} however its context does not match the desired criteria.
+At least one daemon option is different.
+Wanted: DaemonRequestContext{jvmCriteria=C:\Program Files\Java\jdk-21.0.10 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:MaxMetaspaceSize=384m, -XX:+HeapDumpOnOutOfMemoryError, -Xms256m, -Xmx512m, -Dfile.encoding=UTF-8, -Duser.country=KR, -Duser.language=ko, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=d9eec322-6978-4d17-acde-eb4110435d20,javaHome=C:\Program Files\Java\jdk-21.0.10,javaVersion=21,javaVendor=Oracle Corporation,daemonRegistryDir=C:\Users\SSAFY\.gradle\daemon,pid=8244,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]
+
+  Looking for a different daemon...
+Found daemon DaemonInfo{pid=16180, address=[9f159a8f-4801-4b15-b3a6-02ed22620471 port:49529, addresses:[/127.0.0.1]], state=Idle, lastBusy=1779350991902, context=DefaultDaemonContext[uid=2a5897cd-822b-4861-9a8e-b5d6c28066dc,javaHome=C:\Users\SSAFY\.vscode\extensions\redhat.java-1.54.0-win32-x64\jre\21.0.10-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\SSAFY\.gradle\daemon,pid=16180,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]} however its context does not match the desired criteria.
+JVM is incompatible.
+Wanted: DaemonRequestContext{jvmCriteria=C:\Program Files\Java\jdk-21.0.10 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:MaxMetaspaceSize=384m, -XX:+HeapDumpOnOutOfMemoryError, -Xms256m, -Xmx512m, -Dfile.encoding=UTF-8, -Duser.country=KR, -Duser.language=ko, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=2a5897cd-822b-4861-9a8e-b5d6c28066dc,javaHome=C:\Users\SSAFY\.vscode\extensions\redhat.java-1.54.0-win32-x64\jre\21.0.10-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\SSAFY\.gradle\daemon,pid=16180,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]
+
+  Looking for a different daemon...
+Found daemon DaemonInfo{pid=13600, address=[96abf1db-9e55-45c5-911d-44f34cdd8a3b port:58066, addresses:[/127.0.0.1]], state=Idle, lastBusy=1779750054249, context=DefaultDaemonContext[uid=fe0a15b2-ce04-48aa-b166-70dd9a4b22ff,javaHome=C:\Users\SSAFY\.vscode\extensions\redhat.java-1.54.0-win32-x64\jre\21.0.10-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\SSAFY\.gradle\daemon,pid=13600,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]} however its context does not match the desired criteria.
+JVM is incompatible.
+Wanted: DaemonRequestContext{jvmCriteria=C:\Program Files\Java\jdk-21.0.10 (no Daemon JVM specified, using current Java home), daemonOpts=[-XX:MaxMetaspaceSize=384m, -XX:+HeapDumpOnOutOfMemoryError, -Xms256m, -Xmx512m, -Dfile.encoding=UTF-8, -Duser.country=KR, -Duser.language=ko, -Duser.variant], applyInstrumentationAgent=true, nativeServicesMode=ENABLED, priority=NORMAL}
+Actual: DefaultDaemonContext[uid=fe0a15b2-ce04-48aa-b166-70dd9a4b22ff,javaHome=C:\Users\SSAFY\.vscode\extensions\redhat.java-1.54.0-win32-x64\jre\21.0.10-win32-x86_64,javaVersion=21,javaVendor=Eclipse Adoptium,daemonRegistryDir=C:\Users\SSAFY\.gradle\daemon,pid=13600,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,nativeServicesMode=ENABLED,daemonOpts=-XX:MaxMetaspaceSize=384m,-XX:+HeapDumpOnOutOfMemoryError,-Xms256m,-Xmx512m,-Dfile.encoding=UTF-8,-Duser.country=KR,-Duser.language=ko,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 22828). The daemon log file: C:\Users\SSAFY\.gradle\daemon\9.4.1\daemon-22828.out.log
+Starting 41st build in daemon [uptime: 1 hrs 1 mins 25.046 secs, performance: 100%, GC rate: 0.00/s, heap usage: 2% of 512 MiB, non-heap usage: 22% of 384 MiB]
+Using 8 worker leases.
+Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=false, resilientModelBuilding=false}
+Now considering [C:\Users\SSAFY\Desktop\db-project\ecommerce] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'C:\Users\SSAFY\Desktop\db-project\ecommerce\settings.gradle'.
+Projects loaded. Root project using build file 'C:\Users\SSAFY\Desktop\db-project\ecommerce\build.gradle'.
+Included projects: [root project 'ecommerce']
+
+> Configure project :
+Evaluating root project 'ecommerce' using build file 'C:\Users\SSAFY\Desktop\db-project\ecommerce\build.gradle'.
+Resolved plugin [id: 'java']
+Resolved plugin [id: 'org.springframework.boot', version: '4.0.5']
+Resolved plugin [id: 'io.spring.dependency-management', version: '1.1.7']
+Applying dependency management to configuration 'annotationProcessor' in project 'ecommerce'
+Applying dependency management to configuration 'apiElements' in project 'ecommerce'
+Applying dependency management to configuration 'archives' in project 'ecommerce'
+Applying dependency management to configuration 'bootArchives' in project 'ecommerce'
+Applying dependency management to configuration 'compileClasspath' in project 'ecommerce'
+Applying dependency management to configuration 'compileOnly' in project 'ecommerce'
+Applying dependency management to configuration 'default' in project 'ecommerce'
+Applying dependency management to configuration 'developmentOnly' in project 'ecommerce'
+Applying dependency management to configuration 'implementation' in project 'ecommerce'
+Applying dependency management to configuration 'mainSourceElements' in project 'ecommerce'
+Applying dependency management to configuration 'productionRuntimeClasspath' in project 'ecommerce'
+Applying dependency management to configuration 'runtimeClasspath' in project 'ecommerce'
+Applying dependency management to configuration 'runtimeElements' in project 'ecommerce'
+Applying dependency management to configuration 'runtimeOnly' in project 'ecommerce'
+Applying dependency management to configuration 'testAndDevelopmentOnly' in project 'ecommerce'
+Applying dependency management to configuration 'testAnnotationProcessor' in project 'ecommerce'
+Applying dependency management to configuration 'testCompileClasspath' in project 'ecommerce'
+Applying dependency management to configuration 'testCompileOnly' in project 'ecommerce'
+Applying dependency management to configuration 'testImplementation' in project 'ecommerce'
+Applying dependency management to configuration 'testResultsElementsForTest' in project 'ecommerce'
+Applying dependency management to configuration 'testRuntimeClasspath' in project 'ecommerce'
+Applying dependency management to configuration 'testRuntimeOnly' in project 'ecommerce'
+All projects evaluated.
+Task name matched 'test'
+Selected primary task 'test' from project :
+Resolving global dependency management for project 'ecommerce'
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Excluding []
+Tasks to be executed: [task ':compileJava', task ':processResources', task ':classes', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :compileJava (Thread[#1572,Execution worker,5,main]) started.
+:compileJava (Thread[#1572,Execution worker,5,main]) started.
+
+> Task :compileJava
+Custom actions are attached to task ':compileJava'.
+Caching disabled for task ':compileJava' because:
+  Build cache is disabled
+Task ':compileJava' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+The input changes require a full rebuild for incremental task ':compileJava'.
+Compilation mode: in-process compilation
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain 'C:\Program Files\Java\jdk-21.0.10'.
+Compiling with JDK Java compiler API.
+Class dependency analysis for incremental compilation took 0.084 secs.
+Created classpath snapshot for incremental compilation in 0.013 secs.
+Resolve mutations for :processResources (Thread[#1572,Execution worker,5,main]) started.
+:processResources (Thread[#1571,included builds,5,main]) started.
+
+> Task :processResources
+Caching disabled for task ':processResources' because:
+  Build cache is disabled
+  Not worth caching
+Task ':processResources' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+Resolve mutations for :classes (Thread[#1571,included builds,5,main]) started.
+:classes (Thread[#1571,included builds,5,main]) started.
+
+> Task :classes
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :compileTestJava (Thread[#1571,included builds,5,main]) started.
+:compileTestJava (Thread[#1571,included builds,5,main]) started.
+
+> Task :compileTestJava
+Custom actions are attached to task ':compileTestJava'.
+Caching disabled for task ':compileTestJava' because:
+  Build cache is disabled
+Task ':compileTestJava' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+The input changes require a full rebuild for incremental task ':compileTestJava'.
+Compilation mode: in-process compilation
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain 'C:\Program Files\Java\jdk-21.0.10'.
+Compiling with JDK Java compiler API.
+Class dependency analysis for incremental compilation took 0.008 secs.
+Created classpath snapshot for incremental compilation in 0.033 secs.
+Resolve mutations for :processTestResources (Thread[#1571,included builds,5,main]) started.
+:processTestResources (Thread[#1571,included builds,5,main]) started.
+
+> Task :processTestResources
+Caching disabled for task ':processTestResources' because:
+  Build cache is disabled
+  Not worth caching
+Task ':processTestResources' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+Resolve mutations for :testClasses (Thread[#1571,included builds,5,main]) started.
+:testClasses (Thread[#1571,included builds,5,main]) started.
+
+> Task :testClasses
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :test (Thread[#1571,included builds,5,main]) started.
+:test (Thread[#1571,included builds,5,main]) started.
+Gradle Test Executor 25 started executing tests.
+
+> Task :test
+Caching disabled for task ':test' because:
+  Build cache is disabled
+Task ':test' is not up-to-date because:
+  Executed with '--rerun-tasks'.
+Starting process 'Gradle Test Executor 25'. Working directory: C:\Users\SSAFY\Desktop\db-project\ecommerce Command: C:\Program Files\Java\jdk-21.0.10\bin\java.exe -Dorg.gradle.internal.worker.tmpdir=C:\Users\SSAFY\Desktop\db-project\ecommerce\build\tmp\test\work @C:\Users\SSAFY\.gradle\.tmp\gradle-worker-classpath17632300758796659810txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country=KR -Duser.language=ko -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 25'
+Successfully started process 'Gradle Test Executor 25'
+
+OrderBulkUpdateTest STANDARD_OUT
+    11:03:14.107 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.dblab.ecommerce.order.OrderBulkUpdateTest]: OrderBulkUpdateTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+    11:03:14.297 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.dblab.ecommerce.EcommerceApplication for test class com.dblab.ecommerce.order.OrderBulkUpdateTest
+    11:03:14.300 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.dblab.ecommerce.order.OrderBulkUpdateTest]: OrderBulkUpdateTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+    11:03:14.335 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.dblab.ecommerce.EcommerceApplication for test class com.dblab.ecommerce.order.OrderBulkUpdateTest
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v4.0.5)
+
+    2026-05-26T11:03:15.002+09:00  INFO 21520 --- [ecommerce] [    Test worker] c.d.ecommerce.order.OrderBulkUpdateTest  : Starting OrderBulkUpdateTest using Java 21.0.10 with PID 21520 (started by SSAFY in C:\Users\SSAFY\Desktop\db-project\ecommerce)
+    2026-05-26T11:03:15.005+09:00  INFO 21520 --- [ecommerce] [    Test worker] c.d.ecommerce.order.OrderBulkUpdateTest  : No active profile set, falling back to 1 default profile: "default"
+    2026-05-26T11:03:15.531+09:00  INFO 21520 --- [ecommerce] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-05-26T11:03:15.627+09:00  INFO 21520 --- [ecommerce] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 83 ms. Found 4 JPA repository interfaces.
+    2026-05-26T11:03:15.836+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.images.PullPolicy     : Image pull policy will be performed by: DefaultPullPolicy()
+    2026-05-26T11:03:15.840+09:00  INFO 21520 --- [ecommerce] [    Test worker] o.t.utility.ImageNameSubstitutor         : Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+    2026-05-26T11:03:15.866+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.DockerClientFactory   : Testcontainers version: 2.0.4
+    2026-05-26T11:03:16.132+09:00  INFO 21520 --- [ecommerce] [    Test worker] o.t.d.DockerClientProviderStrategy       : Loaded org.testcontainers.dockerclient.NpipeSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+    2026-05-26T11:03:16.867+09:00  INFO 21520 --- [ecommerce] [    Test worker] o.t.d.DockerClientProviderStrategy       : Found Docker environment with local Npipe socket (npipe:////./pipe/docker_engine)
+    2026-05-26T11:03:16.868+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.DockerClientFactory   : Docker host IP address is localhost
+    2026-05-26T11:03:16.890+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.DockerClientFactory   : Connected to docker: 
+      Server Version: 29.2.1
+      API Version: 1.53
+      Operating System: Docker Desktop
+      Total Memory: 15960 MB
+      Labels: 
+        com.docker.desktop.address=npipe://\\.\pipe\docker_cli
+    2026-05-26T11:03:17.034+09:00  INFO 21520 --- [ecommerce] [    Test worker] tc.testcontainers/ryuk:0.14.0            : Creating container for image: testcontainers/ryuk:0.14.0
+    2026-05-26T11:03:17.132+09:00  INFO 21520 --- [ecommerce] [    Test worker] o.t.utility.RegistryAuthLocator          : Credential helper/store (docker-credential-desktop) does not have credentials for https://index.docker.io/v1/
+    2026-05-26T11:03:17.321+09:00  INFO 21520 --- [ecommerce] [    Test worker] tc.testcontainers/ryuk:0.14.0            : Container testcontainers/ryuk:0.14.0 is starting: 56c2de13609d787d3017db95f60acb92819fde144aa55f01e545ddabf7e744ca
+    2026-05-26T11:03:17.831+09:00  INFO 21520 --- [ecommerce] [    Test worker] tc.testcontainers/ryuk:0.14.0            : Container testcontainers/ryuk:0.14.0 started in PT0.796962S
+    2026-05-26T11:03:17.837+09:00  INFO 21520 --- [ecommerce] [    Test worker] o.t.utility.RyukResourceReaper           : Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+    2026-05-26T11:03:17.837+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.DockerClientFactory   : Checking the system...
+    2026-05-26T11:03:17.838+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.DockerClientFactory   : ✔︎ Docker server version should be at least 1.6.0
+    2026-05-26T11:03:17.839+09:00  INFO 21520 --- [ecommerce] [    Test worker] tc.postgres:17-alpine                    : Creating container for image: postgres:17-alpine
+    2026-05-26T11:03:17.939+09:00  INFO 21520 --- [ecommerce] [    Test worker] tc.postgres:17-alpine                    : Container postgres:17-alpine is starting: 3fa15d6d0db01923e9f4a54282d81e8865ec24272edffae32a494e093ffa0085
+    2026-05-26T11:03:19.913+09:00  INFO 21520 --- [ecommerce] [    Test worker] tc.postgres:17-alpine                    : Container postgres:17-alpine started in PT2.0739057S
+    2026-05-26T11:03:19.913+09:00  INFO 21520 --- [ecommerce] [    Test worker] tc.postgres:17-alpine                    : Container is started (JDBC URL: jdbc:postgresql://localhost:57030/test?loggerLevel=OFF)
+    2026-05-26T11:03:19.925+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.ext.ScriptUtils       : Executing database script from init.sql
+    2026-05-26T11:03:20.277+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.testcontainers.ext.ScriptUtils       : Executed database script from init.sql in 351 ms.
+    2026-05-26T11:03:20.503+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+    2026-05-26T11:03:20.589+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+    2026-05-26T11:03:21.280+09:00  INFO 21520 --- [ecommerce] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-05-26T11:03:21.322+09:00  INFO 21520 --- [ecommerce] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-05-26T11:03:21.357+09:00  INFO 21520 --- [ecommerce] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6b35b0f4
+    2026-05-26T11:03:21.359+09:00  INFO 21520 --- [ecommerce] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-05-26T11:03:21.396+09:00  WARN 21520 --- [ecommerce] [    Test worker] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+    2026-05-26T11:03:21.431+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [jdbc:postgresql://localhost:57030/test?loggerLevel=OFF]
+    	Database driver: PostgreSQL JDBC Driver
+    	Database dialect: PostgreSQLDialect
+    	Database version: 17.9
+    	Default catalog/schema: test/public
+    	Autocommit mode: undefined/unknown
+    	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+    	JDBC fetch size: none
+    	Pool: DataSourceConnectionProvider
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-05-26T11:03:22.914+09:00  INFO 21520 --- [ecommerce] [    Test worker] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-05-26T11:03:22.995+09:00  INFO 21520 --- [ecommerce] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-05-26T11:03:23.145+09:00  INFO 21520 --- [ecommerce] [    Test worker] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-05-26T11:03:24.116+09:00  INFO 21520 --- [ecommerce] [    Test worker] c.d.ecommerce.order.OrderBulkUpdateTest  : Started OrderBulkUpdateTest in 9.698 seconds (process running for 11.664)
+
+OrderBulkUpdateTest > JPQL bulk update uses one update statement STANDARD_ERROR
+    Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    WARNING: A Java agent has been loaded dynamically (C:\Users\SSAFY\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.17.8\f09415827a71be7ed621c7bd02550678f28bc81c\byte-buddy-agent-1.17.8.jar)
+    WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+    WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+    WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+Gradle Test Executor 25 finished executing tests.
+2026-05-26T11:03:24.932+09:00  INFO 21520 --- [ecommerce] [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-05-26T11:03:24.934+09:00  INFO 21520 --- [ecommerce] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-05-26T11:03:24.937+09:00  INFO 21520 --- [ecommerce] [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+> Task :test
+
+OrderBulkUpdateTest > JPQL bulk update uses one update statement STANDARD_OUT
+    Hibernate: update orders o1_0 set status=? where o1_0.status=?
+    Hibernate: select o1_0.id,o1_0.address_id,o1_0.created_at,o1_0.discount_price,o1_0.final_price,o1_0.status,o1_0.total_price,o1_0.used_coupon_id,o1_0.user_id from orders o1_0 where o1_0.status=?
+    PHASE5_BULK_UPDATE_SQL_COUNT=1
+
+OrderBulkUpdateTest > Row-by-row dirty checking issues one update per order STANDARD_OUT
+    Hibernate: select o1_0.id,o1_0.address_id,o1_0.created_at,o1_0.discount_price,o1_0.final_price,o1_0.status,o1_0.total_price,o1_0.used_coupon_id,o1_0.user_id from orders o1_0 where o1_0.status=?
+    Hibernate: update orders set address_id=?,created_at=?,discount_price=?,final_price=?,status=?,total_price=?,used_coupon_id=?,user_id=? where id=?
+    Hibernate: update orders set address_id=?,created_at=?,discount_price=?,final_price=?,status=?,total_price=?,used_coupon_id=?,user_id=? where id=?
+    Hibernate: update orders set address_id=?,created_at=?,discount_price=?,final_price=?,status=?,total_price=?,used_coupon_id=?,user_id=? where id=?
+    PHASE5_ROW_BY_ROW_UPDATE_SQL_COUNT=4
+
+OrderBulkUpdateTest > JPQL bulk update clears persistence context before reload STANDARD_OUT
+    Hibernate: select o1_0.id,o1_0.address_id,o1_0.created_at,o1_0.discount_price,o1_0.final_price,o1_0.status,o1_0.total_price,o1_0.used_coupon_id,o1_0.user_id from orders o1_0 where o1_0.id=?
+    Hibernate: update orders o1_0 set status=? where o1_0.status=?
+    Hibernate: select o1_0.id,o1_0.address_id,o1_0.created_at,o1_0.discount_price,o1_0.final_price,o1_0.status,o1_0.total_price,o1_0.used_coupon_id,o1_0.user_id from orders o1_0 where o1_0.id=?
+Generating HTML test report...
+Finished generating test html results (0.013 secs) into: C:\Users\SSAFY\Desktop\db-project\ecommerce\build\reports\tests\test
+Finished generating test XML results (0.002 secs) into: C:\Users\SSAFY\Desktop\db-project\ecommerce\build\test-results\test
+
+BUILD SUCCESSFUL in 18s
+5 actionable tasks: 5 executed
+Watched directory hierarchies: [C:\Users\SSAFY\Desktop\db-project\ecommerce]
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.4.1/userguide/configuration_cache_enabling.html

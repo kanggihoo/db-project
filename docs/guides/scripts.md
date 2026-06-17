@@ -2,6 +2,8 @@
 
 > 프로젝트 루트의 `scripts/` 디렉토리에 있는 실행 스크립트를 설명한다.
 
+반복 실행하는 프로젝트 작업은 루트 `Makefile`과 [Commands](./commands.md)를 우선 사용한다. 이 문서는 Makefile target이 호출하는 내부 구현 스크립트를 설명한다.
+
 ## Directory
 
 ```text
@@ -9,6 +11,7 @@ scripts/
 ├── capture-grafana-dashboard.mjs
 ├── generate-db-lab-dashboard.mjs
 ├── grafana-capture-utils.mjs
+├── run-phase-sql.mjs
 ├── phase-02/
 │   ├── 00-clean-product-indexes.sql
 │   ├── 01-main-pre-index-explain.sql
@@ -31,6 +34,14 @@ scripts/
 ./scripts/seed.sh small
 ./scripts/seed.sh loadtest
 ```
+
+공통 seed baseline evidence까지 남길 때는 Makefile target을 사용한다.
+
+```bash
+make seed-state SEED_PRESET=loadtest
+```
+
+이 명령은 seed 실행 후 `scripts/db-state/00-seed-state.sql`을 실행해 `docs/evidence/common/seed-loadtest/seed-state.txt`를 만든다.
 
 | preset | 실행되는 Spring profiles | 목적 |
 |---|---|---|
@@ -82,7 +93,7 @@ Spring Boot API 서버를 HikariCP pool preset으로 실행한다.
 k6 부하 테스트 시나리오를 실행한다.
 
 ```bash
-./k6/run.sh orders baseline local
+./k6/run.sh orders baseline
 ./k6/run.sh products baseline local
 ./k6/run.sh points baseline prometheus
 ```
@@ -98,16 +109,22 @@ k6 부하 테스트 시나리오를 실행한다.
 | 값 | 기본값 | 설명 |
 |---|---|---|
 | `preset` | `baseline` | `k6/presets/<preset>.json` |
-| `mode` | `local` | 로컬 `k6` 또는 Docker `grafana/k6` 실행 |
+| `mode` | `local` | Docker `grafana/k6` 단발 실행. `prometheus`는 Docker Compose k6 서비스 실행 |
 | `PHASE` | `phase-01` | k6 스크립트에 전달되는 phase 이름 |
 | `POOL` | `pool10` | k6 스크립트에 전달되는 pool 이름 |
 | `K6_TAIL_ONLY` | `0` | `1`이면 실행 중 출력은 숨기고 종료 후 tail만 출력 |
 | `K6_TAIL_LINES` | `120` | `K6_TAIL_ONLY=1`일 때 보여줄 마지막 로그 줄 수 |
+| `K6_SUMMARY_JSON_FILE` | `auto` | k6 종료 summary JSON 저장 경로. `0`이면 생성하지 않음 |
+| `K6_SUMMARY_TREND_STATS` | `avg,min,med,max,p(90),p(95),p(99)` | k6 종료 summary에 포함할 Trend 통계 |
+| `K6_SUMMARY_TIME_UNIT` | `ms` | k6 종료 summary 시간 단위 |
 
 로그 출력:
 
 - 전체 k6 stdout/stderr는 기본적으로 `k6/results/<scenario>-<preset>-<mode>.log`에 저장된다.
-- 기본 실행은 콘솔에 k6 출력을 실시간으로 보여주면서 같은 내용을 로그 파일에도 저장한다.
+- 기계가 읽는 종료 요약은 기본적으로 같은 디렉토리의 `k6-summary.json`에 저장된다.
+- 기본 실행은 콘솔에 k6 종료 요약을 출력하고, evidence 로그 파일은 자동으로 만들지 않는다.
+- `k6/run.sh`는 `--quiet`, `--summary-mode=full`, `--summary-export <k6-summary.json>` 옵션을 적용한다.
+- 사람이 읽는 종료 요약을 파일로 남기려면 `K6_LOG_FILE`을 직접 지정한다.
 - `K6_TAIL_ONLY=1`이면 콘솔에는 전체 로그를 직접 출력하지 않고 마지막 `K6_TAIL_LINES`줄만 출력한다.
 - 실행 종료 코드는 원래 k6 또는 Docker 실행 결과를 그대로 반환한다.
 - `K6_TAIL_ONLY=1`은 AI 에이전트가 실행할 때 전체 k6 진행 로그가 context에 들어가는 것을 줄이기 위한 옵션이다.
@@ -117,8 +134,9 @@ k6 부하 테스트 시나리오를 실행한다.
 ```bash
 K6_RESULTS_DIR=docs/evidence/phase-02/products ./k6/run.sh products baseline local
 K6_LOG_FILE=/tmp/products-baseline.log ./k6/run.sh products baseline local
-K6_TAIL_ONLY=1 K6_TAIL_LINES=40 ./k6/run.sh products baseline local
-K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt ./k6/run.sh products baseline prometheus
+K6_SUMMARY_JSON_FILE=/tmp/products-baseline-summary.json ./k6/run.sh products baseline local
+K6_LOG_FILE=/tmp/products-baseline.log K6_TAIL_ONLY=1 K6_TAIL_LINES=40 ./k6/run.sh products baseline local
+K6_LOG_FILE=docs/evidence/phase-02/products/pool10-post-index/k6-summary-readable.txt ./k6/run.sh products baseline prometheus
 ```
 
 Evidence용으로는 긴 환경변수 조합 대신 npm wrapper를 쓴다.
@@ -127,9 +145,9 @@ Evidence용으로는 긴 환경변수 조합 대신 npm wrapper를 쓴다.
 npm run k6:evidence -- --phase phase-02 --scenario products --condition pool10-post-index
 ```
 
-기본값은 `preset=baseline`, `pool=pool10`, `mode=prometheus`다. 위 명령은 `docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt`와 같은 디렉토리의 `run-window.json`을 자동으로 만든다.
+기본값은 `preset=baseline`, `pool=pool10`, `mode=prometheus`다. 위 명령은 `docs/evidence/phase-02/products/pool10-post-index/` 아래에 `k6-summary.json`, `run-window.json`, `k6-exit-status.txt`를 자동으로 만든다.
 
-`run.sh`는 기본적으로 k6 log와 같은 디렉토리에 `run-window.json`을 저장한다. 파일에는 host-side `startedAt`, `endedAt`, `grafanaFrom`, `grafanaTo`가 들어간다. 기본 padding은 시작 전 10초, 종료 후 20초이며 `K6_WINDOW_START_PADDING_MS`, `K6_WINDOW_END_PADDING_MS`로 조정할 수 있다. `K6_RUN_WINDOW_FILE=0`을 지정하면 window 파일 생성을 끈다. k6 실행이 실패하면 실패한 실행 구간을 evidence로 쓰지 않도록 `run-window.json`을 만들지 않는다.
+`run.sh`는 기본적으로 `K6_RESULTS_DIR` 디렉토리에 `run-window.json`을 저장한다. 파일에는 host-side `startedAt`, `endedAt`, `grafanaFrom`, `grafanaTo`, `exitStatus`가 들어간다. 기본 padding은 시작 전 10초, 종료 후 20초이며 `K6_WINDOW_START_PADDING_MS`, `K6_WINDOW_END_PADDING_MS`로 조정할 수 있다. `K6_RUN_WINDOW_FILE=0`을 지정하면 window 파일 생성을 끈다. k6 실행이 실패하면 실패한 실행 구간을 evidence로 쓰지 않도록 기본적으로 `run-window.json`을 만들지 않는다. Phase 3처럼 threshold 실패 자체가 관찰 대상이면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`로 실패 실행 구간도 저장할 수 있다.
 
 k6 실행 직후 같은 `run-window.json`으로 Grafana를 캡처하고 stitch까지 끝내려면 같은 wrapper의 capture alias를 쓴다.
 
@@ -139,7 +157,47 @@ rtk npm run evidence:capture -- --phase phase-02 --scenario products --condition
 
 위 명령은 `npm run k6:evidence -- --capture ...`와 같은 흐름이다. 순서대로 `k6/run.sh`를 실행하고, 성공하면 `scripts/capture-grafana-dashboard.mjs --window-file docs/evidence/phase-02/products/pool10-post-index/run-window.json`을 호출한다. 기본 PNG는 `docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png`에 저장된다. 파일명을 직접 정하려면 `--output <path>`를 넘긴다.
 
-`local` 모드는 로컬에 `k6` 명령이 있으면 그것을 사용하고, 없으면 `grafana/k6` Docker 이미지를 사용한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
+Phase 3 orders strategy 증빙은 같은 wrapper에 `STRATEGY` 환경변수를 함께 넘긴다.
+
+Phase 3 rerun evidence는 `phase3-orders-baseline` preset을 사용한다. 저장된 Phase 3 evidence는 preset 분리 이전에 수집되어 Grafana label에는 historical `preset=baseline`이 남아 있다. threshold 실패 구간도 Grafana window로 남겨야 하면 `K6_WRITE_RUN_WINDOW_ON_FAILURE=1`을 함께 사용한다.
+
+```bash
+STRATEGY=lazy rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --preset phase3-orders-baseline \
+  --condition pool10-lazy \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-lazy.png
+
+STRATEGY=fetch-join rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --preset phase3-orders-baseline \
+  --condition pool10-fetch-join \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-fetch-join.png
+
+STRATEGY=batch-size rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --preset phase3-orders-baseline \
+  --condition pool10-batch-size \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-batch-size.png
+
+STRATEGY=entity-graph rtk npm run evidence:capture -- \
+  --phase phase-03 \
+  --scenario orders \
+  --preset phase3-orders-baseline \
+  --condition pool10-entity-graph \
+  --table orders \
+  --output docs/evidence/phase-03/grafana-screenshots/orders-pool10-entity-graph.png
+```
+
+`evidence:capture`는 현재 환경변수를 `k6/run.sh`까지 전달한다. 따라서 `STRATEGY=...`는 API strategy를 제어하고, `--condition`과 `--output`은 evidence 디렉토리와 Grafana screenshot 이름을 제어한다.
+
+`local` 모드는 `docker run grafana/k6`로 실행한다. `prometheus` 모드는 `docker compose --profile test run --rm k6`로 실행하며 `experimental-prometheus-rw` output을 사용한다.
 
 Windows Git Bash에서 `prometheus` 모드를 실행할 때 `/scripts/*.js` 같은 Docker 컨테이너 내부 경로가 `C:/Program Files/Git/...` 형태로 바뀌지 않도록 `run.sh`가 `MSYS_NO_PATHCONV=1`을 설정한다. 사용자가 별도로 설정할 필요는 없다.
 
@@ -166,6 +224,22 @@ docker/grafana/dashboards/db-lab-overview.json
 
 - k6 실행이나 Playwright 캡처 중에 자동으로 호출되지는 않는다.
 - dashboard JSON을 다시 만든 뒤 Grafana 컨테이너가 이미 떠 있다면 dashboard reload 또는 컨테이너 재시작이 필요할 수 있다.
+
+## scripts/run-phase-sql.mjs
+
+Phase SQL 파일을 Docker PostgreSQL에서 실행하는 공통 runner다. 반복 실행은 루트 Makefile의 `phase-sql` target을 사용한다.
+
+```bash
+make phase-sql FILE=scripts/phase-06/11-review-baseline-explain.sql OUTPUT=docs/evidence/phase-06/review-aggregate/baseline/explain.txt
+```
+
+직접 실행할 수도 있다.
+
+```bash
+npm run phase:sql -- --file scripts/phase-06/11-review-baseline-explain.sql --output docs/evidence/phase-06/review-aggregate/baseline/explain.txt
+```
+
+이 스크립트는 phase별 매핑을 갖지 않는다. 호스트의 SQL 파일을 읽어 `docker compose exec -T postgres psql -U app -d ecommerce -v ON_ERROR_STOP=1 -f -`에 stdin으로 전달한다. `OUTPUT` 또는 `--output`을 지정하면 대상 디렉토리를 만들고 psql stdout을 파일로 저장한다.
 
 ## scripts/capture-grafana-dashboard.mjs
 
@@ -215,7 +289,7 @@ Useful options:
 | `--url <url>` | Start from a custom Grafana dashboard URL. Explicit variable options still override matching `var-*` parameters. |
 | `--output <path>` | Override the final PNG path. |
 | `--parts-dir <path>` | Override the temporary part capture directory. |
-| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-07`. |
+| `--phase <phase-id>` | Set `var-phase` and the phase focus row to expand. Supported: `phase-01`, `phase-02`, `phase-03`, `phase-04`, `phase-07`. |
 | `--scenario <name>` | Set `var-scenario`. |
 | `--preset <name>` | Set `var-preset`. |
 | `--pool <name>` | Set `var-pool`. |

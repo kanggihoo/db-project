@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "phase": "phase-01",
+  "scenario": "points",
+  "condition": "points-page500",
+  "preset": "baseline",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "target": {
+    "method": "GET",
+    "endpoint": "/api/points",
+    "queryParams": {
+      "userId": "1..1000",
+      "size": "20",
+      "page": "weighted"
+    },
+    "strategy": "baseline"
+  },
+  "workload": {
+    "rate": 50,
+    "duration": "5m",
+    "timeout": "5s",
+    "preAllocatedVUs": 100,
+    "maxVUs": 300
+  },
+  "evidence": {
+    "exitStatus": 99,
+    "files": {
+      "summaryJson": "docs/evidence/phase-01/points/points-page500/k6-summary.json",
+      "runWindow": "docs/evidence/phase-01/points/points-page500/run-window.json",
+      "exitStatus": "docs/evidence/phase-01/points/points-page500/k6-exit-status.txt"
+    }
+  },
+  "execution": {
+    "command": "npm run k6:evidence -- --phase phase-01 --scenario points --preset baseline --pool pool10 --mode prometheus --condition points-page500",
+    "exitStatus": 99,
+    "resultStatus": "threshold_failed"
+  },
+  "git": {
+    "commitSha": "1828ced5ef7eb13b483dfa3d1df6a592c6c3663e",
+    "dirty": true
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "phase": "phase-01",
+  "scenario": "points",
+  "condition": "points-page0-rps20",
+  "preset": "phase1-points-page0-rps20",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "target": {
+    "method": "GET",
+    "endpoint": "/api/points",
+    "queryParams": {
+      "userId": "1..1000",
+      "page": "0",
+      "size": "20"
+    },
+    "strategy": "offset-page"
+  },
+  "workload": {
+    "rate": 20,
+    "duration": "5m",
+    "timeout": "5s",
+    "preAllocatedVUs": 100,
+    "maxVUs": 300
+  },
+  "evidence": {
+    "exitStatus": 99,
+    "files": {
+      "summaryJson": "docs/evidence/phase-01/rps20-test/points-page0-rps20/k6-summary.json",
+      "runWindow": "docs/evidence/phase-01/rps20-test/points-page0-rps20/run-window.json",
+      "exitStatus": "docs/evidence/phase-01/rps20-test/points-page0-rps20/k6-exit-status.txt",
+      "pgStatStatements": "docs/evidence/phase-01/rps20-test/points-page0-rps20/pg-stat-statements.txt"
+    }
+  },
+  "execution": {
+    "command": "PHASE=phase-01 POOL=pool10 ./k6/run.sh points phase1-points-page0-rps20 prometheus",
+    "exitStatus": 99,
+    "resultStatus": "threshold_failed"
+  }
+}

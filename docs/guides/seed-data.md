@@ -22,6 +22,18 @@ docker compose up -d
 ./scripts/seed.sh loadtest
 ```
 
+## Testcontainers Fixtures
+
+Testcontainers 기반 integration test는 이 seed preset을 사용하지 않는다. 예를 들어 Phase 4 transaction isolation 테스트는 `src/test/resources/init.sql`로 schema만 만들고, 테스트 클래스의 `@BeforeEach`에서 필요한 최소 row를 직접 삽입하거나 reset한다.
+
+```text
+category id=900001
+product id=900001
+product_sku id=900001
+```
+
+이 방식은 docker compose volume, 대량 seed 데이터, 이전 실행 이력에 의존하지 않는다.
+
 ## Preset Files
 
 | File | Purpose |

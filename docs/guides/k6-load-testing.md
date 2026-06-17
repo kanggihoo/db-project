@@ -10,9 +10,14 @@ k6/
 ├── orders-test.js
 ├── products-test.js
 ├── points-test.js
+├── review-summary-test.js
 └── presets/
     ├── smoke.json
     ├── baseline.json
+    ├── phase3-orders-baseline.json
+    ├── phase1-points-page0.json
+    ├── phase1-points-page500.json
+    ├── review-summary-baseline.json
     ├── stress-100.json
     ├── stress-200.json
     ├── points-page0.json
@@ -25,6 +30,7 @@ k6/
 | `k6/orders-test.js` | 주문 목록 API 부하 테스트 |
 | `k6/products-test.js` | 상품 검색 API 부하 테스트 |
 | `k6/points-test.js` | 포인트 내역 API 부하 테스트 |
+| `k6/review-summary-test.js` | 상품 리뷰 요약 API 부하 테스트 |
 | `k6/presets/*.json` | rate, duration, VU, page, user/category 범위 설정 |
 
 ## Run
@@ -33,7 +39,7 @@ k6/
 ./k6/run.sh <scenario> <preset> [local|prometheus]
 ```
 
-`local` 모드는 로컬 `k6` 실행 파일이 있으면 로컬로 실행하고, 없으면 `grafana/k6` Docker 이미지를 사용한다.
+`local` 모드는 `grafana/k6` Docker 이미지를 단발 컨테이너로 실행한다.
 `prometheus` 모드는 Docker Compose의 `k6` 서비스를 사용하고, k6 지표를 Prometheus remote write endpoint로 전송한다.
 
 언제 실행하는가:
@@ -41,6 +47,8 @@ k6/
 - Spring 서버가 떠 있고 API 정상 응답을 확인한 뒤
 - 시나리오별 `pg_stat_statements_reset()`와 `VACUUM ANALYZE`를 실행한 뒤
 - Phase별 기준선 또는 Before/After를 측정할 때
+
+k6는 부하, 처리량, latency evidence가 필요한 Phase에 사용한다. Phase 4 transaction isolation처럼 두 transaction의 실행 순서를 고정해 DB 격리 현상을 재현하는 경우에는 primary evidence가 아니며, [Testcontainers Integration Testing Guide](./testcontainers-integration-testing.md)의 focused integration test 방식을 우선한다.
 
 Grafana 증빙을 남길 때는 Measurement Condition을 label로 남긴다.
 
@@ -57,6 +65,27 @@ PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 
 `scenario`와 `preset`은 `k6/run.sh` 인자에서 결정한다. `phase`와 `pool`은 환경변수로 전달한다. `userId`, `categoryId`, `page` 같은 요청별 값은 label로 남기지 않는다.
 
+## Summary Artifacts
+
+`k6/run.sh`는 모든 실행에 다음 summary 옵션을 적용한다.
+
+```bash
+--quiet
+--summary-mode=full
+--summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)"
+--summary-time-unit ms
+--summary-export <k6-summary.json>
+```
+
+`k6-summary.json`은 report 표에 쓸 run-level 수치의 원본이다. p95/p99의 최종 비교값은 `k6-summary.json`을 기준으로 한다. 사람이 읽는 종료 요약이 필요하면 `K6_LOG_FILE=<path>`를 직접 지정하거나 stdout을 redirect해서 별도로 저장한다.
+
+`prometheus` 모드에서는 k6가 Prometheus remote write로 시계열 metric도 함께 보낸다. Grafana의 p95/p99는 Prometheus에서 `histogram_quantile()`로 재계산한 보조 evidence이며, 시간축 병목 해석에 사용한다.
+
+Phase 3 orders runs can set `STRATEGY=lazy|fetch-join|batch-size|entity-graph`.
+The value is sent to `GET /api/orders` as the `strategy` query parameter.
+Keep strategy evidence separate by using matching `--condition` and `--output` names, for example `pool10-lazy` and `orders-pool10-lazy.png`.
+For Phase 3 reruns, use `phase3-orders-baseline`. The stored Phase 3 evidence was captured before this preset split and therefore still has the historical Grafana label `preset=baseline`.
+
 ## Scenarios
 
 | scenario | Target API | Purpose |
@@ -64,6 +93,7 @@ PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 | `orders` | `GET /api/orders?userId=` | N+1, Hikari pool 점유 |
 | `products` | `GET /api/products?categoryId=&status=` | 인덱스 없는 Seq Scan |
 | `points` | `GET /api/points?userId=&page=&size=` | Offset deep page 병목 |
+| `review-summary` | `GET /api/products/review-summary` | Phase 6 aggregation API representative evidence |
 
 ## Presets
 
@@ -71,9 +101,13 @@ PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 |---|---:|---|---|
 | `smoke` | 5 rps | 1m | API 정상 확인 |
 | `baseline` | 50 rps | 5m | 기본 기준선 |
+| `phase3-orders-baseline` | 1 rps | 5m | Phase 3 strategy 비교 재실행 |
+| `review-summary-baseline` | 20 rps | 5m | Phase 6 review summary API comparison |
 | `stress-100` | 100 rps | 5m | 부하 증가 |
 | `stress-200` | 200 rps | 5m | 한계 확인 |
-| `points-page0` | 50 rps | 5m | 얕은 페이지 |
+| `phase1-points-page0` | 50 rps | 5m | Phase 1 clean rerun 얕은 페이지 |
+| `phase1-points-page500` | 50 rps | 5m | Phase 1 clean rerun 깊은 페이지 |
+| `points-page0` | 50 rps | 5m | Phase 7 hot user 얕은 페이지 |
 | `points-page500` | 50 rps | 5m | 깊은 페이지 |
 
 Preset files live in `k6/presets/`.
@@ -83,18 +117,20 @@ Preset files live in `k6/presets/`.
 ```bash
 ./k6/run.sh orders smoke
 ./k6/run.sh orders baseline
-./k6/run.sh products baseline
-./k6/run.sh products stress-100
-./k6/run.sh points points-page0
-./k6/run.sh points points-page500
+STRATEGY=baseline ./k6/run.sh products baseline
+STRATEGY=baseline ./k6/run.sh products stress-100
+./k6/run.sh points phase1-points-page0
+./k6/run.sh points phase1-points-page500
+./k6/run.sh review-summary review-summary-baseline
 ```
 
 Grafana에서 k6 지표까지 함께 보려면 `prometheus` 모드를 사용한다.
 
 ```bash
 PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
-PHASE=phase-01 POOL=pool10 ./k6/run.sh products stress-100 prometheus
-PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus
+STRATEGY=baseline PHASE=phase-01 POOL=pool10 ./k6/run.sh products stress-100 prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh points phase1-points-page500 prometheus
+PHASE=phase-06 POOL=pool10 ./k6/run.sh review-summary review-summary-baseline prometheus
 ```
 
 ## Adding a Preset
@@ -109,3 +145,14 @@ PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus
 2. Read `JSON.parse(open(__ENV.PRESET || 'presets/baseline.json'))`.
 3. Keep executor settings driven by preset values.
 4. Run with `./k6/run.sh <scenario> <preset>`.
+
+## Phase 7 Pagination
+
+Phase 7 uses `phase=phase-07` and keeps page/user values out of metric labels. Page depth is represented by `preset`.
+
+```bash
+PHASE=phase-07 SCENARIO=points-offset PRESET_NAME=page0 PRESET=presets/points-page0.json k6 run k6/points-test.js
+PHASE=phase-07 SCENARIO=points-offset PRESET_NAME=mid PRESET=presets/points-mid.json k6 run k6/points-test.js
+PHASE=phase-07 SCENARIO=points-offset PRESET_NAME=deep PRESET=presets/points-deep.json k6 run k6/points-test.js
+PHASE=phase-07 SCENARIO=points-cursor PRESET_NAME=cursor PRESET=presets/points-cursor.json k6 run k6/points-cursor-test.js
+```

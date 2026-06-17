@@ -1,0 +1,8 @@
+PHASE7_SELECTED_USER_AND_PAGES
+user_id=374
+point_count=1912
+size=20
+maxPage=95
+midPage=47
+deepPage=76
+deepOffset=1520

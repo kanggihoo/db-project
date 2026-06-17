@@ -1,0 +1,133 @@
+id: k6-load
+title: k6 Load
+panels:
+  - type: timeseries
+    title: Performance Overview
+    tooltipMode: multi
+    layout:
+      x: 0
+      yOffset: 0
+      w: 24
+      h: 10
+    queries:
+      - alias: k6.load.vus
+        legend: vus
+      - alias: k6.load.request_rate
+        legend: rps
+      - alias: k6.load.error_request_rate
+        legend: error_rps
+      - alias: k6.load.p95_latency
+        legend: p95_latency
+    overrides:
+      - matcher:
+          id: byName
+          options: rps
+        properties:
+          - id: unit
+            value: reqps
+          - id: custom.axisPlacement
+            value: right
+          - id: color
+            value:
+              fixedColor: yellow
+              mode: fixed
+      - matcher:
+          id: byName
+          options: error_rps
+        properties:
+          - id: unit
+            value: reqps
+          - id: custom.axisPlacement
+            value: right
+          - id: color
+            value:
+              fixedColor: red
+              mode: fixed
+      - matcher:
+          id: byName
+          options: p95_latency
+        properties:
+          - id: unit
+            value: s
+          - id: color
+            value:
+              fixedColor: blue
+              mode: fixed
+  - type: timeseries
+    title: HTTP Request Rate
+    tooltipMode: multi
+    layout:
+      x: 0
+      yOffset: 10
+      w: 12
+      h: 8
+    queries:
+      - alias: k6.load.success_request_rate
+        legend: success_rps
+      - alias: k6.load.error_request_rate
+        legend: error_rps
+    overrides:
+      - matcher:
+          id: byName
+          options: success_rps
+        properties:
+          - id: unit
+            value: reqps
+          - id: color
+            value:
+              fixedColor: green
+              mode: fixed
+      - matcher:
+          id: byName
+          options: error_rps
+        properties:
+          - id: unit
+            value: reqps
+          - id: color
+            value:
+              fixedColor: red
+              mode: fixed
+  - type: timeseries
+    title: Latency and Iteration p95
+    layout:
+      x: 12
+      yOffset: 10
+      w: 12
+      h: 8
+    queries:
+      - alias: k6.load.p95_latency
+        legend: p95_latency
+      - alias: k6.load.iteration_p95
+        legend: iteration_p95
+    overrides:
+      - matcher:
+          id: byRegexp
+          options: .*_p95
+        properties:
+          - id: unit
+            value: s
+  - type: timeseries
+    title: Checks Success Rate
+    layout:
+      x: 0
+      yOffset: 18
+      w: 12
+      h: 8
+    queries:
+      - alias: k6.load.checks_by_name
+        legend: '{{check}}'
+    overrides:
+      - matcher:
+          id: byRegexp
+          options: .*
+        properties:
+          - id: unit
+            value: percent
+  - type: timeseries
+    title: Dropped Iterations
+    layout:
+      x: 12
+      yOffset: 18
+      w: 12
+      h: 8
+    query: k6.load.dropped_iterations_rate

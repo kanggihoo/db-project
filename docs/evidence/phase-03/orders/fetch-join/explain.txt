@@ -1,0 +1,31 @@
+Phase 3 fetch-join representative query
+                                                                         QUERY PLAN
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Nested Loop  (cost=6.04..1026.96 rows=122 width=40) (actual time=0.159..9.740 rows=762 loops=1)
+   Buffers: shared hit=6854
+   ->  Nested Loop  (cost=5.74..988.69 rows=122 width=40) (actual time=0.140..8.203 rows=762 loops=1)
+         Buffers: shared hit=5329
+         ->  Nested Loop  (cost=5.32..933.39 rows=122 width=32) (actual time=0.118..3.151 rows=762 loops=1)
+               Buffers: shared hit=2281
+               ->  Bitmap Heap Scan on orders o  (cost=4.90..230.70 rows=61 width=16) (actual time=0.101..0.777 rows=381 loops=1)
+                     Recheck Cond: (user_id = 100)
+                     Heap Blocks: exact=370
+                     Buffers: shared hit=376
+                     ->  Bitmap Index Scan on idx_orders_user_id  (cost=0.00..4.88 rows=61 width=0) (actual time=0.069..0.070 rows=381 loops=1)
+                           Index Cond: (user_id = 100)
+                           Buffers: shared hit=6
+               ->  Index Scan using idx_order_item_order_id on order_item oi  (cost=0.42..11.50 rows=2 width=24) (actual time=0.004..0.006 rows=2 loops=381)
+                     Index Cond: (order_id = o.id)
+                     Buffers: shared hit=1905
+         ->  Index Scan using product_sku_pkey on product_sku sku  (cost=0.42..0.45 rows=1 width=16) (actual time=0.006..0.006 rows=1 loops=762)
+               Index Cond: (id = oi.sku_id)
+               Buffers: shared hit=3048
+   ->  Index Only Scan using product_pkey on product p  (cost=0.29..0.31 rows=1 width=8) (actual time=0.002..0.002 rows=1 loops=762)
+         Index Cond: (id = sku.product_id)
+         Heap Fetches: 0
+         Buffers: shared hit=1525
+ Planning:
+   Buffers: shared hit=333 read=4
+ Planning Time: 2.744 ms
+ Execution Time: 10.019 ms
+(27 rows)

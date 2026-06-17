@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phase Evidence Portfolio Review"
+  short_description: "Phase evidence and portfolio closeout review"
+  default_prompt: "Use $phase-evidence-portfolio-review to review a project phase, verify evidence and report readiness, and prepare portfolio.mdx guidance."

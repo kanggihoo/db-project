@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "phase": "phase-01",
+  "scenario": "products",
+  "condition": "products-baseline",
+  "preset": "baseline",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "target": {
+    "method": "GET",
+    "endpoint": "/api/products",
+    "queryParams": {
+      "categoryId": "1..200",
+      "status": "ON_SALE/SOLD_OUT/DISCONTINUED",
+      "strategy": "baseline"
+    },
+    "strategy": "baseline"
+  },
+  "workload": {
+    "rate": 50,
+    "duration": "5m",
+    "timeout": "5s",
+    "preAllocatedVUs": 100,
+    "maxVUs": 300
+  },
+  "evidence": {
+    "exitStatus": 0,
+    "files": {
+      "summaryJson": "docs/evidence/phase-01/products/products-baseline/k6-summary.json",
+      "runWindow": "docs/evidence/phase-01/products/products-baseline/run-window.json",
+      "exitStatus": "docs/evidence/phase-01/products/products-baseline/k6-exit-status.txt"
+    }
+  },
+  "execution": {
+    "command": "npm run k6:evidence -- --phase phase-01 --scenario products --preset baseline --pool pool10 --mode prometheus --condition products-baseline --capture --table product --output docs/evidence/phase-01/grafana-screenshots/products-baseline.png",
+    "exitStatus": 0,
+    "resultStatus": "passed"
+  },
+  "git": {
+    "commitSha": "1828ced5ef7eb13b483dfa3d1df6a592c6c3663e",
+    "dirty": true
+  }
+}

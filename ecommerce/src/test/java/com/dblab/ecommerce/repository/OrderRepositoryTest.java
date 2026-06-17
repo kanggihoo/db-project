@@ -1,9 +1,12 @@
 package com.dblab.ecommerce.repository;
 
 import com.dblab.ecommerce.TestcontainersConfiguration;
+import com.dblab.ecommerce.entity.OrderItem;
 import com.dblab.ecommerce.entity.Orders;
+import com.dblab.ecommerce.entity.ProductImage;
 import org.hibernate.Session;
 import org.hibernate.stat.Statistics;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -34,7 +37,8 @@ class OrderRepositoryTest {
     private final Long savedUserId = 100L; // SQL 파일에서 지정한 고정 ID
 
     @Test
-    void 주문_목록_조회_후_OrderItem_루프_접근시_N개_추가쿼리_발생_SQL버전() {
+    @DisplayName("주문 목록 조회 후 OrderItem 루프 접근 시 주문 수만큼 추가 쿼리가 발생한다")
+    void shouldIssueOneAdditionalQueryPerOrderWhenLoadingItemsInLoop() {
         // Given
         Session session = entityManager.unwrap(Session.class);
         Statistics statistics = session.getSessionFactory().getStatistics();
@@ -57,5 +61,77 @@ class OrderRepositoryTest {
 
         assertThat(extraSqlCount).isEqualTo(orders.size());
         System.out.println("[@Sql 버전] N+1 발생 확인 — 루프 추가 SQL 수: " + extraSqlCount);
+    }
+
+    @Test
+    @DisplayName("주문상품에서 SKU, 상품, 대표 이미지까지 LAZY 연관 경로로 탐색한다")
+    void shouldTraverseLazyAssociationPathFromOrderItemToProductImage() {
+        List<Orders> orders = orderRepository.findByUserId(savedUserId);
+        assertThat(orders).hasSize(3);
+
+        OrderItem firstItem = orders.getFirst().getOrderItems().getFirst();
+
+        assertThat(firstItem.getProductSku().getId()).isEqualTo(100L);
+        assertThat(firstItem.getProductSku().getProduct().getId()).isEqualTo(100L);
+        assertThat(firstItem.getProductSku().getProduct().getImages())
+                .extracting(ProductImage::getImageUrl)
+                .contains("https://example.com/product-100-main.jpg");
+    }
+
+    @Test
+    @DisplayName("LAZY 연관 접근은 OrderItem, SKU, Product, Image 조회 SQL을 추가로 발생시킨다")
+    void shouldIssueAdditionalQueriesWhenTraversingLazyAssociations() {
+        Session session = entityManager.unwrap(Session.class);
+        Statistics statistics = session.getSessionFactory().getStatistics();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        List<Orders> orders = orderRepository.findByUserId(savedUserId);
+        long beforeTraversal = statistics.getPrepareStatementCount();
+
+        orders.forEach(order -> order.getOrderItems().forEach(item -> {
+            item.getProductSku().getProduct().getImages().forEach(ProductImage::getImageUrl);
+        }));
+
+        long extraSqlCount = statistics.getPrepareStatementCount() - beforeTraversal;
+        assertThat(extraSqlCount).isGreaterThanOrEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("Fetch Join 조회는 OrderItem, SKU, Product 반복 조회를 줄인다")
+    void shouldReduceRepeatedItemSkuProductQueriesWithFetchJoin() {
+        Session session = entityManager.unwrap(Session.class);
+        Statistics statistics = session.getSessionFactory().getStatistics();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        List<Orders> orders = orderRepository.findByUserIdWithFetchJoin(savedUserId);
+        long afterQuery = statistics.getPrepareStatementCount();
+
+        orders.forEach(order -> order.getOrderItems().forEach(item -> {
+            item.getProductSku().getProduct().getId();
+        }));
+
+        long afterTraversal = statistics.getPrepareStatementCount();
+        assertThat(afterTraversal).isEqualTo(afterQuery);
+    }
+
+    @Test
+    @DisplayName("EntityGraph 조회는 OrderItem, SKU, Product 연관을 조회 시점에 로딩한다")
+    void shouldLoadItemSkuProductAssociationsWithEntityGraph() {
+        Session session = entityManager.unwrap(Session.class);
+        Statistics statistics = session.getSessionFactory().getStatistics();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        List<Orders> orders = orderRepository.findGraphByUserId(savedUserId);
+        long afterQuery = statistics.getPrepareStatementCount();
+
+        orders.forEach(order -> order.getOrderItems().forEach(item -> {
+            item.getProductSku().getProduct().getId();
+        }));
+
+        long afterTraversal = statistics.getPrepareStatementCount();
+        assertThat(afterTraversal).isEqualTo(afterQuery);
     }
 }

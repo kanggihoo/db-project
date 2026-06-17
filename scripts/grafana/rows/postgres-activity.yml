@@ -1,0 +1,90 @@
+id: postgres-activity
+title: PostgreSQL Activity
+panels:
+  - type: timeseries
+    title: Active Sessions
+    query: postgres.active_sessions
+    layout:
+      x: 0
+      yOffset: 0
+      w: 12
+      h: 8
+    legend: active
+  - type: timeseries
+    title: Locks
+    query: postgres.locks
+    layout:
+      x: 12
+      yOffset: 0
+      w: 12
+      h: 8
+    legend: '{{mode}}'
+  - type: timeseries
+    title: Commit Rate
+    query: postgres.commit_rate
+    layout:
+      x: 0
+      yOffset: 8
+      w: 12
+      h: 8
+    legend: commit
+  - type: timeseries
+    title: Rollback Rate
+    query: postgres.rollback_rate
+    layout:
+      x: 12
+      yOffset: 8
+      w: 12
+      h: 8
+    legend: rollback
+  - type: stat
+    title: Lock Waiting Sessions
+    query: postgres.lock_waiting_sessions
+    layout:
+      x: 0
+      yOffset: 16
+      w: 6
+      h: 4
+  - type: stat
+    title: Ungranted Locks
+    query: postgres.ungranted_locks
+    layout:
+      x: 6
+      yOffset: 16
+      w: 6
+      h: 4
+  - type: stat
+    title: Idle In Transaction
+    query: postgres.idle_in_transaction_sessions
+    layout:
+      x: 12
+      yOffset: 16
+      w: 6
+      h: 4
+  - type: stat
+    title: Max Xact Age
+    query: postgres.max_xact_age_seconds
+    unit: s
+    layout:
+      x: 18
+      yOffset: 16
+      w: 6
+      h: 4
+  - type: timeseries
+    title: Locks By Granted State
+    query: postgres.locks_by_granted
+    layout:
+      x: 0
+      yOffset: 20
+      w: 12
+      h: 8
+    legend: '{{granted}}'
+  - type: timeseries
+    title: Lock Waits By Event
+    query: postgres.lock_waits_by_event
+    layout:
+      x: 12
+      yOffset: 20
+      w: 12
+      h: 8
+    legend: '{{wait_event}}'

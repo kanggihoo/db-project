@@ -31,6 +31,16 @@ Prometheus는 k6 remote write를 받을 수 있게 `--web.enable-remote-write-re
 
 공통 대시보드는 `DB Lab / DB Lab Overview`를 기준으로 한다. 대시보드는 Spring Boot 서버가 실행되고 k6가 `prometheus` 모드로 한 번 이상 실행된 뒤에 의미 있는 값을 보여준다.
 
+## Testcontainers
+
+일부 Phase는 docker compose PostgreSQL volume 대신 PostgreSQL Testcontainers를 사용한다. 대표적으로 Phase 4 transaction isolation 테스트는 개발 DB 상태나 대량 seed 데이터에 의존하지 않고, test-only PostgreSQL 컨테이너에서 최소 fixture를 직접 reset한다.
+
+```bash
+cd ecommerce && rtk gradlew test --tests "*TransactionIsolationTest"
+```
+
+Testcontainers 실행에는 Docker daemon만 필요하다. `docker compose up -d`로 공통 PostgreSQL/Prometheus/Grafana stack을 띄울 필요는 없다. 자세한 기준은 [Testcontainers Integration Testing Guide](./testcontainers-integration-testing.md)를 따른다.
+
 ## k6 with Prometheus
 
 k6 지표를 Prometheus와 Grafana에서 보려면 `prometheus` 모드로 실행한다.

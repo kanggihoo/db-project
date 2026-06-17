@@ -40,7 +40,7 @@
 | 1     | k6 p95 응답시간, DB 커넥션 수     | 최적화 없는 베이스라인 수치 확보                       |
 | 2     | 쿼리 실행시간 (인덱스 전/후)      | 풀스캔 → 인덱스 스캔 ms 차이                           |
 | 3     | 발생 쿼리 수 (N+1 전/후)          | 주문 100건 조회 시 쿼리 101번 → 1번                    |
-| 4     | 격리 수준별 에러율, 동시 처리 RPS | SERIALIZABLE 직렬화 실패 빈도, 격리 수준별 처리량 변화 |
+| 4     | 격리 수준별 재현 결과, 동시 갱신 실패 | Dirty Read, Non-Repeatable Read, Phantom Read, Lost Update 관찰 |
 | 5     | 응답시간, 데이터 전송량           | Entity vs DTO, 단건 루프 vs 벌크 차이                  |
 | 6     | 집계 쿼리 실행시간 (인덱스 전/후) | GROUP BY에 인덱스가 미치는 영향                        |
 | 7     | p95 응답시간 (페이지 번호별)      | 1페이지 vs 1000페이지 응답시간                         |
@@ -268,7 +268,7 @@ REVIEW_LIKE
 | ----------------- | ------------------------------------------------------------------- | ------- |
 | N+1 대표 케이스   | ORDER → ORDER_ITEM → SKU → PRODUCT → PRODUCT_IMAGE                  | Phase 3 |
 | 복합 인덱스 실험  | ORDER(user_id + created_at), PRODUCT(category_id + status)          | Phase 2 |
-| 격리 수준 실험    | ORDER(동시 주문 시 Phantom Read), PRODUCT_SKU(SERIALIZABLE 비용 예시) | Phase 4 |
+| 격리 수준 실험    | PRODUCT(가격/카테고리 조회), PRODUCT_SKU(naive 동시 갱신 충돌) | Phase 4 |
 | 집계 쿼리 실험    | REVIEW(상품별 평점), ORDER(등급별 구매통계), PRODUCT(카테고리별 수) | Phase 6 |
 | Soft Delete 함정  | PRODUCT(is_deleted + 부분 인덱스)                                   | Phase 2 |
 | 페이지네이션 실험 | DELIVERY_TRACKING, POINT_HISTORY (계속 쌓이는 이력)                 | Phase 7 |
@@ -295,8 +295,8 @@ Phase 3: N+1 + 로딩 전략 최적화
        │
 Phase 4: 트랜잭션 격리 수준
   └─ 발견: 쿼리 수는 줄었는데, 동시 요청 시 데이터 정합성은 어떻게 되는가?
-  └─ 해결: 격리 수준에 따라 동일 쿼리의 읽기 결과가 달라지는 현상을 실험
-  └─ 발견: SERIALIZABLE은 정합성은 완벽하지만 재시도 로직 필수
+  └─ 해결: 격리 수준에 따라 동일 쿼리의 읽기 결과와 동시 갱신 충돌 결과가 달라지는 현상을 실험
+  └─ 발견: PostgreSQL REPEATABLE READ 이상에서는 Lost Update가 조용히 발생하지 않고 실패로 방지됨
        │
 Phase 5: 쿼리 최적화 + QueryDSL
   └─ 해결: DTO Projection, 동적 쿼리, 벌크 연산
@@ -347,7 +347,7 @@ Phase 13: CDC + Kafka
 | 1     | 베이스라인         | k6 부하 테스트, 나이브한 API 구현                    | -                               | 풀스캔, N+1, 느린 페이지네이션     |
 | 2     | 인덱스 설계        | EXPLAIN ANALYZE, 복합/커버링/부분 인덱스             | 풀스캔                          | 인덱스 순서 함정, Soft Delete 함정 |
 | 3     | N+1 + 로딩 전략    | Fetch Join, EntityGraph, BatchSize                   | 쿼리 N번 → 1~5번                | Fetch Join + 페이징 OOM 위험       |
-| 4     | 트랜잭션 격리 수준 | 격리 수준 실험, MVCC 스냅샷                          | 동시 요청 시 데이터 정합성      | SERIALIZABLE 재시도 로직 필수      |
+| 4     | 트랜잭션 격리 수준 | Dirty Read, Non-Repeatable Read, Phantom Read, Lost Update 관찰 | 격리 수준별 데이터 가시성과 동시 갱신 충돌 | 실무 동시성 제어 전략 필요 |
 | 5     | 쿼리 최적화        | DTO Projection, QueryDSL, 벌크 연산                  | 불필요한 데이터 로딩, 동적 쿼리 | 집계 쿼리 + 인덱스 관계            |
 | 6     | 집계 쿼리          | GROUP BY 인덱스, 표현식 인덱스, HashAggregate 분석   | 집계 쿼리 성능                  | 대용량 이력 테이블 페이지네이션    |
 | 7     | 페이지네이션       | Cursor 페이지네이션, Count 쿼리 분리                 | Offset 성능 저하                | Cursor 정렬 제약, 구현 복잡도      |
@@ -368,7 +368,7 @@ Phase 13: CDC + Kafka
 > → Phase 2에서 복합 인덱스 컬럼 순서 함정과 Soft Delete 무력화를 직접 측정했습니다. `EXPLAIN ANALYZE`로 Seq Scan이 선택된 이유를 확인했습니다.
 
 > "트랜잭션 격리 수준이 뭔가요? 실무에서 뭘 써야 하나요?"
-> → Phase 4에서 READ COMMITTED와 REPEATABLE READ에서 주문 중 가격 변경 시나리오를 직접 실험했습니다. PostgreSQL의 MVCC가 락 없이 스냅샷으로 격리하는 방식을 확인했고, SERIALIZABLE의 성능 비용(Serialization Failure 발생률 N%)을 k6로 측정했습니다.
+> → Phase 4에서 READ COMMITTED와 REPEATABLE READ의 live 가격 조회, 카테고리 집계, naive 동시 갱신 시나리오를 직접 실험했습니다. PostgreSQL의 MVCC가 스냅샷으로 격리하는 방식과 REPEATABLE READ 이상에서 Lost Update가 조용히 발생하지 않고 실패로 방지되는 방식을 확인했습니다.
 
 > "N+1이 뭔가요? 어떻게 해결하나요?"
 > → Phase 3에서 주문 100건 조회 시 쿼리가 401번 나가는 것을 직접 확인했습니다. Fetch Join, BatchSize 각각 적용 후 쿼리 수와 응답시간을 측정했습니다.

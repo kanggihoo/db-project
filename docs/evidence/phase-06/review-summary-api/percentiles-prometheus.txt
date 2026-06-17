@@ -1,0 +1,18 @@
+PHASE6_REVIEW_SUMMARY_PROMETHEUS_PERCENTILES
+
+The k6 console summary emits p95 but not p99 in the current output.
+The p99 values below were read from Prometheus native histogram samples at each run end.
+
+naive-index
+- time: 2026-05-27T00:55:41Z
+- query p95: histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase="phase-06",scenario="review-summary",preset="review-summary-baseline",pool="pool10"}[5m])))
+- value p95: 10.116040697234775s
+- query p99: histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{phase="phase-06",scenario="review-summary",preset="review-summary-baseline",pool="pool10"}[5m])))
+- value p99: 10.322457462147716s
+
+query-shaped-index
+- time: 2026-05-27T01:07:54Z
+- query p95: histogram_quantile(0.95, sum(rate(k6_http_req_duration_seconds{phase="phase-06",scenario="review-summary",preset="review-summary-baseline",pool="pool10"}[5m])))
+- value p95: 10.280004697321186s
+- query p99: histogram_quantile(0.99, sum(rate(k6_http_req_duration_seconds{phase="phase-06",scenario="review-summary",preset="review-summary-baseline",pool="pool10"}[5m])))
+- value p99: 10.355704537339623s

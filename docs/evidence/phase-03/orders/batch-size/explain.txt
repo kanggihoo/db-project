@@ -1,0 +1,11 @@
+Phase 3 batch-size representative query: order_item IN order_ids
+                                                              QUERY PLAN
+--------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using idx_order_item_order_id on order_item  (cost=0.42..32.20 rows=6 width=79) (actual time=0.041..0.051 rows=6 loops=1)
+   Index Cond: (order_id = ANY ('{100,101,102}'::bigint[]))
+   Buffers: shared hit=7 read=2
+ Planning:
+   Buffers: shared hit=129 read=4
+ Planning Time: 1.387 ms
+ Execution Time: 0.124 ms
+(7 rows)

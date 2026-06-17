@@ -1,20 +1,33 @@
--- 1. 카테고리 설정
-INSERT INTO category (id, name, depth) VALUES (200, '전자제품-SQL', 0);
+-- 1. Categories
+INSERT INTO category (id, name, depth) VALUES (200, 'Electronics SQL', 0);
+INSERT INTO category (id, name, depth) VALUES (201, 'Lifestyle SQL', 0);
 
--- 2. ON_SALE 상품 5건
+-- 2. ON_SALE products in category 200
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
-VALUES (200, 200, '판매중상품0', 10000, 'ON_SALE', false, NOW(), NOW());
+VALUES (200, 200, 'On Sale Product 0', 10000, 'ON_SALE', false, NOW(), NOW());
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
-VALUES (201, 200, '판매중상품1', 10000, 'ON_SALE', false, NOW(), NOW());
+VALUES (201, 200, 'On Sale Product 1', 10000, 'ON_SALE', false, NOW(), NOW());
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
-VALUES (202, 200, '판매중상품2', 10000, 'ON_SALE', false, NOW(), NOW());
+VALUES (202, 200, 'On Sale Product 2', 10000, 'ON_SALE', false, NOW(), NOW());
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
-VALUES (203, 200, '판매중상품3', 10000, 'ON_SALE', false, NOW(), NOW());
+VALUES (203, 200, 'On Sale Product 3', 10000, 'ON_SALE', false, NOW(), NOW());
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
-VALUES (204, 200, '판매중상품4', 10000, 'ON_SALE', false, NOW(), NOW());
+VALUES (204, 200, 'On Sale Product 4', 10000, 'ON_SALE', false, NOW(), NOW());
 
--- 3. SOLD_OUT 상품 2건
+-- 3. SOLD_OUT products in category 200
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
-VALUES (205, 200, '품절상품0', 10000, 'SOLD_OUT', false, NOW(), NOW());
+VALUES (205, 200, 'Sold Out Product 0', 10000, 'SOLD_OUT', false, NOW(), NOW());
 INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
-VALUES (206, 200, '품절상품1', 10000, 'SOLD_OUT', false, NOW(), NOW());
+VALUES (206, 200, 'Sold Out Product 1', 10000, 'SOLD_OUT', false, NOW(), NOW());
+
+-- 4. ON_SALE product in another category
+INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
+VALUES (207, 201, 'Other Category Product 0', 20000, 'ON_SALE', false, NOW(), NOW());
+
+-- 5. Deleted product; Phase 5 intentionally does not add is_deleted filtering.
+INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
+VALUES (208, 200, 'Deleted Product 0', 30000, 'ON_SALE', true, NOW(), NOW());
+
+-- 6. SOLD_OUT product in another category to prove null status is not defaulted.
+INSERT INTO product (id, category_id, name, base_price, status, is_deleted, created_at, updated_at)
+VALUES (209, 201, 'Other Category Sold Out Product 0', 25000, 'SOLD_OUT', false, NOW(), NOW());

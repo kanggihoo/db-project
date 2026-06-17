@@ -1,0 +1,25 @@
+Scenario: Lost Update
+Tests:
+- TransactionIsolationTest.readCommittedCanLoseUpdateWithNaiveReadModifyWrite
+- TransactionIsolationTest.repeatableReadPreventsLostUpdateWithConcurrentUpdateFailure
+Database: PostgreSQL Testcontainers using src/test/resources/init.sql
+Fixture: product_sku id=900001 stock_quantity=10
+
+READ COMMITTED:
+1. txA reads stock_quantity=10.
+2. txB reads stock_quantity=10.
+3. txA writes stock_quantity=9 and commits.
+4. txB writes stale stock_quantity=9 and commits.
+5. Final stock_quantity is 9.
+Expected: Naive read-modify-write can lose one update.
+
+REPEATABLE READ:
+1. txA reads stock_quantity=10.
+2. txB reads stock_quantity=10.
+3. txA writes stock_quantity=9 and commits.
+4. txB attempts stale write.
+5. PostgreSQL fails txB with SQL state 40001.
+6. Final stock_quantity is 9.
+Expected: Lost Update is prevented by concurrent update failure.
+
+Result: PASS - TransactionIsolationTest completed successfully in Gradle.

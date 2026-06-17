@@ -1,0 +1,25 @@
+                                                             QUERY PLAN                                                             
+------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=72939.98..85439.98 rows=500000 width=30) (actual time=339.180..454.377 rows=100 loops=1)
+   Group Key: (date_trunc('month'::text, o.created_at)), u.grade
+   Buffers: shared hit=472 read=5394, temp read=2326 written=2334
+   ->  Sort  (cost=72939.98..74189.98 rows=500000 width=26) (actual time=337.498..404.086 rows=500000 loops=1)
+         Sort Key: (date_trunc('month'::text, o.created_at)) DESC, u.grade
+         Sort Method: external merge  Disk: 18608kB
+         Buffers: shared hit=472 read=5394, temp read=2326 written=2334
+         ->  Hash Join  (cost=403.00..13648.06 rows=500000 width=26) (actual time=2.621..172.168 rows=500000 loops=1)
+               Hash Cond: (o.user_id = u.id)
+               Buffers: shared hit=466 read=5394
+               ->  Seq Scan on orders o  (cost=0.00..10682.00 rows=500000 width=28) (actual time=0.023..33.547 rows=500000 loops=1)
+                     Buffers: shared hit=288 read=5394
+               ->  Hash  (cost=278.00..278.00 rows=10000 width=14) (actual time=2.540..2.541 rows=10000 loops=1)
+                     Buckets: 16384  Batches: 1  Memory Usage: 597kB
+                     Buffers: shared hit=178
+                     ->  Seq Scan on users u  (cost=0.00..278.00 rows=10000 width=14) (actual time=0.042..1.223 rows=10000 loops=1)
+                           Buffers: shared hit=178
+ Planning:
+   Buffers: shared hit=260 read=1
+ Planning Time: 2.301 ms
+ Execution Time: 457.079 ms
+(21 rows)
+
