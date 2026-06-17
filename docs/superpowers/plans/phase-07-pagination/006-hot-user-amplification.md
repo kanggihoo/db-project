@@ -7,6 +7,7 @@ Phase 7 Cursor/Offset 차이를 더 명확히 보기 위해 기존 `loadtest` se
 ## Files
 
 - Create: `scripts/phase-07/05-hot-user-amplify.sql`
+- Create: `scripts/phase-07/06-hot-user-cleanup.sql`
 - Modify: `k6/presets/points-page0.json`
 - Modify: `k6/presets/points-mid.json`
 - Modify: `k6/presets/points-deep.json`
@@ -64,17 +65,52 @@ docker compose exec -T postgres psql -U app -d ecommerce < scripts/phase-07/05-h
 
 Expected: `user_id=707000` has `point_count=100000`.
 
-- [ ] **Step 3: Update k6 presets**
+- [ ] **Step 3: Create hot user cleanup SQL**
+
+Create `scripts/phase-07/06-hot-user-cleanup.sql`:
+
+```sql
+\echo 'PHASE7_HOT_USER_CLEANUP'
+\set phase7_user_id 707000
+\set phase7_point_start_id 707000000
+\set phase7_point_count 100000
+
+BEGIN;
+
+DELETE FROM point_history
+WHERE user_id = :phase7_user_id
+  AND id > :phase7_point_start_id
+  AND id <= (:phase7_point_start_id + :phase7_point_count)
+  AND description = 'phase7 hot user amplification';
+
+DELETE FROM users
+WHERE id = :phase7_user_id
+  AND email = 'phase7-hot-user@example.com';
+
+COMMIT;
+
+SELECT COUNT(*) AS remaining_phase7_points
+FROM point_history
+WHERE user_id = :phase7_user_id;
+
+SELECT COUNT(*) AS remaining_phase7_users
+FROM users
+WHERE id = :phase7_user_id;
+```
+
+Do not run cleanup before Phase 7 evidence capture. Run it only when moving to another Phase on the same Docker volume.
+
+- [ ] **Step 4: Update k6 presets**
 
 Set Offset presets to `userStart=707000`, `userEnd=707000`, and use `page=0`, `page=2499`, `page=3999`.
 
 Set Cursor preset to `userId=707000`.
 
-- [ ] **Step 4: Re-capture focused evidence**
+- [ ] **Step 5: Re-capture focused evidence**
 
 Run SQL-only hot user explain with `deep_offset=79980`, then run k6 Offset page0/mid/deep and Cursor.
 
-- [ ] **Step 5: Update report**
+- [ ] **Step 6: Update report**
 
 Add an amplified hot user section to `docs/phases/07-pagination/report.md` that records:
 
@@ -84,10 +120,11 @@ Add an amplified hot user section to `docs/phases/07-pagination/report.md` that 
 - midPage `2499`
 - deepPage `3999`
 - why this evidence supersedes the earlier natural hot user run for pagination contrast
+- cleanup policy for long-lived Docker volume workflows
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add scripts/phase-07/05-hot-user-amplify.sql k6/presets/points-page0.json k6/presets/points-mid.json k6/presets/points-deep.json k6/presets/points-cursor.json docs/phases/07-pagination/report.md docs/superpowers/plans/phase-07-pagination/006-hot-user-amplification.md
+git add scripts/phase-07/05-hot-user-amplify.sql scripts/phase-07/06-hot-user-cleanup.sql k6/presets/points-page0.json k6/presets/points-mid.json k6/presets/points-deep.json k6/presets/points-cursor.json docs/phases/07-pagination/report.md docs/superpowers/plans/phase-07-pagination/006-hot-user-amplification.md
 git commit -m "docs(phase7): add hot user amplification plan"
 ```
