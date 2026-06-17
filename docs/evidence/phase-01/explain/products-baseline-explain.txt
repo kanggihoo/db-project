@@ -1,0 +1,19 @@
+Pager usage is off.
+PRODUCTS_BASELINE_EXPLAIN
+                              QUERY PLAN                              
+----------------------------------------------------------------------
+ Seq Scan on product  (cost=0.00..4610.00 rows=396 width=214)
+   Filter: ((category_id = 1) AND ((status)::text = 'ON_SALE'::text))
+(2 rows)
+
+PRODUCTS_BASELINE_EXPLAIN_ANALYZE
+                                                QUERY PLAN                                                 
+-----------------------------------------------------------------------------------------------------------
+ Seq Scan on product  (cost=0.00..4610.00 rows=396 width=214) (actual time=2.335..67.664 rows=397 loops=1)
+   Filter: ((category_id = 1) AND ((status)::text = 'ON_SALE'::text))
+   Rows Removed by Filter: 99603
+   Buffers: shared hit=4 read=3106
+ Planning Time: 0.024 ms
+ Execution Time: 67.707 ms
+(6 rows)
+

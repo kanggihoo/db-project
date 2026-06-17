@@ -1,5 +1,7 @@
 # Claude / Agent
 .agents/*
+!.agents/rules/
+!.agents/rules/**
 !.agents/skills/
 .agents/skills/*
 !.agents/skills/phase-evidence-portfolio-review/

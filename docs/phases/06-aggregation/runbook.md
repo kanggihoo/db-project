@@ -15,33 +15,33 @@ docker compose up -d
 데이터 프로파일:
 
 ```bash
-make phase-sql PHASE=phase-06 SCENARIO=data-profile ACTION=profile OUTPUT=docs/evidence/phase-06/data-profile/row-counts.txt
+make phase-sql FILE=scripts/phase-06/00-data-profile.sql OUTPUT=docs/evidence/phase-06/data-profile/row-counts.txt
 ```
 
 상품 리뷰 요약:
 
 ```bash
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=baseline ACTION=prepare
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=baseline ACTION=explain OUTPUT=docs/evidence/phase-06/review-aggregate/baseline/explain.txt
+make phase-sql FILE=scripts/phase-06/10-review-baseline-prepare.sql
+make phase-sql FILE=scripts/phase-06/11-review-baseline-explain.sql OUTPUT=docs/evidence/phase-06/review-aggregate/baseline/explain.txt
 
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=naive-index ACTION=prepare
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=naive-index ACTION=explain OUTPUT=docs/evidence/phase-06/review-aggregate/naive-index/explain.txt
+make phase-sql FILE=scripts/phase-06/12-review-naive-prepare.sql
+make phase-sql FILE=scripts/phase-06/13-review-naive-explain.sql OUTPUT=docs/evidence/phase-06/review-aggregate/naive-index/explain.txt
 
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=query-shaped-index ACTION=prepare
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=query-shaped-index ACTION=explain OUTPUT=docs/evidence/phase-06/review-aggregate/query-shaped-index/explain.txt
+make phase-sql FILE=scripts/phase-06/14-review-query-shaped-prepare.sql
+make phase-sql FILE=scripts/phase-06/15-review-query-shaped-explain.sql OUTPUT=docs/evidence/phase-06/review-aggregate/query-shaped-index/explain.txt
 ```
 
 월별 주문 집계:
 
 ```bash
-make phase-sql PHASE=phase-06 SCENARIO=monthly-order-aggregate CONDITION=baseline ACTION=prepare
-make phase-sql PHASE=phase-06 SCENARIO=monthly-order-aggregate CONDITION=baseline ACTION=explain OUTPUT=docs/evidence/phase-06/monthly-order-aggregate/baseline/explain.txt
+make phase-sql FILE=scripts/phase-06/20-monthly-baseline-prepare.sql
+make phase-sql FILE=scripts/phase-06/21-monthly-baseline-explain.sql OUTPUT=docs/evidence/phase-06/monthly-order-aggregate/baseline/explain.txt
 
-make phase-sql PHASE=phase-06 SCENARIO=monthly-order-aggregate CONDITION=naive-index ACTION=prepare
-make phase-sql PHASE=phase-06 SCENARIO=monthly-order-aggregate CONDITION=naive-index ACTION=explain OUTPUT=docs/evidence/phase-06/monthly-order-aggregate/naive-index/explain.txt
+make phase-sql FILE=scripts/phase-06/22-monthly-naive-prepare.sql
+make phase-sql FILE=scripts/phase-06/23-monthly-naive-explain.sql OUTPUT=docs/evidence/phase-06/monthly-order-aggregate/naive-index/explain.txt
 
-make phase-sql PHASE=phase-06 SCENARIO=monthly-order-aggregate CONDITION=query-shaped-index ACTION=prepare
-make phase-sql PHASE=phase-06 SCENARIO=monthly-order-aggregate CONDITION=query-shaped-index ACTION=explain OUTPUT=docs/evidence/phase-06/monthly-order-aggregate/query-shaped-index/explain.txt
+make phase-sql FILE=scripts/phase-06/24-monthly-query-shaped-prepare.sql
+make phase-sql FILE=scripts/phase-06/25-monthly-query-shaped-explain.sql OUTPUT=docs/evidence/phase-06/monthly-order-aggregate/query-shaped-index/explain.txt
 ```
 
 ## API 테스트
@@ -57,13 +57,13 @@ rtk gradlew test --tests "*ProductReviewSummaryTest"
 단순 인덱스 API 증거를 실행한다.
 
 ```bash
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=naive-index ACTION=prepare
-make k6-evidence PHASE=phase-06 SCENARIO=review-summary CONDITION=naive-index
+make phase-sql FILE=scripts/phase-06/12-review-naive-prepare.sql
+make k6-evidence PHASE=phase-06 SCENARIO=review-summary PRESET=review-summary-baseline CONDITION=naive-index
 ```
 
 쿼리 형태 맞춤 인덱스 API 증거를 실행한다.
 
 ```bash
-make phase-sql PHASE=phase-06 SCENARIO=review-aggregate CONDITION=query-shaped-index ACTION=prepare
-make k6-evidence PHASE=phase-06 SCENARIO=review-summary CONDITION=query-shaped-index
+make phase-sql FILE=scripts/phase-06/14-review-query-shaped-prepare.sql
+make k6-evidence PHASE=phase-06 SCENARIO=review-summary PRESET=review-summary-baseline CONDITION=query-shaped-index
 ```

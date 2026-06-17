@@ -1,0 +1,101 @@
+Pager usage is off.
+POINTS_PAGE0_EXPLAIN
+                                          QUERY PLAN                                           
+-----------------------------------------------------------------------------------------------
+ Limit  (cost=33377.96..33380.29 rows=20 width=53)
+   ->  Gather Merge  (cost=33377.96..33424.16 rows=396 width=53)
+         Workers Planned: 2
+         ->  Sort  (cost=32377.94..32378.43 rows=198 width=53)
+               Sort Key: created_at DESC, id DESC
+               ->  Parallel Seq Scan on point_history  (cost=0.00..32372.67 rows=198 width=53)
+                     Filter: (user_id = 5714)
+(7 rows)
+
+POINTS_PAGE0_EXPLAIN_ANALYZE
+                                                                QUERY PLAN                                                                
+------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=33377.96..33380.29 rows=20 width=53) (actual time=73.531..75.582 rows=20 loops=1)
+   Buffers: shared hit=470 read=21572
+   ->  Gather Merge  (cost=33377.96..33424.16 rows=396 width=53) (actual time=73.530..75.579 rows=20 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=470 read=21572
+         ->  Sort  (cost=32377.94..32378.43 rows=198 width=53) (actual time=70.821..70.823 rows=8 loops=3)
+               Sort Key: created_at DESC, id DESC
+               Sort Method: quicksort  Memory: 25kB
+               Buffers: shared hit=470 read=21572
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               Worker 1:  Sort Method: quicksort  Memory: 26kB
+               ->  Parallel Seq Scan on point_history  (cost=0.00..32372.67 rows=198 width=53) (actual time=2.979..70.709 rows=8 loops=3)
+                     Filter: (user_id = 5714)
+                     Rows Removed by Filter: 666658
+                     Buffers: shared hit=384 read=21572
+ Planning Time: 0.022 ms
+ Execution Time: 75.603 ms
+(18 rows)
+
+POINTS_PAGE500_EXPLAIN
+                                          QUERY PLAN                                           
+-----------------------------------------------------------------------------------------------
+ Limit  (cost=33426.45..33426.56 rows=1 width=53)
+   ->  Gather Merge  (cost=33380.24..33426.45 rows=396 width=53)
+         Workers Planned: 2
+         ->  Sort  (cost=32380.22..32380.71 rows=198 width=53)
+               Sort Key: created_at DESC, id DESC
+               ->  Parallel Seq Scan on point_history  (cost=0.00..32372.67 rows=198 width=53)
+                     Filter: (user_id = 5714)
+(7 rows)
+
+POINTS_PAGE500_EXPLAIN_ANALYZE
+                                                                QUERY PLAN                                                                
+------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=33426.45..33426.56 rows=1 width=53) (actual time=47.209..49.101 rows=0 loops=1)
+   Buffers: shared hit=566 read=21476
+   ->  Gather Merge  (cost=33380.24..33426.45 rows=396 width=53) (actual time=47.204..49.099 rows=25 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=566 read=21476
+         ->  Sort  (cost=32380.22..32380.71 rows=198 width=53) (actual time=45.368..45.369 rows=8 loops=3)
+               Sort Key: created_at DESC, id DESC
+               Sort Method: quicksort  Memory: 26kB
+               Buffers: shared hit=566 read=21476
+               Worker 0:  Sort Method: quicksort  Memory: 26kB
+               Worker 1:  Sort Method: quicksort  Memory: 25kB
+               ->  Parallel Seq Scan on point_history  (cost=0.00..32372.67 rows=198 width=53) (actual time=3.983..45.268 rows=8 loops=3)
+                     Filter: (user_id = 5714)
+                     Rows Removed by Filter: 666658
+                     Buffers: shared hit=480 read=21476
+ Planning Time: 0.021 ms
+ Execution Time: 49.247 ms
+(18 rows)
+
+POINTS_COUNT_EXPLAIN
+                                          QUERY PLAN                                          
+----------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=33373.38..33373.39 rows=1 width=8)
+   ->  Gather  (cost=33373.16..33373.37 rows=2 width=8)
+         Workers Planned: 2
+         ->  Partial Aggregate  (cost=32373.16..32373.17 rows=1 width=8)
+               ->  Parallel Seq Scan on point_history  (cost=0.00..32372.67 rows=198 width=0)
+                     Filter: (user_id = 5714)
+(6 rows)
+
+POINTS_COUNT_EXPLAIN_ANALYZE
+                                                               QUERY PLAN                                                                
+-----------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=33373.38..33373.39 rows=1 width=8) (actual time=38.942..40.620 rows=1 loops=1)
+   Buffers: shared hit=576 read=21380
+   ->  Gather  (cost=33373.16..33373.37 rows=2 width=8) (actual time=38.766..40.613 rows=3 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=576 read=21380
+         ->  Partial Aggregate  (cost=32373.16..32373.17 rows=1 width=8) (actual time=37.015..37.015 rows=1 loops=3)
+               Buffers: shared hit=576 read=21380
+               ->  Parallel Seq Scan on point_history  (cost=0.00..32372.67 rows=198 width=0) (actual time=1.975..37.002 rows=8 loops=3)
+                     Filter: (user_id = 5714)
+                     Rows Removed by Filter: 666658
+                     Buffers: shared hit=576 read=21380
+ Planning Time: 0.019 ms
+ Execution Time: 40.642 ms
+(14 rows)
+

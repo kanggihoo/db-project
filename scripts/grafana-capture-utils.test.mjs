@@ -156,7 +156,7 @@ test('shouldRequireRunWindow allows explicit live capture opt-in', () => {
   );
 });
 
-test('buildK6EvidencePaths binds log, run window, and output to the same condition', () => {
+test('buildK6EvidencePaths binds summary json, run window, and output to the same condition', () => {
   assert.deepEqual(
     buildK6EvidencePaths({
       phase: 'phase-02',
@@ -168,8 +168,10 @@ test('buildK6EvidencePaths binds log, run window, and output to the same conditi
     {
       condition: 'pool10-post-index',
       evidenceDir: 'docs/evidence/phase-02/products/pool10-post-index',
-      logFile: 'docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt',
+      measurementFile: 'docs/evidence/phase-02/products/pool10-post-index/measurement.json',
+      summaryJsonFile: 'docs/evidence/phase-02/products/pool10-post-index/k6-summary.json',
       runWindowFile: 'docs/evidence/phase-02/products/pool10-post-index/run-window.json',
+      exitStatusFile: 'docs/evidence/phase-02/products/pool10-post-index/k6-exit-status.txt',
       output: 'docs/evidence/phase-02/grafana-screenshots/products-pool10-post-index.png',
     },
   );
@@ -199,8 +201,10 @@ test('buildK6EvidencePaths stores Phase 6 review summary API evidence under the 
     {
       condition: 'naive-index',
       evidenceDir: 'docs/evidence/phase-06/review-summary-api/naive-index',
-      logFile: 'docs/evidence/phase-06/review-summary-api/naive-index/k6-summary.txt',
+      measurementFile: 'docs/evidence/phase-06/review-summary-api/naive-index/measurement.json',
+      summaryJsonFile: 'docs/evidence/phase-06/review-summary-api/naive-index/k6-summary.json',
       runWindowFile: 'docs/evidence/phase-06/review-summary-api/naive-index/run-window.json',
+      exitStatusFile: 'docs/evidence/phase-06/review-summary-api/naive-index/k6-exit-status.txt',
       output: 'docs/evidence/phase-06/grafana-screenshots/review-summary-naive-index.png',
     },
   );

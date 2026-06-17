@@ -1,0 +1,127 @@
+---
+title: "Phase 01: Naive Baseline"
+sidebar_label: "01. Naive Baseline"
+description: "Spring Boot와 PostgreSQL 기반 이커머스 DB Lab에서 나이브 구현의 성능 기준선을 측정하고 evidence 품질에 따라 비교 기준을 선별한 case study"
+tags: [spring-boot, postgresql, jpa, k6, performance]
+---
+
+# Phase 01: Naive Baseline
+
+## 한 줄 요약
+
+최적화하지 않은 JPA 기반 API를 실제 부하에서 측정해 이후 인덱스, N+1 제거, pagination 개선 Phase의 Before 기준선을 만들었다. 단순히 느린 수치를 나열하지 않고, 측정 조건이 틀린 evidence는 제외해 비교 가능한 기준선만 남겼다.
+
+## 문제
+
+이 프로젝트는 이커머스 도메인을 실험 대상으로 삼아 DB 병목을 재현하고 개선하는 학습용 DB Optimization Lab이다. Phase 1의 목적은 문제를 해결하는 것이 아니라, 최적화 전 상태가 실제로 어떻게 무너지는지 측정 가능한 evidence로 남기는 것이다.
+
+검증 대상은 세 가지였다.
+
+| API | 의도한 병목 | 다음 비교 Phase |
+|---|---|---|
+| `GET /api/products?categoryId=&status=&strategy=baseline` | 인덱스 없는 필터 조회 | Phase 2 Index |
+| `GET /api/orders?userId=&strategy=lazy` | LAZY 연관 순회로 인한 N+1 | Phase 3 N+1 |
+| `GET /api/points?userId=&page=&size=` | Offset/Page 조회와 count query | Phase 7 Pagination |
+
+## 가설과 접근
+
+나이브 구현에서는 세 API가 서로 다른 방식으로 병목을 드러낼 것이라고 가정했다.
+
+| 가설 | 검증 방법 |
+|---|---|
+| 상품 검색은 `(category_id, status)` 보조 인덱스가 없어 `Seq Scan`을 선택한다. | `EXPLAIN ANALYZE`, `pg_stat_statements`, k6 50 rps |
+| 주문 목록은 LAZY 연관 접근 때문에 요청당 SQL 수가 폭증한다. | `pg_stat_statements`의 반복 SQL calls, k6 50 rps |
+| 포인트 내역은 `Page<T>` 응답을 만들며 content query와 count query가 함께 느려진다. | fixed page0 k6 20 rps, `pg_stat_statements`, `EXPLAIN ANALYZE` |
+
+## 실험 조건
+
+| 항목 | 값 |
+|---|---|
+| Project | Ecommerce DB Optimization Lab |
+| Phase | Phase 01. Naive Baseline |
+| 측정일 | 2026-06-16 |
+| Spring profile | `pool10` |
+| k6 mode | `prometheus` |
+| timeout | 5초 |
+| 주요 label | `phase=phase-01`, `pool=pool10` |
+
+데이터 규모는 다음과 같다.
+
+| Table | Rows | 주요 인덱스 상태 |
+|---|---:|---|
+| `product` | 100,000 | `product_pkey`만 있음 |
+| `orders` | 500,000 | `orders_pkey`만 있음 |
+| `order_item` | 1,000,000 | `order_item_pkey`만 있음 |
+| `point_history` | 2,000,000 | `point_history_pkey`만 있음 |
+
+## 핵심 결과
+
+| Case | Workload | Failed | p95 | p99 | 판단 |
+|---|---:|---:|---:|---:|---|
+| Products baseline | 50 rps, 5m | 0.013% | 621.91ms | 2.07s | Phase 2 기준선 |
+| Orders lazy | 50 rps, 5m | 100.00% | 5.00s | 5.03s | N+1로 인한 응답 실패 기준선 |
+| Points page0 | 20 rps, 5m | 97.42% | 5.04s | 7.06s | no-index Page endpoint 운영 한계 |
+
+SQL 관점의 핵심 지표는 다음과 같다.
+
+| Target | SQL evidence | 핵심 수치 |
+|---|---|---|
+| `product` filter | `Seq Scan on product` | 397 rows 반환, 99,603 rows filter 제거, 단건 `Execution Time` 67.707ms |
+| `products` 부하 직후 | `pg_stat_statements` | 14,935 calls, mean 21.45ms, total 320,401.33ms |
+| `orders` lazy 부하 직후 | `order_item where order_id = ?` | 12,312 calls, mean 139.78ms, total 1,721,017.69ms |
+| `orders` lazy 부하 직후 | `product_image where product_id = ?` | 24,532 calls, mean 36.07ms, total 884,785.41ms |
+| `points` page0 부하 직후 | page query | 5,669 calls, mean 442.29ms, total 2,507,359.90ms |
+| `points` page0 부하 직후 | count query | 5,669 calls, mean 419.99ms, total 2,380,922.59ms |
+
+## Evidence 선별
+
+Phase 1에서 가장 중요한 결정은 모든 결과를 같은 품질의 기준선으로 취급하지 않은 것이다.
+
+| Evidence | 채택 여부 | 이유 |
+|---|---|---|
+| `products/products-baseline` | 채택 | measurement, k6 summary, `pg_stat_statements`, `EXPLAIN ANALYZE`가 같은 조건을 가리킨다. |
+| `orders/orders-baseline` | 부분 채택 | HTTP p95는 실패 상태라 비교값으로 쓰지 않고, 반복 SQL 폭증과 응답 실패 근거로만 사용한다. |
+| `rps20-test/points-page0-rps20` | 채택 | fixed page0 조건, k6 summary, `pg_stat_statements`가 일치한다. |
+| `points/points-page0`, `points/points-page500` | 제외 | condition 이름은 page0/page500이지만 실제 measurement는 둘 다 `preset=baseline`, `page=weighted`다. |
+| old `points/page0`, `points/page500` pg_stat | 제외 | 상위 SQL이 `order_item`, `product_image`라 points SQL snapshot으로 보기 어렵다. |
+
+이 선별 때문에 Phase 1의 공식 결론은 "page500이 page0보다 몇 배 느리다"가 아니다. 공식 결론은 `point_history`에 보조 인덱스가 없는 상태에서는 page0 요청만으로도 `Page<T>` 기반 endpoint가 운영 한계에 도달한다는 것이다.
+
+## 해석과 의사결정
+
+Products baseline은 Phase 2의 Before로 바로 사용할 수 있다. API는 대부분 응답했지만 `Seq Scan`과 높은 tail latency가 남아 있어, Phase 2에서는 `(category_id, status)` 계열 인덱스 적용 후 Index Scan 전환, rows removed 감소, SQL mean/total time 감소, k6 p95/p99 감소를 비교하면 된다.
+
+Orders baseline은 정상 응답 성능 기준선이 아니라 failure baseline이다. 50 rps에서 실패율 100%, `data_received=0`으로 끝났기 때문에 p95 자체를 개선 비교값으로 쓰면 안 된다. 대신 Phase 3에서는 응답 성공률 회복과 `order_item` 반복 calls 제거가 먼저 비교 기준이 된다.
+
+Points baseline은 deep offset보다 더 앞선 문제를 드러냈다. `point_history` 2,000,000건에 `user_id`, `created_at`, `id` 접근 패턴을 지원하는 보조 인덱스가 없고, `Page<T>`가 content query와 count query를 함께 실행한다. 그래서 Phase 7에서는 cursor 전환만 볼 것이 아니라 index 적용, count query 제거 또는 분리, page0 정상 응답 회복을 함께 검증해야 한다.
+
+## 백엔드 역량 포인트
+
+- JPA LAZY loading, DTO 변환, Repository query shape가 실제 SQL calls로 어떻게 드러나는지 추적했다.
+- k6 결과를 HTTP 성능값, 실패 신호, threshold failure로 구분해 해석했다.
+- `EXPLAIN ANALYZE`와 `pg_stat_statements`를 함께 사용해 단건 실행계획과 부하 직후 누적 DB 시간을 연결했다.
+- measurement condition이 틀린 evidence를 폐기하고, 이후 Phase에서 비교 가능한 기준선만 남겼다.
+- 실패한 부하 테스트를 숨기지 않고 다음 실험의 입력 조건으로 재정의했다.
+
+## 한계와 다음 단계
+
+Phase 1에서는 Grafana dashboard screenshot을 예외적으로 필수 evidence에서 제외했다. 따라서 Hikari active/pending, Tomcat worker 포화 같은 운영 지표는 SQL 지연과 timeout에서 추론한 보조 해석으로만 다룬다.
+
+남은 한계는 명확하다.
+
+| 한계 | 다음 조치 |
+|---|---|
+| Products는 p99가 2초 이상으로 흔들린다. | Phase 2에서 인덱스 적용 후 p95/p99와 SQL mean/total을 비교한다. |
+| Orders는 정상 응답 성능 비교값이 없다. | Phase 3에서 fetch join, entity graph, batch size 적용 후 성공률과 반복 SQL calls를 먼저 비교한다. |
+| Points page500 정밀 비교는 아직 없다. | Phase 7에서 page0 정상 응답 회복 후 fixed page500 또는 cursor 조건을 다시 측정한다. |
+| Grafana screenshot은 Phase 1에서 pass했다. | 이후 Phase에서는 dashboard evidence를 다시 수집해 Hikari/DB 시계열과 연결한다. |
+
+## References
+
+- Full technical report: [report.md](./report.md)
+- Phase evidence index: [docs/evidence/phase-01](../../evidence/phase-01/)
+- Products k6 summary: [k6-summary.json](../../evidence/phase-01/products/products-baseline/k6-summary.json)
+- Products SQL snapshot: [pg-stat-statements.txt](../../evidence/phase-01/products/products-baseline/pg-stat-statements.txt)
+- Orders SQL snapshot: [pg-stat-statements.txt](../../evidence/phase-01/orders/orders-baseline/pg-stat-statements.txt)
+- Points page0 k6 summary: [k6-summary.json](../../evidence/phase-01/rps20-test/points-page0-rps20/k6-summary.json)
+- Points page0 SQL snapshot: [pg-stat-statements.txt](../../evidence/phase-01/rps20-test/points-page0-rps20/pg-stat-statements.txt)

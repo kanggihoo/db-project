@@ -1,8 +1,8 @@
-# 018 Phase 7 Data Cleanup
+# 018 Phase 7 Data And Index Cleanup
 
 ## Goal
 
-Provide a Phase 7-owned cleanup path for long-lived Docker volume workflows. Phase 7 may add `user_id=707000` and 100,000 `point_history` rows for pagination evidence. When the same DB volume is reused for another Phase, this fixture must be removable without deleting base `loadtest` seed data.
+Provide a Phase 7-owned cleanup path for long-lived Docker volume workflows. Phase 7 may add `user_id=707000`, 100,000 `point_history` rows, and pagination indexes for evidence. When the same DB volume is reused for another Phase, this fixture and Phase 7-owned indexes must be removable without deleting base `loadtest` seed data.
 
 ## Files
 
@@ -14,7 +14,7 @@ Provide a Phase 7-owned cleanup path for long-lived Docker volume workflows. Pha
 
 - [ ] **Step 1: Create cleanup SQL**
 
-Create `scripts/phase-07/06-hot-user-cleanup.sql` with a narrow delete scope:
+Create `scripts/phase-07/06-hot-user-cleanup.sql` with a narrow delete scope and Phase 7 index cleanup:
 
 ```sql
 \echo 'PHASE7_HOT_USER_CLEANUP'
@@ -34,6 +34,9 @@ DELETE FROM users
 WHERE id = :phase7_user_id
   AND email = 'phase7-hot-user@example.com';
 
+DROP INDEX IF EXISTS idx_point_history_created_id;
+DROP INDEX IF EXISTS idx_point_history_user_created_id;
+
 COMMIT;
 
 SELECT COUNT(*) AS remaining_phase7_points
@@ -43,6 +46,14 @@ WHERE user_id = :phase7_user_id;
 SELECT COUNT(*) AS remaining_phase7_users
 FROM users
 WHERE id = :phase7_user_id;
+
+SELECT COUNT(*) AS remaining_phase7_indexes
+FROM pg_indexes
+WHERE schemaname = 'public'
+  AND indexname IN (
+      'idx_point_history_created_id',
+      'idx_point_history_user_created_id'
+  );
 ```
 
 - [ ] **Step 2: Document when to run cleanup**
@@ -62,9 +73,10 @@ Run:
 ```bash
 rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_point_count FROM point_history WHERE user_id = 707000;"
 rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_user_count FROM users WHERE id = 707000;"
+rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_index_count FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('idx_point_history_created_id', 'idx_point_history_user_created_id');"
 ```
 
-Expected: both counts are `0`.
+Expected: all counts are `0`.
 
 - [ ] **Step 4: Preserve stronger isolation option**
 
@@ -74,5 +86,6 @@ Keep `docker compose down -v && docker compose up -d && ./scripts/seed.sh loadte
 
 - [ ] `scripts/phase-07/06-hot-user-cleanup.sql` exists.
 - [ ] Cleanup deletes only the Phase 7 amplified fixture.
+- [ ] Cleanup drops Phase 7-owned pagination indexes.
 - [ ] The runbook explains cleanup as a post-evidence step for long-lived Docker volume workflows.
-- [ ] Verification queries confirm `user_id=707000` and its Phase 7 `point_history` rows are gone after cleanup.
+- [ ] Verification queries confirm `user_id=707000`, its Phase 7 `point_history` rows, and Phase 7 pagination indexes are gone after cleanup.

@@ -15,6 +15,8 @@ k6/
     ├── smoke.json
     ├── baseline.json
     ├── phase3-orders-baseline.json
+    ├── phase1-points-page0.json
+    ├── phase1-points-page500.json
     ├── review-summary-baseline.json
     ├── stress-100.json
     ├── stress-200.json
@@ -37,7 +39,7 @@ k6/
 ./k6/run.sh <scenario> <preset> [local|prometheus]
 ```
 
-`local` 모드는 로컬 `k6` 실행 파일이 있으면 로컬로 실행하고, 없으면 `grafana/k6` Docker 이미지를 사용한다.
+`local` 모드는 `grafana/k6` Docker 이미지를 단발 컨테이너로 실행한다.
 `prometheus` 모드는 Docker Compose의 `k6` 서비스를 사용하고, k6 지표를 Prometheus remote write endpoint로 전송한다.
 
 언제 실행하는가:
@@ -63,6 +65,22 @@ PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
 
 `scenario`와 `preset`은 `k6/run.sh` 인자에서 결정한다. `phase`와 `pool`은 환경변수로 전달한다. `userId`, `categoryId`, `page` 같은 요청별 값은 label로 남기지 않는다.
 
+## Summary Artifacts
+
+`k6/run.sh`는 모든 실행에 다음 summary 옵션을 적용한다.
+
+```bash
+--quiet
+--summary-mode=full
+--summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)"
+--summary-time-unit ms
+--summary-export <k6-summary.json>
+```
+
+`k6-summary.json`은 report 표에 쓸 run-level 수치의 원본이다. p95/p99의 최종 비교값은 `k6-summary.json`을 기준으로 한다. 사람이 읽는 종료 요약이 필요하면 `K6_LOG_FILE=<path>`를 직접 지정하거나 stdout을 redirect해서 별도로 저장한다.
+
+`prometheus` 모드에서는 k6가 Prometheus remote write로 시계열 metric도 함께 보낸다. Grafana의 p95/p99는 Prometheus에서 `histogram_quantile()`로 재계산한 보조 evidence이며, 시간축 병목 해석에 사용한다.
+
 Phase 3 orders runs can set `STRATEGY=lazy|fetch-join|batch-size|entity-graph`.
 The value is sent to `GET /api/orders` as the `strategy` query parameter.
 Keep strategy evidence separate by using matching `--condition` and `--output` names, for example `pool10-lazy` and `orders-pool10-lazy.png`.
@@ -87,7 +105,9 @@ For Phase 3 reruns, use `phase3-orders-baseline`. The stored Phase 3 evidence wa
 | `review-summary-baseline` | 20 rps | 5m | Phase 6 review summary API comparison |
 | `stress-100` | 100 rps | 5m | 부하 증가 |
 | `stress-200` | 200 rps | 5m | 한계 확인 |
-| `points-page0` | 50 rps | 5m | 얕은 페이지 |
+| `phase1-points-page0` | 50 rps | 5m | Phase 1 clean rerun 얕은 페이지 |
+| `phase1-points-page500` | 50 rps | 5m | Phase 1 clean rerun 깊은 페이지 |
+| `points-page0` | 50 rps | 5m | Phase 7 hot user 얕은 페이지 |
 | `points-page500` | 50 rps | 5m | 깊은 페이지 |
 
 Preset files live in `k6/presets/`.
@@ -97,10 +117,10 @@ Preset files live in `k6/presets/`.
 ```bash
 ./k6/run.sh orders smoke
 ./k6/run.sh orders baseline
-./k6/run.sh products baseline
-./k6/run.sh products stress-100
-./k6/run.sh points points-page0
-./k6/run.sh points points-page500
+STRATEGY=baseline ./k6/run.sh products baseline
+STRATEGY=baseline ./k6/run.sh products stress-100
+./k6/run.sh points phase1-points-page0
+./k6/run.sh points phase1-points-page500
 ./k6/run.sh review-summary review-summary-baseline
 ```
 
@@ -108,8 +128,8 @@ Grafana에서 k6 지표까지 함께 보려면 `prometheus` 모드를 사용한�
 
 ```bash
 PHASE=phase-01 POOL=pool10 ./k6/run.sh orders baseline prometheus
-PHASE=phase-01 POOL=pool10 ./k6/run.sh products stress-100 prometheus
-PHASE=phase-01 POOL=pool10 ./k6/run.sh points points-page500 prometheus
+STRATEGY=baseline PHASE=phase-01 POOL=pool10 ./k6/run.sh products stress-100 prometheus
+PHASE=phase-01 POOL=pool10 ./k6/run.sh points phase1-points-page500 prometheus
 PHASE=phase-06 POOL=pool10 ./k6/run.sh review-summary review-summary-baseline prometheus
 ```
 

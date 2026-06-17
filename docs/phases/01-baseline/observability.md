@@ -1,6 +1,6 @@
 # Phase 1 관측 전략
 
-> 목적: k6 시나리오별로 Grafana와 PostgreSQL에서 어떤 지표를 봐야 하는지 정리한다.
+> 목적: k6 시나리오별로 k6 summary, PostgreSQL `pg_stat_statements`, SQL 실행계획에서 어떤 지표를 봐야 하는지 정리한다.
 
 ## 관측 원칙
 
@@ -10,7 +10,7 @@ Phase 1에서는 세 API를 섞지 않고 먼저 단일 시나리오로 측정�
 |---|---|
 | `orders` | N+1 쿼리 증가와 HikariCP 점유 |
 | `products` | 인덱스 없는 필터 조회의 Seq Scan |
-| `points` | Offset deep page 지연 |
+| `points` | no-index page0 운영 한계와 count query 비용 |
 
 각 시나리오 직전에는 DB 통계를 초기화한다.
 
@@ -21,7 +21,16 @@ VACUUM ANALYZE;
 
 ## 공통 지표
 
-모든 시나리오에서 공통으로 보는 지표는 [Grafana Observability Guide](../../guides/grafana-observability.md)를 기준으로 한다.
+모든 시나리오는 k6 summary와 PostgreSQL snapshot을 기본 근거로 본다.
+
+| 지표 | 출처 | 의미 |
+|---|---|---|
+| 요청 수, RPS | k6 summary | 실제로 주입된 부하 규모 |
+| `http_req_failed` | k6 summary | timeout, 5xx, check 실패 비율 |
+| p95, p99 | k6 summary | 사용자 관점 응답 지연 |
+| dropped iterations | k6 summary | 목표 arrival rate를 맞추지 못한 반복 수 |
+| calls, mean time, total time | `pg_stat_statements` | 반복 SQL의 비용과 누적 DB 시간 |
+| actual time, rows, buffers | `EXPLAIN ANALYZE` | 실행계획과 실제 처리량 |
 
 ## 시나리오: orders
 
@@ -38,9 +47,6 @@ VACUUM ANALYZE;
 
 | 지표 | 기대되는 관찰 |
 |---|---|
-| Hikari active connections | pool size 근처까지 상승할 수 있음 |
-| Hikari pending threads | 커넥션을 기다리면 0보다 커짐 |
-| Hikari acquire time | pending이 생기면 같이 증가 |
 | k6 p95/p99 | RPS 증가 시 계단식으로 튈 수 있음 |
 | pg_stat_statements calls | `order_item where order_id = ?` 호출 수가 많아짐 |
 | pg_stat_statements total_exec_time | 반복되는 단건 조회가 상위권에 올라옴 |
@@ -49,16 +55,13 @@ VACUUM ANALYZE;
 
 | 관찰 | 해석 |
 |---|---|
-| pending > 0, active가 pool 상한 근처 | 커넥션 풀 대기 병목 |
-| pending = 0, p95 증가 | 풀보다 쿼리 형태, 반복 조회, 테이블 스캔, 데이터 규모가 병목 |
 | `order_item` 조회 calls가 요청 수보다 훨씬 큼 | N+1 재현 성공 |
-| pool20에서 p95가 줄어듦 | 풀 크기가 병목 완화에 일부 효과 |
-| pool20에서도 p95가 그대로 높음 | N+1 쿼리 수 자체가 문제 |
+| `order_item` total_exec_time이 상위권 | 반복 단건 조회가 DB 시간을 지배 |
+| `data_received=0`, 실패율 100% | HTTP latency 비교값이 아니라 앱 응답 실패 evidence |
 
 증빙으로 남길 것:
 
 - k6 summary
-- Hikari active/pending 그래프
 - `order_item` 조회가 포함된 `pg_stat_statements`
 - 요청 1건당 추가 SQL 수를 보여주는 테스트 또는 로그
 
@@ -68,8 +71,8 @@ VACUUM ANALYZE;
 
 ```bash
 ./scripts/server.sh pool10
-./k6/run.sh products baseline
-./k6/run.sh products stress-100
+STRATEGY=baseline ./k6/run.sh products baseline
+STRATEGY=baseline ./k6/run.sh products stress-100
 ```
 
 목표는 `category_id + status` 필터가 인덱스 없이 전체 테이블을 스캔하는지 확인하는 것이다.
@@ -80,26 +83,22 @@ VACUUM ANALYZE;
 |---|---|
 | pg_stat_statements mean_exec_time | 상품 조회 쿼리의 평균 실행시간 확인 |
 | pg_stat_statements total_exec_time | 상품 조회가 총 DB 시간 상위권에 올라옴 |
-| PostgreSQL seq scan count | product 테이블 스캔 증가 |
-| PostgreSQL seq tuples read | product 테이블에서 읽은 tuple 증가 |
-| PostgreSQL index scan count | Phase 2 인덱스 후 비교 기준 |
-| Hikari pending threads | 없어도 응답시간은 느릴 수 있음 |
 | k6 p95/p99 | RPS 증가 시 테이블 스캔 비용과 같이 상승 가능 |
+| EXPLAIN rows removed | 필터 조건 때문에 버린 row 수 |
 
 해석 기준:
 
 | 관찰 | 해석 |
 |---|---|
-| Hikari pending이 낮고 seq scan / seq tuples read가 높음 | 커넥션 풀이 아니라 풀스캔 병목 |
+| `Seq Scan`과 rows removed가 높음 | 인덱스 없는 필터 조회 병목 |
 | mean_exec_time이 높고 calls가 많음 | 인덱스 없는 필터 조회 비용 누적 |
 | Phase 2 인덱스 후 mean_exec_time 감소 | 인덱스 최적화 효과 증명 |
-| seq scan count 감소, index scan 증가 | 실행 계획 전환 증명 |
+| Seq Scan에서 Index Scan으로 전환 | 실행 계획 전환 증명 |
 
 증빙으로 남길 것:
 
 - 상품 조회 쿼리의 `EXPLAIN ANALYZE`
 - `pg_stat_statements` 상위 쿼리
-- seq scan, index scan, seq tuples read 관련 Grafana 패널
 - k6 p95/TPS/error rate
 
 ## 시나리오: points
@@ -108,44 +107,45 @@ VACUUM ANALYZE;
 
 ```bash
 ./scripts/server.sh pool10
-./k6/run.sh points points-page0
-./k6/run.sh points points-page500
+./k6/run.sh points phase1-points-page0
 ```
 
-목표는 같은 RPS에서 page가 깊어질수록 Offset 비용이 증가하는지 확인하는 것이다.
+현재 Phase 1 evidence의 목표는 no-index `point_history` 조회가 page0부터 운영 한계에 도달하는지 확인하는 것이다. page0과 page500의 정밀 비교는 응답 성공률이 회복된 뒤 Phase 7에서 다시 측정한다.
 
-페이지별로 따로 측정한다.
+페이지별 preset은 다음 의미를 갖는다.
 
 | preset | 의미 |
 |---|---|
-| `points-page0` | 얕은 페이지 기준선 |
-| `points-page500` | 깊은 페이지 병목 |
+| `phase1-points-page0` | Phase 7 cleanup 후 clean DB 얕은 페이지 기준선 |
+| `phase1-points-page500` | Phase 7 cleanup 후 clean DB 깊은 페이지 선택 재측정용 |
 | `baseline` | page 가중 랜덤 분포 |
+
+`points-page0` preset은 Phase 7 hot user `707000` 조건에 맞춰져 있으므로, Phase 1 clean rerun에는 사용하지 않는다.
 
 중점 지표:
 
 | 지표 | 기대되는 관찰 |
 |---|---|
-| k6 p95/p99 | page500이 page0보다 높아야 함 |
-| pg_stat_statements mean_exec_time | page500 쿼리 평균 실행시간 증가 |
-| pg_stat_statements rows | 반환 row는 적어도 스캔 비용은 커짐 |
-| PostgreSQL seq tuples read | deep page에서 읽는 tuple 증가 가능 |
-| Hikari active connections | 쿼리가 느릴수록 커넥션 점유 시간이 길어짐 |
+| k6 failure rate | page0에서도 timeout/check 실패가 발생하는지 확인 |
+| k6 p95/p99 | timeout 상한에 도달하는지 확인 |
+| dropped iterations | 목표 RPS를 따라가지 못하는지 확인 |
+| pg_stat_statements mean_exec_time | page query와 count query의 평균 실행시간 |
+| pg_stat_statements total_exec_time | page query와 count query의 누적 DB 시간 |
 
 해석 기준:
 
 | 관찰 | 해석 |
 |---|---|
-| page0은 빠르고 page500만 느림 | Offset deep page 병목 재현 |
-| page500에서도 빠름 | hot user당 point_history 수가 부족하거나 데이터 규모 부족 |
-| Hikari pending까지 증가 | deep page 쿼리가 커넥션을 오래 점유 |
-| Cursor 전환 후 page500 p95 감소 | Phase 7 개선 효과 증명 |
+| page0부터 실패율이 높음 | no-index `Page<T>` 조회가 운영 한계에 도달 |
+| page query와 count query가 모두 상위권 | cursor 전환뿐 아니라 count 제거/분리도 검토 필요 |
+| `data_received=0`, 실패율 100% | 성능 비교값이 아니라 앱 응답 실패 evidence |
+| Cursor/index/count 개선 후 page0 성공률 회복 | Phase 7 개선 효과의 1차 기준 |
 
 증빙으로 남길 것:
 
-- `points-page0` k6 summary
-- `points-page500` k6 summary
-- 두 테스트의 `pg_stat_statements` 비교
+- fixed page0 k6 summary
+- page query와 count query가 포함된 `pg_stat_statements`
+- `point_history` 인덱스 상태와 row count
 - hot user의 point_history count
 
 ## Hikari Pool 비교 전략
@@ -160,13 +160,9 @@ pool5 같은 시나리오 반복
 pool20 같은 시나리오 반복
 ```
 
-상세 해석 기준은 [Grafana Observability Guide](../../guides/grafana-observability.md)의 Hikari pool 해석을 따른다.
+pool 비교를 수행할 때도 최종 판정은 k6 summary와 `pg_stat_statements`를 기준으로 한다.
 
-## Grafana 패널 구성 권장
-
-Phase 1 대시보드는 [Grafana Observability Guide](../../guides/grafana-observability.md)의 공통 패널을 먼저 구성하고, 시나리오별 패널은 이 문서의 각 섹션을 따른다.
-
-## BASELINE.md에 기록할 값
+## report.md에 기록할 값
 
 각 시나리오마다 다음 값을 남긴다.
 
@@ -177,19 +173,15 @@ Phase 1 대시보드는 [Grafana Observability Guide](../../guides/grafana-obser
 | k6 p50/p95/p99 | k6 summary |
 | TPS | k6 `http_reqs` rate |
 | error rate | k6 `http_req_failed` |
-| Hikari max active | Grafana |
-| Hikari pending max | Grafana |
-| table seq/index scan delta | Grafana |
-| seq tuples read delta | Grafana |
 | top SQL mean/total time | pg_stat_statements |
-| 원인 해석 | notes.md 또는 BASELINE.md |
+| 원인 해석 | report.md |
 
 ## Phase 전환 기준
 
 Phase 2로 넘어가기 전 최소 조건:
 
-- `orders`, `products`, `points-page0`, `points-page500` 결과가 각각 저장되어 있다.
+- `orders`, `products`, fixed `points page0` 결과가 각각 저장되어 있다.
 - `orders`에서 N+1 호출 증가가 확인됐다.
 - `products`에서 Seq Scan 또는 비효율 실행계획이 확인됐다.
-- `points-page500`이 `points-page0`보다 느린 근거가 있다.
-- k6 결과와 SQL 분석 결과가 `BASELINE.md` 또는 동등한 문서에 기록됐다.
+- fixed `points page0`에서 no-index `Page<T>` 조회가 운영 한계에 도달함을 설명하는 근거가 있다.
+- k6 결과와 SQL 분석 결과가 `report.md` 또는 동등한 문서에 기록됐다.

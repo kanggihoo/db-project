@@ -62,7 +62,7 @@ ON point_history (user_id, created_at DESC, id DESC);
 
 ## Phase 7 전용 데이터와 Cleanup
 
-`user_id=707000`의 100,000건 `point_history`는 Phase 7 재측정을 위한 amplified fixture다. 기본 `loadtest` seed에 속한 데이터로 해석하지 않는다.
+`user_id=707000`의 100,000건 `point_history`와 Phase 7 pagination index는 Phase 7 재측정을 위한 fixture다. 기본 `loadtest` seed에 속한 데이터나 schema 상태로 해석하지 않는다.
 
 Docker volume을 매 Phase마다 재생성하지 않고 계속 사용하는 경우, Phase 7은 데이터를 추가하는 스크립트와 제거하는 스크립트를 함께 제공해야 한다.
 
@@ -71,7 +71,7 @@ scripts/phase-07/05-hot-user-amplify.sql
 scripts/phase-07/06-hot-user-cleanup.sql
 ```
 
-cleanup SQL은 Phase 7 fixture만 삭제한다. 최소 조건은 아래 값을 함께 사용한다.
+cleanup SQL은 Phase 7 fixture와 Phase 7 pagination index만 제거한다. data 삭제 최소 조건은 아래 값을 함께 사용한다.
 
 ```text
 user_id = 707000
@@ -90,9 +90,17 @@ WHERE user_id = 707000;
 SELECT COUNT(*) AS phase7_user_count
 FROM users
 WHERE id = 707000;
+
+SELECT COUNT(*) AS phase7_index_count
+FROM pg_indexes
+WHERE schemaname = 'public'
+  AND indexname IN (
+      'idx_point_history_created_id',
+      'idx_point_history_user_created_id'
+  );
 ```
 
-두 값은 모두 `0`이어야 한다. Phase 간 완전 격리가 필요하면 cleanup 대신 `docker compose down -v` 후 `./scripts/seed.sh loadtest`로 DB를 재생성한다.
+세 값은 모두 `0`이어야 한다. Phase 간 완전 격리가 필요하면 cleanup 대신 `docker compose down -v` 후 `./scripts/seed.sh loadtest`로 DB를 재생성한다.
 
 ## Cache 조건
 
@@ -455,7 +463,7 @@ Cursor = cursor 이후 size + 1 조회 비용
 9. B run의 k6 summary와 pg_stat_statements snapshot을 저장한다.
 10. C count-only EXPLAIN을 저장한다.
 11. report.md는 A/B/C 구분으로 다시 작성한다.
-12. 같은 Docker volume으로 다른 Phase를 진행해야 하면 Phase 7 cleanup SQL을 실행하고 삭제 결과를 확인한다.
+12. 같은 Docker volume으로 다른 Phase를 진행해야 하면 Phase 7 cleanup SQL을 실행하고 data/index 삭제 결과를 확인한다.
 ```
 
 반복 실행이 필요하면 A와 B의 k6 sampling을 최소 3회 실행하고, run 순서를 바꾼다.
@@ -561,4 +569,4 @@ Grafana는 k6 run 중 request rate, failure rate, Hikari 상태, table access �
 - [ ] count-only EXPLAIN evidence가 저장됐다.
 - [ ] 기존 shared `DB Lab Overview` Grafana screenshot이 보조 evidence로 저장됐다.
 - [ ] 보고서가 A/B/C 구분과 Page-vs-Cursor trade-off 중심으로 작성됐다.
-- [ ] long-lived Docker volume을 계속 사용할 때 실행할 Phase 7 cleanup SQL과 검증 절차가 문서화됐다.
+- [ ] long-lived Docker volume을 계속 사용할 때 실행할 Phase 7 data/index cleanup SQL과 검증 절차가 문서화됐다.

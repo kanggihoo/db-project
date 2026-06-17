@@ -111,7 +111,7 @@ docker compose exec -T postgres psql -U app -d ecommerce -f /tmp/30-pg-stat-stat
 
 ## 8. Phase 7 hot user cleanup
 
-Cleanup은 Phase 7 evidence를 모두 캡처한 뒤에만 실행한다. 같은 Docker volume을 유지한 채 다른 Phase로 이동할 때 `user_id=707000`과 Phase 7 전용 `point_history` 증폭 fixture만 제거하기 위한 절차다.
+Cleanup은 Phase 7 evidence를 모두 캡처한 뒤에만 실행한다. 같은 Docker volume을 유지한 채 다른 Phase로 이동할 때 `user_id=707000`, Phase 7 전용 `point_history` 증폭 fixture, Phase 7 전용 pagination index만 제거하기 위한 절차다.
 
 postgres container에서 repository root가 `/workspace`로 mount되어 있으면 아래 명령을 실행한다.
 
@@ -131,9 +131,10 @@ cleanup 후에는 Phase 7 fixture가 제거됐는지 확인한다.
 ```bash
 rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_point_count FROM point_history WHERE user_id = 707000;"
 rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_user_count FROM users WHERE id = 707000;"
+rtk docker compose exec -T postgres psql -U app -d ecommerce -c "SELECT COUNT(*) AS phase7_index_count FROM pg_indexes WHERE schemaname = 'public' AND indexname IN ('idx_point_history_created_id', 'idx_point_history_user_created_id');"
 ```
 
-두 count가 모두 `0`이어야 한다.
+세 count가 모두 `0`이어야 한다.
 
 Phase 간 상태 격리가 더 중요하면 cleanup SQL 대신 새 volume에서 다시 시작한다.
 

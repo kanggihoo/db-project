@@ -113,7 +113,7 @@ warm-cache repeated load
 
 - [ ] **Step 6: Verify cleanup contract**
 
-`scripts/phase-07/06-hot-user-cleanup.sql` must remove only the Phase 7 amplified fixture. It must use `user_id=707000`, point id range `707000001..707100000`, and `description='phase7 hot user amplification'` when deleting `point_history`.
+`scripts/phase-07/06-hot-user-cleanup.sql` must remove only the Phase 7 amplified fixture and Phase 7-owned pagination indexes. It must use `user_id=707000`, point id range `707000001..707100000`, and `description='phase7 hot user amplification'` when deleting `point_history`.
 
 Cleanup is not part of evidence capture. Run it only when the same Docker volume will be reused by another Phase.
 
@@ -122,5 +122,5 @@ Cleanup is not part of evidence capture. Run it only when the same Docker volume
 - [ ] `707000` exists in `users`.
 - [ ] `point_history` has exactly `100000` rows for `user_id=707000`.
 - [ ] `idx_point_history_user_created_id` exists.
-- [ ] `scripts/phase-07/06-hot-user-cleanup.sql` exists and is scoped to the Phase 7 fixture only.
+- [ ] `scripts/phase-07/06-hot-user-cleanup.sql` exists and is scoped to the Phase 7 fixture and Phase 7 pagination indexes only.
 - [ ] `retest-hot-user-profile.txt` is saved under `docs/evidence/phase-07/data-profile/`.

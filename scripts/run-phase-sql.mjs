@@ -1,24 +1,9 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
-const PHASE_06_SCRIPTS = {
-  'data-profile:profile': 'scripts/phase-06/00-data-profile.sql',
-  'review-aggregate:baseline:prepare': 'scripts/phase-06/10-review-baseline-prepare.sql',
-  'review-aggregate:baseline:explain': 'scripts/phase-06/11-review-baseline-explain.sql',
-  'review-aggregate:naive-index:prepare': 'scripts/phase-06/12-review-naive-prepare.sql',
-  'review-aggregate:naive-index:explain': 'scripts/phase-06/13-review-naive-explain.sql',
-  'review-aggregate:query-shaped-index:prepare': 'scripts/phase-06/14-review-query-shaped-prepare.sql',
-  'review-aggregate:query-shaped-index:explain': 'scripts/phase-06/15-review-query-shaped-explain.sql',
-  'monthly-order-aggregate:baseline:prepare': 'scripts/phase-06/20-monthly-baseline-prepare.sql',
-  'monthly-order-aggregate:baseline:explain': 'scripts/phase-06/21-monthly-baseline-explain.sql',
-  'monthly-order-aggregate:naive-index:prepare': 'scripts/phase-06/22-monthly-naive-prepare.sql',
-  'monthly-order-aggregate:naive-index:explain': 'scripts/phase-06/23-monthly-naive-explain.sql',
-  'monthly-order-aggregate:query-shaped-index:prepare': 'scripts/phase-06/24-monthly-query-shaped-prepare.sql',
-  'monthly-order-aggregate:query-shaped-index:explain': 'scripts/phase-06/25-monthly-query-shaped-explain.sql',
-};
-
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const parsed = {};
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -39,62 +24,16 @@ function parseArgs(argv) {
   return parsed;
 }
 
-function usage() {
+export function resolveSqlFile({ file }) {
+  if (!file) {
+    throw new Error('Missing required argument: --file');
+  }
+
+  return file;
+}
+
+export function buildPsqlCommand() {
   return [
-    'Usage:',
-    '  npm run phase:sql -- --phase phase-06 --scenario data-profile --action profile [--output <path>]',
-    '  npm run phase:sql -- --phase phase-06 --scenario review-aggregate --condition naive-index --action prepare',
-    '  npm run phase:sql -- --phase phase-06 --scenario review-aggregate --condition naive-index --action explain --output <path>',
-  ].join('\n');
-}
-
-function resolveScript({ phase, scenario, condition, action }) {
-  if (phase !== 'phase-06') {
-    throw new Error(`Unsupported phase: ${phase}. Only phase-06 is mapped.`);
-  }
-
-  if (!scenario) {
-    throw new Error('Missing required argument: --scenario');
-  }
-
-  if (!action) {
-    throw new Error('Missing required argument: --action');
-  }
-
-  if (scenario === 'data-profile') {
-    if (action !== 'profile') {
-      throw new Error('data-profile requires --action profile');
-    }
-    return PHASE_06_SCRIPTS['data-profile:profile'];
-  }
-
-  if (!condition) {
-    throw new Error(`${scenario} requires --condition`);
-  }
-
-  if (!['prepare', 'explain'].includes(action)) {
-    throw new Error(`${scenario} requires --action prepare or --action explain`);
-  }
-
-  const key = `${scenario}:${condition}:${action}`;
-  const script = PHASE_06_SCRIPTS[key];
-  if (!script) {
-    throw new Error(`Unsupported Phase 6 SQL mapping: ${key}`);
-  }
-
-  return script;
-}
-
-function main() {
-  const args = parseArgs(process.argv.slice(2));
-  const phase = args.phase;
-
-  if (!phase) {
-    throw new Error('Missing required argument: --phase');
-  }
-
-  const script = resolveScript(args);
-  const command = [
     'compose',
     'exec',
     '-T',
@@ -104,12 +43,25 @@ function main() {
     'app',
     '-d',
     'ecommerce',
+    '-v',
+    'ON_ERROR_STOP=1',
     '-f',
     '-',
   ];
+}
 
-  const sql = readFileSync(script, 'utf8');
-  const result = spawnSync('docker', command, {
+export function runPhaseSql(args, dependencies = {}) {
+  const {
+    readFileSync: readFile = readFileSync,
+    mkdirSync: mkdir = mkdirSync,
+    writeFileSync: writeFile = writeFileSync,
+    spawnSync: spawn = spawnSync,
+    stdout = process.stdout,
+    stderr = process.stderr,
+  } = dependencies;
+
+  const sql = readFile(resolveSqlFile(args), 'utf8');
+  const result = spawn('docker', buildPsqlCommand(), {
     encoding: 'utf8',
     input: sql,
   });
@@ -119,25 +71,42 @@ function main() {
   }
 
   if (result.stderr) {
-    process.stderr.write(result.stderr);
+    stderr.write(result.stderr);
   }
 
   if (args.output) {
-    mkdirSync(dirname(args.output), { recursive: true });
-    writeFileSync(args.output, result.stdout);
+    mkdir(dirname(args.output), { recursive: true });
+    writeFile(args.output, result.stdout);
   } else if (result.stdout) {
-    process.stdout.write(result.stdout);
+    stdout.write(result.stdout);
   }
 
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
+  return result.status ?? 1;
+}
+
+function usage() {
+  return [
+    'Usage:',
+    '  npm run phase:sql -- --file scripts/phase-01/10-products-baseline-explain.sql [--output <path>]',
+    '  make phase-sql FILE=scripts/phase-01/10-products-baseline-explain.sql OUTPUT=docs/evidence/phase-01/.../explain.txt',
+  ].join('\n');
+}
+
+function main() {
+  const status = runPhaseSql(parseArgs(process.argv.slice(2)));
+  if (status !== 0) {
+    process.exit(status);
   }
 }
 
-try {
-  main();
-} catch (error) {
-  console.error(error.message);
-  console.error(usage());
-  process.exit(1);
+const isCli = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isCli) {
+  try {
+    main();
+  } catch (error) {
+    console.error(error.message);
+    console.error(usage());
+    process.exit(1);
+  }
 }
