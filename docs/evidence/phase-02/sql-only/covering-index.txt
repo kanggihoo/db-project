@@ -9,14 +9,14 @@ ANALYZE
 Before covering index
                                                QUERY PLAN                                                
 ---------------------------------------------------------------------------------------------------------
- Seq Scan on product  (cost=0.00..4609.00 rows=397 width=34) (actual time=0.028..8.327 rows=394 loops=1)
+ Seq Scan on product  (cost=0.00..4610.00 rows=393 width=34) (actual time=0.015..4.292 rows=394 loops=1)
    Filter: ((category_id = 10) AND ((status)::text = 'ON_SALE'::text))
    Rows Removed by Filter: 99606
-   Buffers: shared hit=3109
+   Buffers: shared hit=3110
  Planning:
-   Buffers: shared hit=33
- Planning Time: 0.293 ms
- Execution Time: 8.373 ms
+   Buffers: shared hit=31
+ Planning Time: 0.081 ms
+ Execution Time: 4.310 ms
 (8 rows)
 
 CREATE INDEX
@@ -24,13 +24,13 @@ VACUUM
 After covering index
                                                                QUERY PLAN                                                                
 -----------------------------------------------------------------------------------------------------------------------------------------
- Index Only Scan using idx_product_covering on product  (cost=0.42..24.34 rows=396 width=34) (actual time=0.064..0.114 rows=394 loops=1)
+ Index Only Scan using idx_product_covering on product  (cost=0.42..24.36 rows=397 width=34) (actual time=0.029..0.048 rows=394 loops=1)
    Index Cond: ((category_id = 10) AND (status = 'ON_SALE'::text))
    Heap Fetches: 0
    Buffers: shared hit=4 read=7
  Planning:
    Buffers: shared hit=20
- Planning Time: 0.223 ms
- Execution Time: 0.153 ms
+ Planning Time: 0.088 ms
+ Execution Time: 0.067 ms
 (8 rows)
 

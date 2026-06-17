@@ -1,16 +1,16 @@
 Phase 2 main product query: post-index
                                                                QUERY PLAN                                                               
 ----------------------------------------------------------------------------------------------------------------------------------------
- Bitmap Heap Scan on product  (cost=8.38..1123.65 rows=399 width=214) (actual time=0.125..0.849 rows=394 loops=1)
+ Bitmap Heap Scan on product  (cost=8.35..1118.76 rows=396 width=214) (actual time=0.106..0.783 rows=394 loops=1)
    Recheck Cond: ((category_id = 10) AND ((status)::text = 'ON_SALE'::text))
-   Heap Blocks: exact=363
-   Buffers: shared hit=366 read=2
-   ->  Bitmap Index Scan on idx_product_category_status  (cost=0.00..8.28 rows=399 width=0) (actual time=0.084..0.084 rows=394 loops=1)
+   Heap Blocks: exact=362
+   Buffers: shared hit=367
+   ->  Bitmap Index Scan on idx_product_category_status  (cost=0.00..8.25 rows=396 width=0) (actual time=0.061..0.062 rows=394 loops=1)
          Index Cond: ((category_id = 10) AND ((status)::text = 'ON_SALE'::text))
-         Buffers: shared hit=3 read=2
+         Buffers: shared hit=5
  Planning:
-   Buffers: shared hit=143 read=1
- Planning Time: 1.219 ms
- Execution Time: 0.929 ms
+   Buffers: shared hit=144
+ Planning Time: 0.533 ms
+ Execution Time: 0.833 ms
 (11 rows)
 

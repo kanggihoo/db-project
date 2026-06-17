@@ -4,8 +4,10 @@
   "preset": "baseline",
   "pool": "pool10",
   "mode": "prometheus",
-  "startedAt": 1779263780223,
-  "endedAt": 1779264090383,
-  "grafanaFrom": 1779263770223,
-  "grafanaTo": 1779264110383
+  "exitStatus": 0,
+  "resultStatus": "passed",
+  "startedAt": 1781680272548,
+  "endedAt": 1781680574367,
+  "grafanaFrom": 1781680262548,
+  "grafanaTo": 1781680594367
 }

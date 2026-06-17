@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "phase": "phase-02",
+  "scenario": "products",
+  "condition": "pool10-post-index",
+  "preset": "baseline",
+  "pool": "pool10",
+  "mode": "prometheus",
+  "target": {
+    "method": "GET",
+    "endpoint": "/api/products",
+    "queryParams": {
+      "categoryId": "1..200",
+      "status": "ON_SALE/SOLD_OUT/DISCONTINUED",
+      "strategy": "baseline"
+    },
+    "strategy": "baseline"
+  },
+  "workload": {
+    "rate": 50,
+    "duration": "5m",
+    "timeout": "5s",
+    "preAllocatedVUs": 100,
+    "maxVUs": 300
+  },
+  "evidence": {
+    "exitStatus": 0,
+    "files": {
+      "summaryJson": "docs/evidence/phase-02/products/pool10-post-index/k6-summary.json",
+      "summaryText": "docs/evidence/phase-02/products/pool10-post-index/k6-summary.txt",
+      "runWindow": "docs/evidence/phase-02/products/pool10-post-index/run-window.json",
+      "exitStatus": "docs/evidence/phase-02/products/pool10-post-index/k6-exit-status.txt"
+    }
+  },
+  "execution": {
+    "command": "npm run k6:evidence -- --phase phase-02 --scenario products --preset baseline --pool pool10 --mode prometheus --condition pool10-post-index --capture --table product --output docs/evidence/phase-02/grafana-screenshots/products-post-index.png",
+    "exitStatus": 0,
+    "resultStatus": "passed"
+  },
+  "git": {
+    "commitSha": "6c0e2dd67c18158b7ab4cff601fd74531c752878",
+    "dirty": true
+  }
+}

@@ -9,14 +9,14 @@ ANALYZE
 Before partial index
                                                QUERY PLAN                                                
 ---------------------------------------------------------------------------------------------------------
- Seq Scan on product  (cost=0.00..4609.00 rows=378 width=34) (actual time=0.034..8.814 rows=376 loops=1)
+ Seq Scan on product  (cost=0.00..4610.00 rows=376 width=34) (actual time=0.012..3.725 rows=376 loops=1)
    Filter: ((NOT is_deleted) AND (category_id = 10) AND ((status)::text = 'ON_SALE'::text))
    Rows Removed by Filter: 99624
-   Buffers: shared hit=3109
+   Buffers: shared hit=3110
  Planning:
    Buffers: shared hit=34
- Planning Time: 0.300 ms
- Execution Time: 8.862 ms
+ Planning Time: 0.073 ms
+ Execution Time: 3.742 ms
 (8 rows)
 
 CREATE INDEX
@@ -24,16 +24,16 @@ ANALYZE
 After partial index
                                                                   QUERY PLAN                                                                   
 -----------------------------------------------------------------------------------------------------------------------------------------------
- Bitmap Heap Scan on product  (cost=8.14..1071.40 rows=375 width=34) (actual time=0.117..0.357 rows=376 loops=1)
+ Bitmap Heap Scan on product  (cost=8.14..1071.46 rows=375 width=34) (actual time=0.050..0.227 rows=376 loops=1)
    Recheck Cond: ((category_id = 10) AND ((status)::text = 'ON_SALE'::text) AND (NOT is_deleted))
-   Heap Blocks: exact=349
-   Buffers: shared hit=352 read=3
-   ->  Bitmap Index Scan on idx_product_active_category_status  (cost=0.00..8.04 rows=375 width=0) (actual time=0.087..0.088 rows=376 loops=1)
+   Heap Blocks: exact=348
+   Buffers: shared hit=351 read=3
+   ->  Bitmap Index Scan on idx_product_active_category_status  (cost=0.00..8.04 rows=375 width=0) (actual time=0.032..0.032 rows=376 loops=1)
          Index Cond: ((category_id = 10) AND ((status)::text = 'ON_SALE'::text))
          Buffers: shared hit=3 read=3
  Planning:
    Buffers: shared hit=26 read=1
- Planning Time: 0.309 ms
- Execution Time: 0.406 ms
+ Planning Time: 0.121 ms
+ Execution Time: 0.249 ms
 (11 rows)
 

@@ -17,6 +17,7 @@
 | 파일 | 내용 |
 |---|---|
 | `k6-summary.json` | k6 실행 결과 요약 원본 |
+| `k6-summary.txt` | 같은 k6 실행의 사람이 읽는 stdout summary. wrapper가 생성한 경우에만 report 보조 증거로 사용 |
 | `k6-exit-status.txt` | k6 종료 코드 |
 | `run-window.json` | 실행 시작/종료 시각과 Grafana 조회 시간 범위 |
 | `pg-stat-statements.txt` | 테스트 직후 `pg_stat_statements` snapshot |

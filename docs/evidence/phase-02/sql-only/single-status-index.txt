@@ -7,30 +7,30 @@ DROP INDEX
 DROP INDEX
 ANALYZE
 Before status index
-                                                  QUERY PLAN                                                   
----------------------------------------------------------------------------------------------------------------
- Seq Scan on product  (cost=0.00..4359.00 rows=79470 width=214) (actual time=0.006..13.520 rows=79773 loops=1)
+                                                  QUERY PLAN                                                  
+--------------------------------------------------------------------------------------------------------------
+ Seq Scan on product  (cost=0.00..4360.00 rows=79890 width=214) (actual time=0.004..9.773 rows=79773 loops=1)
    Filter: ((status)::text = 'ON_SALE'::text)
    Rows Removed by Filter: 20227
-   Buffers: shared hit=3109
+   Buffers: shared hit=3110
  Planning:
    Buffers: shared hit=40
- Planning Time: 0.306 ms
- Execution Time: 15.617 ms
+ Planning Time: 0.100 ms
+ Execution Time: 11.116 ms
 (8 rows)
 
 CREATE INDEX
 ANALYZE
 After status index
-                                                  QUERY PLAN                                                   
----------------------------------------------------------------------------------------------------------------
- Seq Scan on product  (cost=0.00..4359.00 rows=79677 width=214) (actual time=0.008..13.851 rows=79773 loops=1)
+                                                  QUERY PLAN                                                  
+--------------------------------------------------------------------------------------------------------------
+ Seq Scan on product  (cost=0.00..4360.00 rows=79707 width=214) (actual time=0.005..7.334 rows=79773 loops=1)
    Filter: ((status)::text = 'ON_SALE'::text)
    Rows Removed by Filter: 20227
-   Buffers: shared hit=3109
+   Buffers: shared hit=3110
  Planning:
-   Buffers: shared hit=34 read=1
- Planning Time: 0.351 ms
- Execution Time: 15.999 ms
+   Buffers: shared hit=31 read=1
+ Planning Time: 0.117 ms
+ Execution Time: 8.496 ms
 (8 rows)
 

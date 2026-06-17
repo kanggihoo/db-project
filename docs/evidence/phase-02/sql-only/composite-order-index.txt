@@ -11,54 +11,46 @@ ANALYZE
 category_id only with ORDER BY created_at
                                                                       QUERY PLAN                                                                       
 -------------------------------------------------------------------------------------------------------------------------------------------------------
- Sort  (cost=1351.51..1352.74 rows=495 width=42) (actual time=1.447..1.492 rows=496 loops=1)
+ Sort  (cost=1356.27..1357.52 rows=497 width=42) (actual time=0.335..0.344 rows=496 loops=1)
    Sort Key: created_at DESC
    Sort Method: quicksort  Memory: 55kB
-   Buffers: shared hit=453 read=5
-   ->  Bitmap Heap Scan on product  (cost=16.25..1329.35 rows=495 width=42) (actual time=0.408..1.148 rows=496 loops=1)
+   Buffers: shared hit=455 read=5
+   ->  Bitmap Heap Scan on product  (cost=16.27..1334.02 rows=497 width=42) (actual time=0.070..0.294 rows=496 loops=1)
          Recheck Cond: (category_id = 10)
-         Heap Blocks: exact=450
-         Buffers: shared hit=453 read=5
-         ->  Bitmap Index Scan on idx_product_category_status_created  (cost=0.00..16.13 rows=495 width=0) (actual time=0.301..0.302 rows=496 loops=1)
+         Heap Blocks: exact=452
+         Buffers: shared hit=455 read=5
+         ->  Bitmap Index Scan on idx_product_category_status_created  (cost=0.00..16.14 rows=497 width=0) (actual time=0.048..0.048 rows=496 loops=1)
                Index Cond: (category_id = 10)
                Buffers: shared hit=3 read=5
  Planning:
-   Buffers: shared hit=50 read=3
- Planning Time: 2.607 ms
- Execution Time: 1.735 ms
+   Buffers: shared hit=51 read=2
+ Planning Time: 0.099 ms
+ Execution Time: 0.377 ms
 (15 rows)
 
 category_id and status with ORDER BY created_at
-                                                                      QUERY PLAN                                                                       
--------------------------------------------------------------------------------------------------------------------------------------------------------
- Sort  (cost=1143.91..1144.90 rows=396 width=42) (actual time=0.908..0.936 rows=394 loops=1)
-   Sort Key: created_at DESC
-   Sort Method: quicksort  Memory: 48kB
-   Buffers: shared hit=363 read=5
-   ->  Bitmap Heap Scan on product  (cost=16.48..1126.83 rows=396 width=42) (actual time=0.274..0.721 rows=394 loops=1)
-         Recheck Cond: (((status)::text = 'ON_SALE'::text) AND (category_id = 10))
-         Heap Blocks: exact=363
-         Buffers: shared hit=363 read=5
-         ->  Bitmap Index Scan on idx_product_status_category_created  (cost=0.00..16.38 rows=396 width=0) (actual time=0.197..0.198 rows=394 loops=1)
-               Index Cond: (((status)::text = 'ON_SALE'::text) AND (category_id = 10))
-               Buffers: shared read=5
- Planning Time: 0.113 ms
- Execution Time: 1.085 ms
-(13 rows)
+                                                                     QUERY PLAN                                                                      
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+ Index Scan using idx_product_status_category_created on product  (cost=0.42..1154.18 rows=397 width=42) (actual time=0.020..0.113 rows=394 loops=1)
+   Index Cond: (((status)::text = 'ON_SALE'::text) AND (category_id = 10))
+   Buffers: shared hit=394 read=5
+ Planning Time: 0.019 ms
+ Execution Time: 0.122 ms
+(5 rows)
 
 category_id with created_at range
-                                                                  QUERY PLAN                                                                   
------------------------------------------------------------------------------------------------------------------------------------------------
- Bitmap Heap Scan on product  (cost=17.39..336.06 rows=92 width=34) (actual time=0.091..0.205 rows=95 loops=1)
+                                                                   QUERY PLAN                                                                    
+-------------------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on product  (cost=17.42..400.20 rows=113 width=34) (actual time=0.020..0.043 rows=115 loops=1)
    Recheck Cond: ((category_id = 10) AND (created_at >= '2026-01-01 00:00:00'::timestamp without time zone))
-   Heap Blocks: exact=94
-   Buffers: shared hit=99
-   ->  Bitmap Index Scan on idx_product_category_status_created  (cost=0.00..17.37 rows=92 width=0) (actual time=0.068..0.068 rows=95 loops=1)
+   Heap Blocks: exact=112
+   Buffers: shared hit=117
+   ->  Bitmap Index Scan on idx_product_category_status_created  (cost=0.00..17.39 rows=113 width=0) (actual time=0.014..0.014 rows=115 loops=1)
          Index Cond: ((category_id = 10) AND (created_at >= '2026-01-01 00:00:00'::timestamp without time zone))
          Buffers: shared hit=5
  Planning:
    Buffers: shared hit=3
- Planning Time: 0.140 ms
- Execution Time: 0.291 ms
+ Planning Time: 0.018 ms
+ Execution Time: 0.050 ms
 (11 rows)
 

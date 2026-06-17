@@ -1,0 +1,822 @@
+Pager usage is off.
+SEED_STATE_CAPTURE
+          captured_at          | database_name | database_user 
+-------------------------------+---------------+---------------
+ 2026-06-17 05:09:45.344319+00 | ecommerce     | app
+(1 row)
+
+SEED_STATE_ROW_COUNTS
+      table_name      | row_count 
+----------------------+-----------
+ cart                 |      7000
+ cart_item            |     14000
+ category             |       200
+ coupon               |        50
+ delivery             |    500000
+ delivery_tracking    |   1000000
+ order_item           |   1000000
+ orders               |    500000
+ payment              |    500000
+ point_history        |   2000000
+ product              |    100000
+ product_image        |    200000
+ product_option       |    150000
+ product_option_value |    450000
+ product_sku          |    300000
+ product_sku_option   |    300000
+ refund               |     25000
+ review               |    300000
+ review_image         |    120000
+ review_like          |    299280
+ user_address         |     15000
+ user_coupon          |      6000
+ users                |     10000
+(23 rows)
+
+SEED_STATE_INDEXES
+      tablename       |             indexname             |                                                   indexdef                                                   
+----------------------+-----------------------------------+--------------------------------------------------------------------------------------------------------------
+ cart                 | cart_pkey                         | CREATE UNIQUE INDEX cart_pkey ON public.cart USING btree (id)
+ cart_item            | cart_item_pkey                    | CREATE UNIQUE INDEX cart_item_pkey ON public.cart_item USING btree (id)
+ category             | category_pkey                     | CREATE UNIQUE INDEX category_pkey ON public.category USING btree (id)
+ coupon               | coupon_pkey                       | CREATE UNIQUE INDEX coupon_pkey ON public.coupon USING btree (id)
+ delivery             | delivery_pkey                     | CREATE UNIQUE INDEX delivery_pkey ON public.delivery USING btree (id)
+ delivery_tracking    | delivery_tracking_pkey            | CREATE UNIQUE INDEX delivery_tracking_pkey ON public.delivery_tracking USING btree (id)
+ order_item           | order_item_pkey                   | CREATE UNIQUE INDEX order_item_pkey ON public.order_item USING btree (id)
+ orders               | orders_pkey                       | CREATE UNIQUE INDEX orders_pkey ON public.orders USING btree (id)
+ payment              | payment_pkey                      | CREATE UNIQUE INDEX payment_pkey ON public.payment USING btree (id)
+ point_history        | point_history_pkey                | CREATE UNIQUE INDEX point_history_pkey ON public.point_history USING btree (id)
+ product              | idx_product_category_status       | CREATE INDEX idx_product_category_status ON public.product USING btree (category_id, status)
+ product              | product_pkey                      | CREATE UNIQUE INDEX product_pkey ON public.product USING btree (id)
+ product_image        | product_image_pkey                | CREATE UNIQUE INDEX product_image_pkey ON public.product_image USING btree (id)
+ product_option       | product_option_pkey               | CREATE UNIQUE INDEX product_option_pkey ON public.product_option USING btree (id)
+ product_option_value | product_option_value_pkey         | CREATE UNIQUE INDEX product_option_value_pkey ON public.product_option_value USING btree (id)
+ product_sku          | product_sku_pkey                  | CREATE UNIQUE INDEX product_sku_pkey ON public.product_sku USING btree (id)
+ product_sku          | product_sku_sku_code_key          | CREATE UNIQUE INDEX product_sku_sku_code_key ON public.product_sku USING btree (sku_code)
+ product_sku_option   | product_sku_option_pkey           | CREATE UNIQUE INDEX product_sku_option_pkey ON public.product_sku_option USING btree (id)
+ refund               | refund_pkey                       | CREATE UNIQUE INDEX refund_pkey ON public.refund USING btree (id)
+ review               | review_pkey                       | CREATE UNIQUE INDEX review_pkey ON public.review USING btree (id)
+ review_image         | review_image_pkey                 | CREATE UNIQUE INDEX review_image_pkey ON public.review_image USING btree (id)
+ review_like          | review_like_pkey                  | CREATE UNIQUE INDEX review_like_pkey ON public.review_like USING btree (id)
+ review_like          | review_like_review_id_user_id_key | CREATE UNIQUE INDEX review_like_review_id_user_id_key ON public.review_like USING btree (review_id, user_id)
+ user_address         | user_address_pkey                 | CREATE UNIQUE INDEX user_address_pkey ON public.user_address USING btree (id)
+ user_coupon          | user_coupon_pkey                  | CREATE UNIQUE INDEX user_coupon_pkey ON public.user_coupon USING btree (id)
+ users                | users_email_key                   | CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)
+ users                | users_pkey                        | CREATE UNIQUE INDEX users_pkey ON public.users USING btree (id)
+(27 rows)
+
+SEED_STATE_CONSTRAINTS
+      table_name      |             constraint_name             | constraint_type |                                                                                                               definition                                                                                                                
+----------------------+-----------------------------------------+-----------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ cart                 | cart_user_id_fkey                       | f               | FOREIGN KEY (user_id) REFERENCES users(id)
+ cart                 | cart_pkey                               | p               | PRIMARY KEY (id)
+ cart_item            | cart_item_cart_id_fkey                  | f               | FOREIGN KEY (cart_id) REFERENCES cart(id)
+ cart_item            | cart_item_sku_id_fkey                   | f               | FOREIGN KEY (sku_id) REFERENCES product_sku(id)
+ cart_item            | cart_item_pkey                          | p               | PRIMARY KEY (id)
+ category             | category_parent_id_fkey                 | f               | FOREIGN KEY (parent_id) REFERENCES category(id)
+ category             | category_pkey                           | p               | PRIMARY KEY (id)
+ coupon               | coupon_discount_type_check              | c               | CHECK (((discount_type)::text = ANY ((ARRAY['RATE'::character varying, 'FIXED'::character varying])::text[])))
+ coupon               | coupon_pkey                             | p               | PRIMARY KEY (id)
+ delivery             | delivery_status_check                   | c               | CHECK (((status)::text = ANY ((ARRAY['PREPARING'::character varying, 'SHIPPED'::character varying, 'DELIVERING'::character varying, 'DELIVERED'::character varying])::text[])))
+ delivery             | delivery_order_id_fkey                  | f               | FOREIGN KEY (order_id) REFERENCES orders(id)
+ delivery             | delivery_pkey                           | p               | PRIMARY KEY (id)
+ delivery_tracking    | delivery_tracking_delivery_id_fkey      | f               | FOREIGN KEY (delivery_id) REFERENCES delivery(id)
+ delivery_tracking    | delivery_tracking_pkey                  | p               | PRIMARY KEY (id)
+ order_item           | order_item_order_id_fkey                | f               | FOREIGN KEY (order_id) REFERENCES orders(id)
+ order_item           | order_item_sku_id_fkey                  | f               | FOREIGN KEY (sku_id) REFERENCES product_sku(id)
+ order_item           | order_item_pkey                         | p               | PRIMARY KEY (id)
+ orders               | orders_status_check                     | c               | CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'PAID'::character varying, 'PREPARING'::character varying, 'SHIPPED'::character varying, 'DELIVERED'::character varying, 'CANCELLED'::character varying])::text[])))
+ orders               | orders_address_id_fkey                  | f               | FOREIGN KEY (address_id) REFERENCES user_address(id)
+ orders               | orders_used_coupon_id_fkey              | f               | FOREIGN KEY (used_coupon_id) REFERENCES user_coupon(id)
+ orders               | orders_user_id_fkey                     | f               | FOREIGN KEY (user_id) REFERENCES users(id)
+ orders               | orders_pkey                             | p               | PRIMARY KEY (id)
+ payment              | payment_method_check                    | c               | CHECK (((method)::text = ANY ((ARRAY['CARD'::character varying, 'KAKAO_PAY'::character varying, 'NAVER_PAY'::character varying])::text[])))
+ payment              | payment_status_check                    | c               | CHECK (((status)::text = ANY ((ARRAY['PENDING'::character varying, 'COMPLETED'::character varying, 'FAILED'::character varying, 'REFUNDED'::character varying])::text[])))
+ payment              | payment_order_id_fkey                   | f               | FOREIGN KEY (order_id) REFERENCES orders(id)
+ payment              | payment_pkey                            | p               | PRIMARY KEY (id)
+ point_history        | point_history_type_check                | c               | CHECK (((type)::text = ANY ((ARRAY['EARN'::character varying, 'USE'::character varying, 'EXPIRE'::character varying])::text[])))
+ point_history        | point_history_user_id_fkey              | f               | FOREIGN KEY (user_id) REFERENCES users(id)
+ point_history        | point_history_pkey                      | p               | PRIMARY KEY (id)
+ product              | product_status_check                    | c               | CHECK (((status)::text = ANY ((ARRAY['ON_SALE'::character varying, 'SOLD_OUT'::character varying, 'DISCONTINUED'::character varying])::text[])))
+ product              | product_category_id_fkey                | f               | FOREIGN KEY (category_id) REFERENCES category(id)
+ product              | product_pkey                            | p               | PRIMARY KEY (id)
+ product_image        | product_image_product_id_fkey           | f               | FOREIGN KEY (product_id) REFERENCES product(id)
+ product_image        | product_image_pkey                      | p               | PRIMARY KEY (id)
+ product_option       | product_option_product_id_fkey          | f               | FOREIGN KEY (product_id) REFERENCES product(id)
+ product_option       | product_option_pkey                     | p               | PRIMARY KEY (id)
+ product_option_value | product_option_value_option_id_fkey     | f               | FOREIGN KEY (option_id) REFERENCES product_option(id)
+ product_option_value | product_option_value_pkey               | p               | PRIMARY KEY (id)
+ product_sku          | chk_stock_non_negative                  | c               | CHECK ((stock_quantity >= 0))
+ product_sku          | product_sku_product_id_fkey             | f               | FOREIGN KEY (product_id) REFERENCES product(id)
+ product_sku          | product_sku_pkey                        | p               | PRIMARY KEY (id)
+ product_sku          | product_sku_sku_code_key                | u               | UNIQUE (sku_code)
+ product_sku_option   | product_sku_option_option_value_id_fkey | f               | FOREIGN KEY (option_value_id) REFERENCES product_option_value(id)
+ product_sku_option   | product_sku_option_sku_id_fkey          | f               | FOREIGN KEY (sku_id) REFERENCES product_sku(id)
+ product_sku_option   | product_sku_option_pkey                 | p               | PRIMARY KEY (id)
+ refund               | refund_order_item_id_fkey               | f               | FOREIGN KEY (order_item_id) REFERENCES order_item(id)
+ refund               | refund_payment_id_fkey                  | f               | FOREIGN KEY (payment_id) REFERENCES payment(id)
+ refund               | refund_pkey                             | p               | PRIMARY KEY (id)
+ review               | review_rating_check                     | c               | CHECK (((rating >= 1) AND (rating <= 5)))
+ review               | review_order_item_id_fkey               | f               | FOREIGN KEY (order_item_id) REFERENCES order_item(id)
+ review               | review_product_id_fkey                  | f               | FOREIGN KEY (product_id) REFERENCES product(id)
+ review               | review_user_id_fkey                     | f               | FOREIGN KEY (user_id) REFERENCES users(id)
+ review               | review_pkey                             | p               | PRIMARY KEY (id)
+ review_image         | review_image_review_id_fkey             | f               | FOREIGN KEY (review_id) REFERENCES review(id)
+ review_image         | review_image_pkey                       | p               | PRIMARY KEY (id)
+ review_like          | review_like_review_id_fkey              | f               | FOREIGN KEY (review_id) REFERENCES review(id)
+ review_like          | review_like_user_id_fkey                | f               | FOREIGN KEY (user_id) REFERENCES users(id)
+ review_like          | review_like_pkey                        | p               | PRIMARY KEY (id)
+ review_like          | review_like_review_id_user_id_key       | u               | UNIQUE (review_id, user_id)
+ user_address         | user_address_user_id_fkey               | f               | FOREIGN KEY (user_id) REFERENCES users(id)
+ user_address         | user_address_pkey                       | p               | PRIMARY KEY (id)
+ user_coupon          | user_coupon_coupon_id_fkey              | f               | FOREIGN KEY (coupon_id) REFERENCES coupon(id)
+ user_coupon          | user_coupon_user_id_fkey                | f               | FOREIGN KEY (user_id) REFERENCES users(id)
+ user_coupon          | user_coupon_pkey                        | p               | PRIMARY KEY (id)
+ users                | users_gender_check                      | c               | CHECK (((gender)::text = ANY ((ARRAY['MALE'::character varying, 'FEMALE'::character varying, 'OTHER'::character varying])::text[])))
+ users                | users_grade_check                       | c               | CHECK (((grade)::text = ANY ((ARRAY['BRONZE'::character varying, 'SILVER'::character varying, 'GOLD'::character varying, 'VIP'::character varying])::text[])))
+ users                | users_pkey                              | p               | PRIMARY KEY (id)
+ users                | users_email_key                         | u               | UNIQUE (email)
+(68 rows)
+
+SEED_STATE_PRODUCT_STATUS_CATEGORY_DISTRIBUTION
+ category_id |    status    | product_count 
+-------------+--------------+---------------
+           1 | DISCONTINUED |            25
+           1 | ON_SALE      |           397
+           1 | SOLD_OUT     |           103
+           2 | DISCONTINUED |            20
+           2 | ON_SALE      |           398
+           2 | SOLD_OUT     |            81
+           3 | DISCONTINUED |            31
+           3 | ON_SALE      |           406
+           3 | SOLD_OUT     |            77
+           4 | DISCONTINUED |            18
+           4 | ON_SALE      |           382
+           4 | SOLD_OUT     |            64
+           5 | DISCONTINUED |            22
+           5 | ON_SALE      |           389
+           5 | SOLD_OUT     |            75
+           6 | DISCONTINUED |            23
+           6 | ON_SALE      |           412
+           6 | SOLD_OUT     |            65
+           7 | DISCONTINUED |            33
+           7 | ON_SALE      |           420
+           7 | SOLD_OUT     |            89
+           8 | DISCONTINUED |            27
+           8 | ON_SALE      |           407
+           8 | SOLD_OUT     |            77
+           9 | DISCONTINUED |            31
+           9 | ON_SALE      |           407
+           9 | SOLD_OUT     |            55
+          10 | DISCONTINUED |            33
+          10 | ON_SALE      |           394
+          10 | SOLD_OUT     |            69
+          11 | DISCONTINUED |            17
+          11 | ON_SALE      |           410
+          11 | SOLD_OUT     |            78
+          12 | DISCONTINUED |            21
+          12 | ON_SALE      |           426
+          12 | SOLD_OUT     |            61
+          13 | DISCONTINUED |            33
+          13 | ON_SALE      |           374
+          13 | SOLD_OUT     |            56
+          14 | DISCONTINUED |            19
+          14 | ON_SALE      |           384
+          14 | SOLD_OUT     |            71
+          15 | DISCONTINUED |            21
+          15 | ON_SALE      |           440
+          15 | SOLD_OUT     |            66
+          16 | DISCONTINUED |            40
+          16 | ON_SALE      |           354
+          16 | SOLD_OUT     |            85
+          17 | DISCONTINUED |            27
+          17 | ON_SALE      |           387
+          17 | SOLD_OUT     |            66
+          18 | DISCONTINUED |            32
+          18 | ON_SALE      |           365
+          18 | SOLD_OUT     |            95
+          19 | DISCONTINUED |            30
+          19 | ON_SALE      |           446
+          19 | SOLD_OUT     |            79
+          20 | DISCONTINUED |            32
+          20 | ON_SALE      |           366
+          20 | SOLD_OUT     |            70
+          21 | DISCONTINUED |            22
+          21 | ON_SALE      |           389
+          21 | SOLD_OUT     |            80
+          22 | DISCONTINUED |            22
+          22 | ON_SALE      |           424
+          22 | SOLD_OUT     |            78
+          23 | DISCONTINUED |            26
+          23 | ON_SALE      |           382
+          23 | SOLD_OUT     |            81
+          24 | DISCONTINUED |            26
+          24 | ON_SALE      |           390
+          24 | SOLD_OUT     |            79
+          25 | DISCONTINUED |            28
+          25 | ON_SALE      |           407
+          25 | SOLD_OUT     |            59
+          26 | DISCONTINUED |            27
+          26 | ON_SALE      |           427
+          26 | SOLD_OUT     |            85
+          27 | DISCONTINUED |            32
+          27 | ON_SALE      |           401
+          27 | SOLD_OUT     |            65
+          28 | DISCONTINUED |            21
+          28 | ON_SALE      |           380
+          28 | SOLD_OUT     |            72
+          29 | DISCONTINUED |            27
+          29 | ON_SALE      |           391
+          29 | SOLD_OUT     |            73
+          30 | DISCONTINUED |            29
+          30 | ON_SALE      |           398
+          30 | SOLD_OUT     |            74
+          31 | DISCONTINUED |            21
+          31 | ON_SALE      |           376
+          31 | SOLD_OUT     |            88
+          32 | DISCONTINUED |            22
+          32 | ON_SALE      |           394
+          32 | SOLD_OUT     |            73
+          33 | DISCONTINUED |            31
+          33 | ON_SALE      |           459
+          33 | SOLD_OUT     |            73
+          34 | DISCONTINUED |            27
+          34 | ON_SALE      |           386
+          34 | SOLD_OUT     |            77
+          35 | DISCONTINUED |            31
+          35 | ON_SALE      |           420
+          35 | SOLD_OUT     |            63
+          36 | DISCONTINUED |            29
+          36 | ON_SALE      |           392
+          36 | SOLD_OUT     |            72
+          37 | DISCONTINUED |            42
+          37 | ON_SALE      |           400
+          37 | SOLD_OUT     |            80
+          38 | DISCONTINUED |            31
+          38 | ON_SALE      |           397
+          38 | SOLD_OUT     |            85
+          39 | DISCONTINUED |            21
+          39 | ON_SALE      |           421
+          39 | SOLD_OUT     |            75
+          40 | DISCONTINUED |            19
+          40 | ON_SALE      |           401
+          40 | SOLD_OUT     |            78
+          41 | DISCONTINUED |            23
+          41 | ON_SALE      |           421
+          41 | SOLD_OUT     |            78
+          42 | DISCONTINUED |            24
+          42 | ON_SALE      |           391
+          42 | SOLD_OUT     |            69
+          43 | DISCONTINUED |            25
+          43 | ON_SALE      |           407
+          43 | SOLD_OUT     |            75
+          44 | DISCONTINUED |            28
+          44 | ON_SALE      |           374
+          44 | SOLD_OUT     |            80
+          45 | DISCONTINUED |            33
+          45 | ON_SALE      |           389
+          45 | SOLD_OUT     |            81
+          46 | DISCONTINUED |            17
+          46 | ON_SALE      |           393
+          46 | SOLD_OUT     |            90
+          47 | DISCONTINUED |            19
+          47 | ON_SALE      |           389
+          47 | SOLD_OUT     |            85
+          48 | DISCONTINUED |            27
+          48 | ON_SALE      |           408
+          48 | SOLD_OUT     |            68
+          49 | DISCONTINUED |            27
+          49 | ON_SALE      |           376
+          49 | SOLD_OUT     |            62
+          50 | DISCONTINUED |            27
+          50 | ON_SALE      |           422
+          50 | SOLD_OUT     |            76
+          51 | DISCONTINUED |            26
+          51 | ON_SALE      |           395
+          51 | SOLD_OUT     |            72
+          52 | DISCONTINUED |            33
+          52 | ON_SALE      |           409
+          52 | SOLD_OUT     |            81
+          53 | DISCONTINUED |            34
+          53 | ON_SALE      |           391
+          53 | SOLD_OUT     |            71
+          54 | DISCONTINUED |            23
+          54 | ON_SALE      |           396
+          54 | SOLD_OUT     |            90
+          55 | DISCONTINUED |            27
+          55 | ON_SALE      |           399
+          55 | SOLD_OUT     |            81
+          56 | DISCONTINUED |            31
+          56 | ON_SALE      |           384
+          56 | SOLD_OUT     |            65
+          57 | DISCONTINUED |            20
+          57 | ON_SALE      |           389
+          57 | SOLD_OUT     |            79
+          58 | DISCONTINUED |            33
+          58 | ON_SALE      |           440
+          58 | SOLD_OUT     |            67
+          59 | DISCONTINUED |            20
+          59 | ON_SALE      |           381
+          59 | SOLD_OUT     |            79
+          60 | DISCONTINUED |            20
+          60 | ON_SALE      |           383
+          60 | SOLD_OUT     |            80
+          61 | DISCONTINUED |            31
+          61 | ON_SALE      |           393
+          61 | SOLD_OUT     |            87
+          62 | DISCONTINUED |            22
+          62 | ON_SALE      |           410
+          62 | SOLD_OUT     |            63
+          63 | DISCONTINUED |            21
+          63 | ON_SALE      |           403
+          63 | SOLD_OUT     |            76
+          64 | DISCONTINUED |            27
+          64 | ON_SALE      |           434
+          64 | SOLD_OUT     |            59
+          65 | DISCONTINUED |            34
+          65 | ON_SALE      |           366
+          65 | SOLD_OUT     |            74
+          66 | DISCONTINUED |            18
+          66 | ON_SALE      |           369
+          66 | SOLD_OUT     |            65
+          67 | DISCONTINUED |            21
+          67 | ON_SALE      |           397
+          67 | SOLD_OUT     |            75
+          68 | DISCONTINUED |            26
+          68 | ON_SALE      |           436
+          68 | SOLD_OUT     |            83
+          69 | DISCONTINUED |            29
+          69 | ON_SALE      |           386
+          69 | SOLD_OUT     |            76
+          70 | DISCONTINUED |            24
+          70 | ON_SALE      |           397
+          70 | SOLD_OUT     |            81
+          71 | DISCONTINUED |            24
+          71 | ON_SALE      |           429
+          71 | SOLD_OUT     |            73
+          72 | DISCONTINUED |            23
+          72 | ON_SALE      |           414
+          72 | SOLD_OUT     |            67
+          73 | DISCONTINUED |            27
+          73 | ON_SALE      |           404
+          73 | SOLD_OUT     |            77
+          74 | DISCONTINUED |            30
+          74 | ON_SALE      |           420
+          74 | SOLD_OUT     |            79
+          75 | DISCONTINUED |            25
+          75 | ON_SALE      |           401
+          75 | SOLD_OUT     |            65
+          76 | DISCONTINUED |            29
+          76 | ON_SALE      |           413
+          76 | SOLD_OUT     |            90
+          77 | DISCONTINUED |            25
+          77 | ON_SALE      |           367
+          77 | SOLD_OUT     |            63
+          78 | DISCONTINUED |            36
+          78 | ON_SALE      |           400
+          78 | SOLD_OUT     |            68
+          79 | DISCONTINUED |            23
+          79 | ON_SALE      |           432
+          79 | SOLD_OUT     |            74
+          80 | DISCONTINUED |            24
+          80 | ON_SALE      |           402
+          80 | SOLD_OUT     |            88
+          81 | DISCONTINUED |            13
+          81 | ON_SALE      |           368
+          81 | SOLD_OUT     |            69
+          82 | DISCONTINUED |            27
+          82 | ON_SALE      |           427
+          82 | SOLD_OUT     |            85
+          83 | DISCONTINUED |            28
+          83 | ON_SALE      |           401
+          83 | SOLD_OUT     |            75
+          84 | DISCONTINUED |            22
+          84 | ON_SALE      |           378
+          84 | SOLD_OUT     |            89
+          85 | DISCONTINUED |            28
+          85 | ON_SALE      |           378
+          85 | SOLD_OUT     |            85
+          86 | DISCONTINUED |            25
+          86 | ON_SALE      |           396
+          86 | SOLD_OUT     |            70
+          87 | DISCONTINUED |            19
+          87 | ON_SALE      |           402
+          87 | SOLD_OUT     |            90
+          88 | DISCONTINUED |            30
+          88 | ON_SALE      |           403
+          88 | SOLD_OUT     |            72
+          89 | DISCONTINUED |            29
+          89 | ON_SALE      |           368
+          89 | SOLD_OUT     |            80
+          90 | DISCONTINUED |            20
+          90 | ON_SALE      |           402
+          90 | SOLD_OUT     |            72
+          91 | DISCONTINUED |            19
+          91 | ON_SALE      |           411
+          91 | SOLD_OUT     |            81
+          92 | DISCONTINUED |            24
+          92 | ON_SALE      |           375
+          92 | SOLD_OUT     |            75
+          93 | DISCONTINUED |            26
+          93 | ON_SALE      |           391
+          93 | SOLD_OUT     |            84
+          94 | DISCONTINUED |            22
+          94 | ON_SALE      |           424
+          94 | SOLD_OUT     |            73
+          95 | DISCONTINUED |            26
+          95 | ON_SALE      |           391
+          95 | SOLD_OUT     |            89
+          96 | DISCONTINUED |            28
+          96 | ON_SALE      |           419
+          96 | SOLD_OUT     |            68
+          97 | DISCONTINUED |            18
+          97 | ON_SALE      |           381
+          97 | SOLD_OUT     |            77
+          98 | DISCONTINUED |            18
+          98 | ON_SALE      |           431
+          98 | SOLD_OUT     |            77
+          99 | DISCONTINUED |            24
+          99 | ON_SALE      |           411
+          99 | SOLD_OUT     |            73
+         100 | DISCONTINUED |            20
+         100 | ON_SALE      |           376
+         100 | SOLD_OUT     |            72
+         101 | DISCONTINUED |            23
+         101 | ON_SALE      |           371
+         101 | SOLD_OUT     |            69
+         102 | DISCONTINUED |            16
+         102 | ON_SALE      |           414
+         102 | SOLD_OUT     |            75
+         103 | DISCONTINUED |            24
+         103 | ON_SALE      |           385
+         103 | SOLD_OUT     |            73
+         104 | DISCONTINUED |            17
+         104 | ON_SALE      |           414
+         104 | SOLD_OUT     |            69
+         105 | DISCONTINUED |            28
+         105 | ON_SALE      |           400
+         105 | SOLD_OUT     |            88
+         106 | DISCONTINUED |            29
+         106 | ON_SALE      |           399
+         106 | SOLD_OUT     |            82
+         107 | DISCONTINUED |            27
+         107 | ON_SALE      |           395
+         107 | SOLD_OUT     |            85
+         108 | DISCONTINUED |            25
+         108 | ON_SALE      |           385
+         108 | SOLD_OUT     |            81
+         109 | DISCONTINUED |            26
+         109 | ON_SALE      |           415
+         109 | SOLD_OUT     |            68
+         110 | DISCONTINUED |            30
+         110 | ON_SALE      |           418
+         110 | SOLD_OUT     |            90
+         111 | DISCONTINUED |            32
+         111 | ON_SALE      |           385
+         111 | SOLD_OUT     |            77
+         112 | DISCONTINUED |            24
+         112 | ON_SALE      |           400
+         112 | SOLD_OUT     |            84
+         113 | DISCONTINUED |            23
+         113 | ON_SALE      |           446
+         113 | SOLD_OUT     |            78
+         114 | DISCONTINUED |            24
+         114 | ON_SALE      |           364
+         114 | SOLD_OUT     |            73
+         115 | DISCONTINUED |            15
+         115 | ON_SALE      |           405
+         115 | SOLD_OUT     |            88
+         116 | DISCONTINUED |            32
+         116 | ON_SALE      |           406
+         116 | SOLD_OUT     |            92
+         117 | DISCONTINUED |            28
+         117 | ON_SALE      |           403
+         117 | SOLD_OUT     |            93
+         118 | DISCONTINUED |            21
+         118 | ON_SALE      |           423
+         118 | SOLD_OUT     |            84
+         119 | DISCONTINUED |            33
+         119 | ON_SALE      |           399
+         119 | SOLD_OUT     |            83
+         120 | DISCONTINUED |            19
+         120 | ON_SALE      |           377
+         120 | SOLD_OUT     |            77
+         121 | DISCONTINUED |            25
+         121 | ON_SALE      |           414
+         121 | SOLD_OUT     |            59
+         122 | DISCONTINUED |            20
+         122 | ON_SALE      |           395
+         122 | SOLD_OUT     |            78
+         123 | DISCONTINUED |            16
+         123 | ON_SALE      |           391
+         123 | SOLD_OUT     |            66
+         124 | DISCONTINUED |            26
+         124 | ON_SALE      |           358
+         124 | SOLD_OUT     |            75
+         125 | DISCONTINUED |            44
+         125 | ON_SALE      |           353
+         125 | SOLD_OUT     |            72
+         126 | DISCONTINUED |            36
+         126 | ON_SALE      |           388
+         126 | SOLD_OUT     |            71
+         127 | DISCONTINUED |            25
+         127 | ON_SALE      |           405
+         127 | SOLD_OUT     |            74
+         128 | DISCONTINUED |            28
+         128 | ON_SALE      |           379
+         128 | SOLD_OUT     |            53
+         129 | DISCONTINUED |            28
+         129 | ON_SALE      |           398
+         129 | SOLD_OUT     |            68
+         130 | DISCONTINUED |            26
+         130 | ON_SALE      |           391
+         130 | SOLD_OUT     |            54
+         131 | DISCONTINUED |            23
+         131 | ON_SALE      |           375
+         131 | SOLD_OUT     |            61
+         132 | DISCONTINUED |            20
+         132 | ON_SALE      |           409
+         132 | SOLD_OUT     |            74
+         133 | DISCONTINUED |            27
+         133 | ON_SALE      |           370
+         133 | SOLD_OUT     |            81
+         134 | DISCONTINUED |            32
+         134 | ON_SALE      |           391
+         134 | SOLD_OUT     |            86
+         135 | DISCONTINUED |            16
+         135 | ON_SALE      |           432
+         135 | SOLD_OUT     |            87
+         136 | DISCONTINUED |            33
+         136 | ON_SALE      |           423
+         136 | SOLD_OUT     |            73
+         137 | DISCONTINUED |            17
+         137 | ON_SALE      |           400
+         137 | SOLD_OUT     |            80
+         138 | DISCONTINUED |            14
+         138 | ON_SALE      |           387
+         138 | SOLD_OUT     |            61
+         139 | DISCONTINUED |            21
+         139 | ON_SALE      |           369
+         139 | SOLD_OUT     |            86
+         140 | DISCONTINUED |            22
+         140 | ON_SALE      |           406
+         140 | SOLD_OUT     |            76
+         141 | DISCONTINUED |            25
+         141 | ON_SALE      |           382
+         141 | SOLD_OUT     |            70
+         142 | DISCONTINUED |            30
+         142 | ON_SALE      |           401
+         142 | SOLD_OUT     |            69
+         143 | DISCONTINUED |            34
+         143 | ON_SALE      |           399
+         143 | SOLD_OUT     |            76
+         144 | DISCONTINUED |            24
+         144 | ON_SALE      |           405
+         144 | SOLD_OUT     |            81
+         145 | DISCONTINUED |            22
+         145 | ON_SALE      |           410
+         145 | SOLD_OUT     |            86
+         146 | DISCONTINUED |            21
+         146 | ON_SALE      |           382
+         146 | SOLD_OUT     |            60
+         147 | DISCONTINUED |            21
+         147 | ON_SALE      |           403
+         147 | SOLD_OUT     |            91
+         148 | DISCONTINUED |            26
+         148 | ON_SALE      |           401
+         148 | SOLD_OUT     |            63
+         149 | DISCONTINUED |            24
+         149 | ON_SALE      |           387
+         149 | SOLD_OUT     |            74
+         150 | DISCONTINUED |            26
+         150 | ON_SALE      |           438
+         150 | SOLD_OUT     |            66
+         151 | DISCONTINUED |            24
+         151 | ON_SALE      |           391
+         151 | SOLD_OUT     |            73
+         152 | DISCONTINUED |            21
+         152 | ON_SALE      |           373
+         152 | SOLD_OUT     |            70
+         153 | DISCONTINUED |            25
+         153 | ON_SALE      |           377
+         153 | SOLD_OUT     |            75
+         154 | DISCONTINUED |            16
+         154 | ON_SALE      |           431
+         154 | SOLD_OUT     |            78
+         155 | DISCONTINUED |            16
+         155 | ON_SALE      |           377
+         155 | SOLD_OUT     |            81
+         156 | DISCONTINUED |            25
+         156 | ON_SALE      |           379
+         156 | SOLD_OUT     |            91
+         157 | DISCONTINUED |            29
+         157 | ON_SALE      |           419
+         157 | SOLD_OUT     |            70
+         158 | DISCONTINUED |            22
+         158 | ON_SALE      |           425
+         158 | SOLD_OUT     |            78
+         159 | DISCONTINUED |            37
+         159 | ON_SALE      |           381
+         159 | SOLD_OUT     |            83
+         160 | DISCONTINUED |            26
+         160 | ON_SALE      |           386
+         160 | SOLD_OUT     |            86
+         161 | DISCONTINUED |            23
+         161 | ON_SALE      |           409
+         161 | SOLD_OUT     |            90
+         162 | DISCONTINUED |            19
+         162 | ON_SALE      |           381
+         162 | SOLD_OUT     |            69
+         163 | DISCONTINUED |            20
+         163 | ON_SALE      |           415
+         163 | SOLD_OUT     |            79
+         164 | DISCONTINUED |            26
+         164 | ON_SALE      |           378
+         164 | SOLD_OUT     |            78
+         165 | DISCONTINUED |            20
+         165 | ON_SALE      |           439
+         165 | SOLD_OUT     |            78
+         166 | DISCONTINUED |            19
+         166 | ON_SALE      |           415
+         166 | SOLD_OUT     |            75
+         167 | DISCONTINUED |            24
+         167 | ON_SALE      |           393
+         167 | SOLD_OUT     |            71
+         168 | DISCONTINUED |            24
+         168 | ON_SALE      |           362
+         168 | SOLD_OUT     |            81
+         169 | DISCONTINUED |            35
+         169 | ON_SALE      |           415
+         169 | SOLD_OUT     |            63
+         170 | DISCONTINUED |            25
+         170 | ON_SALE      |           416
+         170 | SOLD_OUT     |            63
+         171 | DISCONTINUED |            20
+         171 | ON_SALE      |           378
+         171 | SOLD_OUT     |            79
+         172 | DISCONTINUED |            19
+         172 | ON_SALE      |           408
+         172 | SOLD_OUT     |            77
+         173 | DISCONTINUED |            21
+         173 | ON_SALE      |           431
+         173 | SOLD_OUT     |            81
+         174 | DISCONTINUED |            20
+         174 | ON_SALE      |           390
+         174 | SOLD_OUT     |            82
+         175 | DISCONTINUED |            39
+         175 | ON_SALE      |           399
+         175 | SOLD_OUT     |            57
+         176 | DISCONTINUED |            26
+         176 | ON_SALE      |           361
+         176 | SOLD_OUT     |            74
+         177 | DISCONTINUED |            28
+         177 | ON_SALE      |           425
+         177 | SOLD_OUT     |            79
+         178 | DISCONTINUED |            30
+         178 | ON_SALE      |           393
+         178 | SOLD_OUT     |            84
+         179 | DISCONTINUED |            25
+         179 | ON_SALE      |           418
+         179 | SOLD_OUT     |            98
+         180 | DISCONTINUED |            23
+         180 | ON_SALE      |           431
+         180 | SOLD_OUT     |            79
+         181 | DISCONTINUED |            36
+         181 | ON_SALE      |           409
+         181 | SOLD_OUT     |            70
+         182 | DISCONTINUED |            31
+         182 | ON_SALE      |           398
+         182 | SOLD_OUT     |            64
+         183 | DISCONTINUED |            17
+         183 | ON_SALE      |           411
+         183 | SOLD_OUT     |            73
+         184 | DISCONTINUED |            26
+         184 | ON_SALE      |           398
+         184 | SOLD_OUT     |            93
+         185 | DISCONTINUED |            31
+         185 | ON_SALE      |           428
+         185 | SOLD_OUT     |            62
+         186 | DISCONTINUED |            33
+         186 | ON_SALE      |           426
+         186 | SOLD_OUT     |            82
+         187 | DISCONTINUED |            17
+         187 | ON_SALE      |           396
+         187 | SOLD_OUT     |            69
+         188 | DISCONTINUED |            19
+         188 | ON_SALE      |           399
+         188 | SOLD_OUT     |            70
+         189 | DISCONTINUED |            19
+         189 | ON_SALE      |           381
+         189 | SOLD_OUT     |            82
+         190 | DISCONTINUED |            24
+         190 | ON_SALE      |           376
+         190 | SOLD_OUT     |            71
+         191 | DISCONTINUED |            29
+         191 | ON_SALE      |           410
+         191 | SOLD_OUT     |            85
+         192 | DISCONTINUED |            20
+         192 | ON_SALE      |           395
+         192 | SOLD_OUT     |            75
+         193 | DISCONTINUED |            26
+         193 | ON_SALE      |           375
+         193 | SOLD_OUT     |            81
+         194 | DISCONTINUED |            23
+         194 | ON_SALE      |           413
+         194 | SOLD_OUT     |            76
+         195 | DISCONTINUED |            28
+         195 | ON_SALE      |           409
+         195 | SOLD_OUT     |            63
+         196 | DISCONTINUED |            31
+         196 | ON_SALE      |           405
+         196 | SOLD_OUT     |            80
+         197 | DISCONTINUED |            26
+         197 | ON_SALE      |           410
+         197 | SOLD_OUT     |            80
+         198 | DISCONTINUED |            11
+         198 | ON_SALE      |           415
+         198 | SOLD_OUT     |            83
+         199 | DISCONTINUED |            34
+         199 | ON_SALE      |           373
+         199 | SOLD_OUT     |            83
+         200 | DISCONTINUED |            21
+         200 | ON_SALE      |           362
+         200 | SOLD_OUT     |            75
+(600 rows)
+
+SEED_STATE_ORDER_STATUS_DISTRIBUTION
+  status   | order_count 
+-----------+-------------
+ CANCELLED |       25141
+ DELIVERED |      249954
+ PAID      |       49908
+ PENDING   |       50032
+ PREPARING |       49928
+ SHIPPED   |       75037
+(6 rows)
+
+SEED_STATE_ORDER_USER_COUNT_SUMMARY
+ users_with_orders | min_orders_per_user | max_orders_per_user | avg_orders_per_user | median_orders_per_user 
+-------------------+---------------------+---------------------+---------------------+------------------------
+             10000 |                   3 |                 414 |               50.00 |                     17
+(1 row)
+
+SEED_STATE_MONTHLY_ORDER_DISTRIBUTION
+ order_month | order_count | total_revenue 
+-------------+-------------+---------------
+ 2024-06-01  |        9588 |     511066000
+ 2024-07-01  |       21136 |    1124249000
+ 2024-08-01  |       21026 |    1127131000
+ 2024-09-01  |       20296 |    1088204000
+ 2024-10-01  |       21199 |    1132469000
+ 2024-11-01  |       20549 |    1097563000
+ 2024-12-01  |       21172 |    1126038000
+ 2025-01-01  |       21503 |    1151814000
+ 2025-02-01  |       19303 |    1019996000
+ 2025-03-01  |       21435 |    1142793000
+ 2025-04-01  |       20564 |    1097042000
+ 2025-05-01  |       21238 |    1126373000
+ 2025-06-01  |       20507 |    1094314000
+ 2025-07-01  |       21198 |    1133934000
+ 2025-08-01  |       21005 |    1117007000
+ 2025-09-01  |       20587 |    1094128000
+ 2025-10-01  |       21254 |    1137282000
+ 2025-11-01  |       20690 |    1106668000
+ 2025-12-01  |       21089 |    1127997000
+ 2026-01-01  |       21212 |    1135831000
+ 2026-02-01  |       19100 |    1027580000
+ 2026-03-01  |       21384 |    1141522000
+ 2026-04-01  |       20741 |    1102795000
+ 2026-05-01  |       21185 |    1126521000
+ 2026-06-01  |       11039 |     591492000
+(25 rows)
+
+SEED_STATE_POINT_HISTORY_TYPE_DISTRIBUTION
+  type  | point_history_count 
+--------+---------------------
+ EARN   |             1200653
+ EXPIRE |               99861
+ USE    |              699486
+(3 rows)
+
+SEED_STATE_POINT_HISTORY_USER_COUNT_SUMMARY
+ users_with_points | min_points_per_user | max_points_per_user | avg_points_per_user | median_points_per_user 
+-------------------+---------------------+---------------------+---------------------+------------------------
+             10000 |                   8 |                1912 |              200.00 |                     23
+(1 row)
+
+SEED_STATE_REVIEW_RATING_DISTRIBUTION
+ rating | review_count 
+--------+--------------
+      1 |        59619
+      2 |        60008
+      3 |        59890
+      4 |        60170
+      5 |        60313
+(5 rows)
+
+SEED_STATE_REVIEW_PRODUCT_COUNT_SUMMARY
+ products_with_reviews | min_reviews_per_product | max_reviews_per_product | avg_reviews_per_product | median_reviews_per_product 
+-----------------------+-------------------------+-------------------------+-------------------------+----------------------------
+                 95209 |                       1 |                      12 |                    3.15 |                          3
+(1 row)
+
