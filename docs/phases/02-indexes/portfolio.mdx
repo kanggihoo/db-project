@@ -1,0 +1,118 @@
+---
+title: "Phase 02: Index Design"
+sidebar_label: "02. Index Design"
+description: "Spring Boot와 PostgreSQL 기반 이커머스 DB Lab에서 상품 필터 조회의 복합 인덱스 효과를 실행계획과 부하 지표로 검증한 case study"
+tags: [spring-boot, postgresql, jpa, k6, performance, indexing]
+---
+
+# Phase 02: Index Design
+
+## 한 줄 요약
+
+상품 검색 API의 `category_id + status` 필터 조건에 PostgreSQL 복합 인덱스를 적용하고, `EXPLAIN ANALYZE`, k6, `pg_stat_statements`로 효과를 검증했다. API 구현은 바꾸지 않고 DB 인덱스만 추가해 k6 p95를 `621.91ms`에서 `18.49ms`로 낮췄고, 대표 SQL은 `Seq Scan`에서 `Bitmap Index Scan` 계열 plan으로 전환됐다.
+
+## 문제
+
+Phase 1에서 상품 검색 API는 100,000건의 `product` 테이블을 `category_id`와 `status`로 필터링했지만, 해당 조건을 지원하는 보조 인덱스가 없었다. API는 대부분 응답했지만 tail latency가 불안정했고, 부하 직후 `pg_stat_statements`에서 상품 검색 SQL이 누적 DB 시간을 크게 사용했다.
+
+이 Phase의 목표는 API/Controller/Service/Repository 성능 개선 없이, 실제 query shape에 맞는 인덱스가 실행계획과 부하 지표를 얼마나 바꾸는지 확인하는 것이다.
+
+## 가설과 접근
+
+가설은 단순했다. `product(category_id, status)` 조건이 반복되는 조회라면, `(category_id, status)` 복합 인덱스를 추가했을 때 PostgreSQL planner가 full table scan 대신 인덱스 기반 plan을 선택하고 SQL 실행시간과 API tail latency가 함께 낮아져야 한다.
+
+검증은 메인 API 실험과 SQL-only 보조 실험으로 나눴다.
+
+| 구분 | 검증 내용 | 이유 |
+|---|---|---|
+| 메인 API 실험 | `GET /api/products?categoryId=&status=&strategy=baseline`에 `idx_product_category_status` 적용 전후 비교 | 실제 API 부하에서 인덱스 효과를 확인하기 위해 |
+| 실행계획 비교 | 같은 `category_id=10 AND status='ON_SALE'` 조건의 pre/post `EXPLAIN (ANALYZE, BUFFERS)` 비교 | scan type, rows, buffers, execution time 변화를 확인하기 위해 |
+| SQL-only 보조 실험 | 단일 컬럼, 복합 인덱스 순서, 커버링 인덱스, 부분 인덱스 확인 | "인덱스를 만들면 항상 빨라진다"가 아니라 planner 선택 조건을 설명하기 위해 |
+
+## 실험 조건
+
+| 항목 | 값 |
+|---|---|
+| Project | Ecommerce DB Optimization Lab |
+| Phase | Phase 02. Index Design |
+| 측정일 | 2026-06-17 |
+| Target endpoint | `GET /api/products?categoryId=&status=&strategy=baseline` |
+| Query shape | `product where category_id = ? and status = ?` |
+| Main index | `idx_product_category_status ON product(category_id, status)` |
+| Spring profile | `pool10` |
+| Seed | `loadtest` |
+| Workload | 50 rps, 5분, timeout 5초 |
+| k6 VUs | preAllocatedVUs 100, maxVUs 300 |
+| Request mix | `categoryId=1..200`, `status=ON_SALE/SOLD_OUT/DISCONTINUED` |
+| Data size | `product` 100,000 rows |
+| Metrics | k6 p95/p99/failure rate, `pg_stat_statements`, `EXPLAIN ANALYZE`, buffers |
+
+## 핵심 결과
+
+Phase 1의 product baseline 원본 evidence를 Before로 사용하고, Phase 2 post-index 실행을 After로 비교했다.
+
+| 지표 | Before: Phase 1 product baseline | After: Phase 2 post-index | 변화 |
+|---|---:|---:|---:|
+| requests | 14,935 | 15,001 | +0.4% |
+| request rate | 49.78/s | 50.00/s | +0.4% |
+| k6 p95 | 621.91ms | 18.49ms | 97.0% 감소 |
+| k6 p99 | 2065.98ms | 81.38ms | 96.1% 감소 |
+| failed rate | 0.0134% | 0.00% | 감소 |
+| dropped iterations | 66 | 0 | 감소 |
+| SQL calls | 14,935 | 15,001 | +0.4% |
+| SQL mean time | 21.45ms | 9.13ms | 57.4% 감소 |
+| SQL total time | 320,401.33ms | 136,902.02ms | 57.3% 감소 |
+
+실행계획은 더 직접적인 근거를 보여준다.
+
+| 조건 | Plan | Rows | Buffers | Execution Time | 해석 |
+|---|---|---:|---|---:|---|
+| pre-index | `Seq Scan on product` | 394 | `shared hit=3110` | 8.525ms | 100,000건 중 99,606건을 필터로 제거했다. |
+| post-index | `Bitmap Index Scan` + `Bitmap Heap Scan` | 394 | heap `shared hit=367`, index `shared hit=5` | 0.833ms | 인덱스로 후보 row를 찾고 필요한 heap block만 읽었다. |
+
+## 해석과 의사결정
+
+`idx_product_category_status`는 목표한 query shape에 맞게 동작했다. PostgreSQL이 단순 `Index Scan`이 아니라 bitmap 계열 plan을 선택했지만, 중요한 판단 기준은 plan 이름이 아니라 full table scan을 피하고 `(category_id, status)` 조건을 `Index Cond`로 처리했는지다.
+
+k6 p95/p99 개선폭이 SQL mean 개선폭보다 큰 이유는 두 지표가 보는 범위가 다르기 때문이다. `pg_stat_statements.mean_exec_time`은 상품 검색 SQL 내부 실행시간만 본다. 반면 k6 p95/p99는 DB scan 감소, 요청 대기 감소, dropped iteration 제거, tail latency 완화를 모두 포함한 end-to-end API 지표다.
+
+이번 Phase에서 운영 적용까지 진행하지는 않았다. Flyway/Liquibase migration은 범위에서 제외했고, 목표는 "이 인덱스 설계가 실제 query shape에 타당한가"를 evidence로 방어하는 것이었다. 결과적으로 상품 필터 조회에는 `(category_id, status)` 복합 인덱스가 필요하다고 판단했다.
+
+## SQL-only 보조 실험
+
+보조 실험은 API latency 개선 근거가 아니라 planner 동작을 설명하기 위한 개념 증거다.
+
+| 주제 | 관찰 | 해석 |
+|---|---|---|
+| 단일 컬럼 선택도 | `status='ON_SALE'`는 79,773건을 반환했고, `idx_product_status` 생성 후에도 `Seq Scan`을 유지했다. | 선택도가 낮은 단일 컬럼 인덱스는 planner가 사용하지 않을 수 있다. |
+| 복합 인덱스 순서 | `category_id` 단독 조건, `category_id + status + ORDER BY created_at`, range 조건에서 plan 차이가 드러났다. | 복합 인덱스는 왼쪽 컬럼, 동등 조건, range 조건, 정렬 요구를 함께 봐야 한다. |
+| 커버링 인덱스 | `idx_product_covering` 적용 후 `Index Only Scan`, `Heap Fetches: 0`, `Execution Time=0.067ms`가 확인됐다. | 필요한 컬럼만 읽는 쿼리는 heap 접근을 제거할 수 있다. |
+| 부분 인덱스 | `is_deleted=false` 조건 포함 쿼리는 partial index 적용 후 `Bitmap Index Scan`으로 바뀌었다. | 자주 쓰는 고정 조건이 있다면 부분 인덱스로 인덱스 범위를 줄일 수 있다. |
+
+## 백엔드 역량 포인트
+
+- API 구현 변경 없이 DB 인덱스만 바꿔 성능 개선 효과를 분리 측정했다.
+- k6, `pg_stat_statements`, `EXPLAIN ANALYZE`를 연결해 end-to-end latency와 DB 내부 실행시간을 구분했다.
+- estimated rows와 actual rows, scan type, buffers, rows removed를 함께 보고 실행계획을 해석했다.
+- 단일 컬럼 인덱스, 복합 인덱스 순서, 커버링 인덱스, 부분 인덱스를 API 실험과 분리해 과장 없이 설명했다.
+- Phase 1 전체 결론을 product API 성과로 확장하지 않고, product baseline evidence만 비교 기준으로 사용했다.
+
+## 한계와 다음 단계
+
+| 한계 | 다음 조치 |
+|---|---|
+| k6 부하 실행은 단일 대표 실행이다. | 더 엄격한 통계가 필요하면 같은 조건을 3회 이상 반복해 중앙값과 분산을 기록한다. |
+| Phase 1 Grafana screenshot이 없어 Grafana 전후 정량 비교는 하지 않았다. | Grafana는 Phase 2 실행 시간대의 보조 evidence로만 사용한다. |
+| `measurement.json`에 `git.dirty=true`가 남아 있다. | 장기 재현성을 높이려면 clean commit 기준으로 재실행한다. |
+| 운영 migration과 rollback 전략은 범위 밖이다. | 실제 운영 적용 전에는 migration, lock 영향, rollback, index build 방식을 별도 검토한다. |
+| 상품 필터 쿼리는 개선됐지만 주문 목록 반복 SQL 문제는 해결하지 않는다. | Phase 3에서 N+1과 로딩 전략 최적화를 검증한다. |
+
+## References
+
+- Full technical report: [report.md](./report.md)
+- Phase evidence index: [docs/evidence/phase-02](../../evidence/phase-02/)
+- Pre-index EXPLAIN: [explain.txt](../../evidence/phase-02/products/pre-index/explain.txt)
+- Post-index EXPLAIN: [explain.txt](../../evidence/phase-02/products/pool10-post-index/explain.txt)
+- Post-index k6 summary: [k6-summary.json](../../evidence/phase-02/products/pool10-post-index/k6-summary.json)
+- Post-index SQL snapshot: [pg-stat-statements.txt](../../evidence/phase-02/products/pool10-post-index/pg-stat-statements.txt)
+- SQL-only evidence: [single status](../../evidence/phase-02/sql-only/single-status-index.txt), [composite order](../../evidence/phase-02/sql-only/composite-order-index.txt), [covering](../../evidence/phase-02/sql-only/covering-index.txt), [partial](../../evidence/phase-02/sql-only/partial-index.txt)
