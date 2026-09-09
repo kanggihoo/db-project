@@ -21,12 +21,12 @@
 | 00 | [Overview](docs/roadmap/00-overview.md) | - | 기술 스택, ERD, 전체 흐름, 학습 질문 |
 | 01 | [Phase 0. 프로젝트 초기 셋팅](docs/roadmap/01-phase-0-setup.md) | [작업 문서](docs/phases/00-setup) | Docker Compose, 스키마, 더미 데이터 |
 | 02 | [Phase 1. 나이브한 구현 + 베이스라인 확보](docs/roadmap/02-phase-1-baseline.md) | [작업 문서](docs/phases/01-baseline) | k6 기준선, 풀스캔, N+1, Offset 병목 |
-| 03 | [Phase 2. 인덱스 설계 + 실행계획 분석](docs/roadmap/03-phase-2-indexes.md) | - | EXPLAIN ANALYZE, 복합/커버링/부분 인덱스 |
-| 04 | [Phase 3. N+1 + 로딩 전략 최적화](docs/roadmap/04-phase-3-n-plus-one.md) | - | Fetch Join, EntityGraph, BatchSize |
-| 05 | [Phase 4. 트랜잭션 격리 수준](docs/roadmap/05-phase-4-transaction-isolation.md) | - | 읽기 일관성, 격리 수준별 비용, SERIALIZABLE |
-| 06 | [Phase 5. 쿼리 최적화 + QueryDSL](docs/roadmap/06-phase-5-querydsl.md) | - | DTO Projection, 동적 쿼리, 벌크 연산 |
-| 07 | [Phase 6. 집계 쿼리 최적화](docs/roadmap/07-phase-6-aggregation.md) | - | GROUP BY, 표현식 인덱스, 집계 실행계획 |
-| 08 | [Phase 7. 페이지네이션 최적화](docs/roadmap/08-phase-7-pagination.md) | - | Offset vs Cursor, Count 쿼리 분리 |
+| 03 | [Phase 2. 인덱스 설계 + 실행계획 분석](docs/roadmap/03-phase-2-indexes.md) | [작업 문서](docs/phases/02-indexes) | EXPLAIN ANALYZE, 복합/커버링/부분 인덱스 |
+| 04 | [Phase 3. N+1 + 로딩 전략 최적화](docs/roadmap/04-phase-3-n-plus-one.md) | [작업 문서](docs/phases/03-n-plus-one) | Fetch Join, EntityGraph, BatchSize |
+| 05 | [Phase 4. 트랜잭션 격리 수준](docs/roadmap/05-phase-4-transaction-isolation.md) | [작업 문서](docs/phases/04-transaction-isolation) | 읽기 일관성, 격리 수준별 비용, SERIALIZABLE |
+| 06 | [Phase 5. 쿼리 최적화 + QueryDSL](docs/roadmap/06-phase-5-querydsl.md) | [작업 문서](docs/phases/05-querydsl) | DTO Projection, 동적 쿼리, 벌크 연산 |
+| 07 | [Phase 6. 집계 쿼리 최적화](docs/roadmap/07-phase-6-aggregation.md) | [작업 문서](docs/phases/06-aggregation) | GROUP BY, 표현식 인덱스, 집계 실행계획 |
+| 08 | [Phase 7. 페이지네이션 최적화](docs/roadmap/08-phase-7-pagination.md) | [작업 문서](docs/phases/07-pagination) | Offset vs Cursor, Count 쿼리 분리 |
 | 09 | [Phase 8. DB Observability](docs/roadmap/09-phase-8-db-observability.md) | - | pg_stat_statements, pg_stat_activity, pg_locks, alert |
 | 10 | [Phase 9. Failure Injection](docs/roadmap/10-phase-9-failure-injection.md) | - | 커넥션 고갈, Lock wait, Deadlock, DB restart, runbook |
 | 11 | [Phase 10. Production Schema Migration](docs/roadmap/11-phase-10-production-schema-migration.md) | - | Flyway, expand-contract, backfill, validation, rollback |
